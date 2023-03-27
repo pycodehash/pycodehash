@@ -7,7 +7,7 @@ name = "pycodehash"
 dynamic = ["version"]
 description = ""
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 license = {text = "MIT License"}
 classifiers = [
     "Programming Language :: Python :: 3",
