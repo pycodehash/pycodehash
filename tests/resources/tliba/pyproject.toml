@@ -1,0 +1,20 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "tliba"
+version = "0.1.0"
+description = ""
+requires-python = ">=3.7"
+authors = [
+  { name = "Ralph Urlus", email = "ralph.urlus@ing.com" },
+]
+
+dependencies = [
+    "numpy",
+    "pandas",
+]
+
+[tool.hatch.metadata]
+allow-direct-references = true
