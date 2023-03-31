@@ -3,14 +3,11 @@ from __future__ import annotations
 import ast
 import hashlib
 
-if hasattr(ast, "unparse"):
-    _unparse = ast.unparse
-else:
-    # when python 3.9 is common this dependency can be removed
-    # as python 3.9 has the corresponding native function
-    from astunparse import unparse as _unparse
-
-from pycodehash.preprocessing import DocstringStripper, TypeHintStripper
+from pycodehash.preprocessing import (
+    DocstringStripper,
+    TypeHintStripper,
+    to_normalised_string,
+)
 
 
 def hash_string(input_string: str) -> str:
@@ -37,6 +34,7 @@ class FuncNodeHasher(ast.NodeVisitor):
     """
 
     def __init__(self):
+        self.strings: dict[str, str] = {}
         self.hashes: dict[str, str] = {}
         self.docstring_stripper: DocstringStripper = DocstringStripper()
         self.typehint_stripper: TypeHintStripper = TypeHintStripper()
@@ -47,5 +45,5 @@ class FuncNodeHasher(ast.NodeVisitor):
         node.name = "_"
         node = self.docstring_stripper.visit(node)
         node = self.typehint_stripper.visit(node)
-        # str.split will split on all whitespace and line-endings
-        self.hashes[name] = hash_string("".join(_unparse(node).split()))
+        self.strings[name] = to_normalised_string(node)
+        self.hashes[name] = hash_string(self.strings[name])
