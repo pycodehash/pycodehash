@@ -4,6 +4,8 @@ import ast
 
 from ast import NodeTransformer
 
+from pycodehash.unparse import _unparse
+
 
 class DocstringStripper(NodeTransformer):
     """Removes docstring node from function and class definitions."""
@@ -43,3 +45,19 @@ class TypeHintStripper(NodeTransformer):
         if node.value is None:
             return None
         return ast.Assign([node.target], node.value, lineno=node.lineno)
+
+
+def to_normalised_string(src: ast.Module | ast.FunctionDef) -> str:
+    """Unparse and create normalised string.
+
+    The leading and trailing whitespace is removed
+    and line breaks are replaced with a semicolumn.
+
+    Args:
+        src : the ast.Module or node to be unparsed.
+
+    Returns:
+        str : the normalised string representation
+
+    """
+    return ";".join(s.strip() for s in _unparse(src).splitlines())
