@@ -1,6 +1,7 @@
 import ast
 from pycodehash.preprocessing import DocstringStripper
 from pycodehash.preprocessing import TypeHintStripper
+from pycodehash.preprocessing import to_normalised_string
 
 from pycodehash.unparse import _unparse
 
@@ -21,6 +22,12 @@ def foo(x, y=None):
     return z + y
 """
 _REFERENCE_FUNC = _strip(_RAW_REFERENCE_FUNC)
+
+
+def test_to_normalised_string_smoke():
+    ref = "def foo(x, y=None):;y = y or 10;z = 2 * x;return z + y"
+    res = to_normalised_string(ast.parse(_RAW_REFERENCE_FUNC))
+    assert ref == res
 
 
 def test_smoke_docstring():
