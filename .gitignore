@@ -130,3 +130,6 @@ dmypy.json
 
 # notebooks
 *.ipynb
+
+# Pycharm
+.idea/
