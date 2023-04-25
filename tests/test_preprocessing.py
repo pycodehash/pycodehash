@@ -1,8 +1,6 @@
 import ast
-from pycodehash.preprocessing import DocstringStripper
-from pycodehash.preprocessing import TypeHintStripper
-from pycodehash.preprocessing import to_normalised_string
 
+from pycodehash.preprocessing import DocstringStripper, TypeHintStripper, WhitespaceNormalizer, FunctionStripper
 from pycodehash.unparse import _unparse
 
 
@@ -26,7 +24,7 @@ _REFERENCE_FUNC = _strip(_RAW_REFERENCE_FUNC)
 
 def test_to_normalised_string_smoke():
     ref = "def foo(x, y=None):;y = y or 10;z = 2 * x;return z + y"
-    res = to_normalised_string(ast.parse(_RAW_REFERENCE_FUNC))
+    res = WhitespaceNormalizer().transform(_unparse(ast.parse(_RAW_REFERENCE_FUNC)))
     assert ref == res
 
 
@@ -194,3 +192,21 @@ def test_typehints_all():
     )
     processed = TypeHintStripper().visit(ast.parse(f_str))
     assert _to_stripped_str(processed) == _REFERENCE_FUNC
+
+
+def test_function_name_stripper():
+    """Test if the function name is removed."""
+    f_str = (
+        "def foo(x, y):\n"
+        "    y = y or 10\n"
+        "    z = 2 * x\n"
+        "    return z + y"
+    )
+    processed = _unparse(FunctionStripper().visit(ast.parse(f_str)))
+    f_str_ref = (
+        "def _(x, y):\n"
+        "    y = y or 10\n"
+        "    z = 2 * x\n"
+        "    return z + y"
+    )
+    assert processed == f_str_ref
