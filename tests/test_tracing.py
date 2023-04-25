@@ -33,7 +33,7 @@ def test_tracing_nested(resource_node):
 
 
 @pytest.mark.parametrize("file_name", ["tliba/src/tliba/etl.py"])
-def test_tracing_pacakge(resource_node):
+def test_tracing_package(resource_node):
     v = Tracer()
     v.visit(resource_node)
 
@@ -56,7 +56,7 @@ def test_tracing_relative_imports(resource_node):
     with pytest.raises(NotImplementedError) as msg:
         v.visit(resource_node)
 
-    assert msg.value.args[0] == "Relative imports not supported"
+    assert msg.value.args[0] == "Relative imports are not supported"
 
 
 @pytest.mark.parametrize("file_name", ["tracing_imports_overwrite.py"])

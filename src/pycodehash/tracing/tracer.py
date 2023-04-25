@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import ast
+from ast import NodeVisitor
 import logging
 from typing import Any
 
@@ -9,7 +10,7 @@ from typing import Any
 logger = logging.getLogger(__name__)
 
 
-class Tracer(ast.NodeVisitor):
+class Tracer(NodeVisitor):
     def __init__(self):
         self.import_bindings = {}
 
@@ -29,7 +30,7 @@ class Tracer(ast.NodeVisitor):
             key = name.asname or name.name
             if hasattr(node, "module"):
                 if node.module is None:
-                    raise NotImplementedError("Relative imports not supported")
+                    raise NotImplementedError("Relative imports are not supported")
 
                 self.import_bindings[key] = f"{node.module}.{name.name}"
             else:
