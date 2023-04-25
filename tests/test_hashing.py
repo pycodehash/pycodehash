@@ -1,6 +1,6 @@
 import ast
-from pycodehash.hashing import hash_string
-from pycodehash.hashing import FuncNodeHasher
+
+from pycodehash.hashing import hash_string, FuncNodeHasher
 
 # to_hash = "def _(x, y=None):;y = y or 10;z = 2 * x;return z + y"
 # hashlib.sha256(to_hash.encode("utf-8")).hexdigest()
