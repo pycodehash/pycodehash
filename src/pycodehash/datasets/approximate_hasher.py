@@ -12,10 +12,7 @@ def inline_metadata(metadata: dict[str, Any]) -> str:
     Convert dict of metadata to string
     (all dictionary items should be serializable to string)
     """
-    return "".join([
-        f"<entry><key>{key}</key><value>{value}</value></entry>"
-        for key, value in metadata.items()
-    ])
+    return "|".join([f"{key}: {value}" for key, value in metadata.items()])
 
 
 class ApproximateHasher(ABC):
