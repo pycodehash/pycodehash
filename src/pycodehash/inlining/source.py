@@ -55,7 +55,7 @@ def _deindent(src: str) -> str:
         source code
     """
     assert src[0:4] == "    "
-    return "\n".join([line[4:] for line in src.splitlines()])
+    return "\n".join([line[4:] for line in src.splitlines()]) + "\n"
 
 
 def get_method_source(method_name: str, class_name: str, module_name: str) -> str:
