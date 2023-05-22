@@ -16,8 +16,8 @@ class Node:
     def __init__(
         self,
         func: Callable,
-        qualname: str | None,
-        module: str | None,
+        qualname: str | None = None,
+        module: str | None = None,
     ):
         if not callable(func):
             raise TypeError("`func` argument should be callable")
