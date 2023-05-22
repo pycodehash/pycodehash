@@ -132,10 +132,7 @@ def inline(source: str, module, first_party: list[str] | None = None, inlined: l
             logger.debug(f"{call[0]} not found in all_bindings[{module}]", all_bindings[module].keys())
             continue
         else:
-            # TODO: smarter way to go from FQN -> (module, class, method) vs (module, function) vs (module)
-            # TODO: now bug with (module, module, function)
-            # TODO: ('pandas.core.arrays', 'datetimelike', 'maybe_infer_freq') => ('pandas.core.arrays.datetimelike', 'maybe_infer_freq')
-
+            # TODO: move to FQN logic
             prefx = all_bindings[module][call[0]]
             if len(prefx) >= 2:
                 m = get_module_by_name(prefx[0])
@@ -150,7 +147,7 @@ def inline(source: str, module, first_party: list[str] | None = None, inlined: l
 
             binding = (*prefx, *call[1:])
 
-            print(binding)
+            # print(binding)
             logger.debug(f"{call[0]} found in all_bindings[{module}]", binding)
 
         if binding[0] == "__builtins__":
