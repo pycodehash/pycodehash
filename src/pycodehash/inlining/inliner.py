@@ -50,10 +50,7 @@ def trace_module(module: str, first_party: list[str] | None = None) -> None:
             all_bindings[module] = {}
             logger.info(f"no source code available for `{module}`")
             return
-        except Exception:
-            all_bindings[module] = {}
-            logger.info(f"exception for occurred when retrieving source code for `{module}`")
-            return
+
         module_src = ast.parse(source)
 
         tracer = Tracer(module)
@@ -96,12 +93,12 @@ def inline(source: str, module, first_party: list[str] | None = None, inlined: l
     """
     inlined_source = ""
 
-    try:
-        src = ast.parse(source)
-    except:
-        print("could not parse AST")
-        print(repr(source))
-        return ""
+    # try:
+    src = ast.parse(source)
+    # except Exception as e:
+    #     print(module, "could not parse AST", e)
+    #     print(repr(source))
+    #     return ""
 
     # Trace module
     trace_module(module, first_party)
@@ -153,10 +150,15 @@ def inline(source: str, module, first_party: list[str] | None = None, inlined: l
             else:
                 print(binding)
                 continue
-                raise ValueError
-        except:
+        except TypeError:
+            logger.info(f"TypeError while fetching source from {binding}")
             continue
-
+        except AttributeError:
+            logger.info(f"AttributeError while fetching source from {binding}")
+            continue
+        except OSError:
+            logger.info(f"OSError: source code not available for {binding}")
+            continue
         inlined.append(binding)
         inlined_source += inline(c_src, binding[0], first_party, inlined)
 
