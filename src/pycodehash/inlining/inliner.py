@@ -113,11 +113,10 @@ def inline(source: str, module, first_party: list[str] | None = None, inlined: l
 
     try:
         src = ast.parse(source)
-    except Exception as e:
-        print(module, "could not parse AST", e)
+    except IndentationError:
+        print(f"could not parse AST for module {module} with source code:")
         print(repr(source))
-        raise 
-    #     return ""
+        raise
 
     # Trace module
     trace_module(module, first_party)
@@ -164,6 +163,9 @@ def inline(source: str, module, first_party: list[str] | None = None, inlined: l
             logger.debug("already inlined")
             continue
 
+        # TODO: move to source
+        # TODO: use above logic based on binding[1], binding[0] types
+        # TODO: FQN -> then source
         try:
             if len(binding) == 1:
                 continue
