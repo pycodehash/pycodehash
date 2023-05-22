@@ -4,11 +4,12 @@ from typing import Callable
 import pytest
 
 from pycodehash.node import Node
-from pycodehash.inlining.inliner import inline_node, all_bindings
+from pycodehash.inlining.inliner import inline_node
 
 import tliba.etl
 import tlibb.etl
 import tlibb.local
+
 
 @pytest.mark.parametrize(["first_party", "reference_file", "entry_function", "reference_modules"], [
     (["tliba"], Path("./resources/inlined/tliba_etl.py"), tliba.etl.add_bernoulli_samples, ["tliba.etl", "tliba.random.rng", "tliba.random"]),
