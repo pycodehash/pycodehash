@@ -16,6 +16,11 @@ def inline_metadata(metadata: dict[str, Any]) -> str:
 
 
 class ApproximateHasher(ABC):
+    """
+    Compute hash based on metadata for a given dataset
+    For certain combinations (e.g. file size and modification date) the chance of collisions
+    is workable for caching in practice
+    """
     @abstractmethod
     def collect_metadata(self, *args, **kwargs) -> dict[str, Any]:
         pass
