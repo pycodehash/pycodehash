@@ -2,11 +2,10 @@
 from __future__ import annotations
 
 import ast
-import dataclasses
 import logging
-from types import ModuleType
 
 from pycodehash.inlining.call_visitor import CallVisitor
+from pycodehash.inlining.fqn import get_fqn
 from pycodehash.inlining.source import get_module_source, get_function_source, get_method_source, get_module_by_name
 from pycodehash.node import Node
 from pycodehash.tracer import Tracer
@@ -46,9 +45,8 @@ def trace_module(module: str, first_party: list[str] | None = None) -> None:
     if module not in all_bindings and (first_party is None or str(module).startswith(tuple(first_party))):
         logger.debug(f"trace `{module}`")
 
-        try:
-            source = get_module_source(module)
-        except OSError:
+        source = get_module_source(module)
+        if source is None:
             all_bindings[module] = {}
             logger.info(f"no source code available for `{module}`")
             return
@@ -79,22 +77,6 @@ def _module_namespace(module: str) -> str:
 # Module: {module}
 {'#' * 80}
 """
-
-
-@dataclasses.dataclass
-class FQN:
-    module_name: str
-
-
-@dataclasses.dataclass
-class FunctionFQN(FQN):
-    function_name: str
-
-
-@dataclasses.dataclass
-class MethodFQN(FQN):
-    class_name: str
-    method_name: str
 
 
 def inline(source: str, module, first_party: list[str] | None = None, inlined: list[str] | None = None) -> str:
@@ -131,24 +113,14 @@ def inline(source: str, module, first_party: list[str] | None = None, inlined: l
         if call[0] not in all_bindings[module]:
             logger.debug(f"{call[0]} not found in all_bindings[{module}]", all_bindings[module].keys())
             continue
-        else:
-            # TODO: move to FQN logic
-            prefx = all_bindings[module][call[0]]
-            if len(prefx) >= 2:
-                m = get_module_by_name(prefx[0])
-                if m is not None:
-                    if hasattr(m, prefx[1]):
-                        o = getattr(m, prefx[1])
-                        if isinstance(o, ModuleType):
-                            prefx = tuple([".".join(prefx)])
-                        else:
-                            print(prefx, "is of type", type(o))
-                            # print(prefx, "is a module!")
 
-            binding = (*prefx, *call[1:])
+        # TODO: move to FQN logic
+        prefx = all_bindings[module][call[0]]
+        prefx = get_fqn(prefx)
+        binding = (*prefx, *call[1:])
 
-            # print(binding)
-            logger.debug(f"{call[0]} found in all_bindings[{module}]", binding)
+        # print('binding', binding)
+        logger.debug(f"{call[0]} found in all_bindings[{module}]", binding)
 
         if binding[0] == "__builtins__":
             logger.debug("skip builtins")
@@ -157,7 +129,7 @@ def inline(source: str, module, first_party: list[str] | None = None, inlined: l
             logger.debug("skip non-first party", binding[0], first_party)
             continue
         if binding in inlined:
-            logger.debug("already inlined")
+            # print("already inlined")
             continue
 
         # TODO: move to source
@@ -180,7 +152,8 @@ def inline(source: str, module, first_party: list[str] | None = None, inlined: l
         except AttributeError:
             logger.info(f"AttributeError while fetching source from {binding}")
             continue
-        except OSError:
+
+        if c_src is None:
             logger.info(f"OSError: source code not available for {binding}")
             continue
         inlined.append(binding)
