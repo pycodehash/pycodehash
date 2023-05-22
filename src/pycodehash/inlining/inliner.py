@@ -18,24 +18,42 @@ all_bindings = {}
 
 
 def inline_node(node: Node, first_party: list[str] | None = None):
+    """Inline a `Node` object
+
+    Args:
+        node: the node to inline
+        first_party: list of modules to trace
+
+    Returns:
+        Inlined function source
+    """
     inlined = []
     return inline(node.source, node.module, first_party=first_party, inlined=inlined)
 
 
-def trace_module(module, first_party: list[str] | None = None):
+def trace_module(module: str, first_party: list[str] | None = None) -> None:
+    """Recursively trace imports in modules
+
+    Args:
+        module: name of the module
+        first_party: list of top-level modules to trace
+
+    Returns:
+        Nothing, results are stored in the global `all_bindings` dictionary
+    """
     if module not in all_bindings and (first_party is None or str(module).startswith(tuple(first_party))):
         logger.debug(f"trace `{module}`")
-        # TODO: move exception handling to source?
+
         try:
             source = get_module_source(module)
-        except OSError: # OSError: source code not available
+        except OSError:
             all_bindings[module] = {}
-            print(f"no source for {module}")
+            logger.info(f"no source code available for `{module}`")
             return
-        # except Exception:
-        #     all_bindings[module] = {}
-        #     print(f"exception for {module}")
-        #     return
+        except Exception:
+            all_bindings[module] = {}
+            logger.info(f"exception for occurred when retrieving source code for `{module}`")
+            return
         module_src = ast.parse(source)
 
         tracer = Tracer(module)
@@ -50,12 +68,32 @@ def trace_module(module, first_party: list[str] | None = None):
 
 
 def _module_namespace(module: str) -> str:
+    """Helper to generate module namespace comment
+
+    Args:
+        module: name of the module
+
+    Returns:
+        Comment block denoting the module namespace
+    """
     return f"""{'#' * 80}
 # Module: {module}
 {'#' * 80}
 """
 
-def inline(source: str, module, first_party: list[str] | None = None, inlined: list[str] | None = None):
+
+def inline(source: str, module, first_party: list[str] | None = None, inlined: list[str] | None = None) -> str:
+    """Inline a function provided the source code
+
+    Args:
+        source: function source code to inline
+        module: the function's module
+        first_party: list of top-level modules to search in
+        inlined: list of already inlined modules (for recursive tracking)
+
+    Returns:
+        Inlined function source code
+    """
     inlined_source = ""
 
     try:
@@ -74,11 +112,9 @@ def inline(source: str, module, first_party: list[str] | None = None, inlined: l
     # Search for all calls in the node source
     visitor = CallVisitor()
     visitor.visit(src)
-    print('all calls', visitor.calls)
     for call in visitor.calls:
-        print('my call', call)
         if call[0] not in all_bindings[module]:
-            print(f"not found in all_bindings[{module}]", all_bindings[module].keys())
+            logger.debug(f"{call[0]} not found in all_bindings[{module}]", all_bindings[module].keys())
             continue
             # x = call
             # TODO: move resolving FQN to tracer (?)
@@ -94,19 +130,18 @@ def inline(source: str, module, first_party: list[str] | None = None, inlined: l
             # pd => in all bindings
             # pandas.concat ?
             binding = (*all_bindings[module][call[0]], *call[1:])
-            print(f"found in all_bindings[{module}]", binding)
+            logger.debug(f"{call[0]} found in all_bindings[{module}]", binding)
 
         if binding[0] == "__builtins__":
-            print("skip builtins")
+            logger.debug("skip builtins")
             continue
         if first_party is not None and not binding[0].startswith(tuple(first_party)):
-            print("skip non-first party", binding[0], first_party)
+            logger.debug("skip non-first party", binding[0], first_party)
             continue
         if binding in inlined:
-            print("already inlined")
+            logger.debug("already inlined")
             continue
-        print("first party", first_party)
-        print("get source", binding)
+
         try:
             if len(binding) == 1:
                 continue
