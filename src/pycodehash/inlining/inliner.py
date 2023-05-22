@@ -48,17 +48,16 @@ def trace_module(module, first_party: list[str] | None = None):
 
 
 def inline(source: str, module, first_party: list[str] | None = None, inlined: list[str] | None = None):
-    # TODO: add module namespace, e.g.
-    #       https://stackoverflow.com/questions/28337308/python-submodule-in-the-same-file-as-module
+    # TODO: invariant for ordering
+
     inlined_source = ""
 
     try:
         src = ast.parse(source)
     except:
-        print("SORUCE")
+        print("SOURCE")
         print(repr(source))
         return ""
-
 
     # Trace module
     trace_module(module, first_party)
@@ -120,5 +119,11 @@ def inline(source: str, module, first_party: list[str] | None = None, inlined: l
         inlined.append(binding)
         inlined_source += inline(c_src, binding[0], first_party, inlined)
 
+    # Comment to identify the module
+    module_namespace = f"""{'#' * 80}
+# Module: {module}
+{'#' * 80}
+"""
+    inlined_source += module_namespace
     inlined_source += source
     return inlined_source
