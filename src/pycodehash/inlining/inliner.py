@@ -12,6 +12,8 @@ from pycodehash.tracer import Tracer
 
 logger = logging.getLogger(__name__)
 
+
+# Mapping from module to fully qualified name
 all_bindings = {}
 
 
@@ -21,8 +23,8 @@ def inline_node(node: Node, first_party: list[str] | None = None):
 
 
 def trace_module(module, first_party: list[str] | None = None):
-    if module not in all_bindings:
-        print(f"trace {module}")
+    if module not in all_bindings and (first_party is None or str(module).startswith(tuple(first_party))):
+        logger.debug(f"trace `{module}`")
         # TODO: move exception handling to source?
         try:
             source = get_module_source(module)
@@ -30,10 +32,10 @@ def trace_module(module, first_party: list[str] | None = None):
             all_bindings[module] = {}
             print(f"no source for {module}")
             return
-        except Exception:
-            all_bindings[module] = {}
-            print(f"exception for {module}")
-            return
+        # except Exception:
+        #     all_bindings[module] = {}
+        #     print(f"exception for {module}")
+        #     return
         module_src = ast.parse(source)
 
         tracer = Tracer(module)
@@ -47,15 +49,19 @@ def trace_module(module, first_party: list[str] | None = None):
                 trace_module(v[0], first_party)
 
 
-def inline(source: str, module, first_party: list[str] | None = None, inlined: list[str] | None = None):
-    # TODO: invariant for ordering
+def _module_namespace(module: str) -> str:
+    return f"""{'#' * 80}
+# Module: {module}
+{'#' * 80}
+"""
 
+def inline(source: str, module, first_party: list[str] | None = None, inlined: list[str] | None = None):
     inlined_source = ""
 
     try:
         src = ast.parse(source)
     except:
-        print("SOURCE")
+        print("could not parse AST")
         print(repr(source))
         return ""
 
@@ -120,10 +126,7 @@ def inline(source: str, module, first_party: list[str] | None = None, inlined: l
         inlined_source += inline(c_src, binding[0], first_party, inlined)
 
     # Comment to identify the module
-    module_namespace = f"""{'#' * 80}
-# Module: {module}
-{'#' * 80}
-"""
-    inlined_source += module_namespace
+    inlined_source += _module_namespace(module)
+
     inlined_source += source
     return inlined_source
