@@ -29,26 +29,30 @@ def bar():
 def creator():
     a = MyClass()
     a.fit()
+    b = a[1][2][3]
+    return type(self)(b).__finalize__(self)
     """
 
     visitor = CallVisitor()
     visitor.visit(ast.parse(src))
 
-    assert len(visitor.calls) == 16
-    assert visitor.calls[0] == ("call", "world")
-    assert visitor.calls[1] == ("call", "hello")
-    assert visitor.calls[2] == ("call", "MyClass.theMethod")
-    assert visitor.calls[3] == ("call", "foo")
-    assert visitor.calls[4] == ("call", "foo")
-    assert visitor.calls[5] == ("call", "bar")
-    assert visitor.calls[6] == ("decorator", "decorated")
-    assert visitor.calls[7] == ("call", "print")
-    assert visitor.calls[8] == ("decorator", "MyClass.my_decorator")
-    assert visitor.calls[9] == ("decorator call", "MyClass.another_decorator")
-    assert visitor.calls[10] == ("decorator call", "also_decorated")
-    assert visitor.calls[11] == ("call", "fizzbuzz")
-    assert visitor.calls[12] == ("call", "hello")
-    assert visitor.calls[13] == ("call", "hello")
+    assert len(visitor.calls) == 17
+    assert visitor.calls[0] == ("world", )
+    assert visitor.calls[1] == ("hello", )
+    assert visitor.calls[2] == ("MyClass", "theMethod")
+    assert visitor.calls[3] == ("foo", )
+    assert visitor.calls[4] == ("foo", )
+    assert visitor.calls[5] == ("bar", )
+    assert visitor.calls[6] == ("decorated", )
+    assert visitor.calls[7] == ("print", )
+    assert visitor.calls[8] == ("MyClass", "my_decorator")
+    assert visitor.calls[9] == ("MyClass", "another_decorator")
+    assert visitor.calls[10] == ("also_decorated", )
+    assert visitor.calls[11] == ("fizzbuzz", )
+    assert visitor.calls[12] == ("hello", )
+    assert visitor.calls[13] == ("hello", )
     # note that `.world()` is currently ignored
-    assert visitor.calls[14] == ("call", "MyClass")
-    assert visitor.calls[15] == ("call", "a.fit")
+    # note that __getitem__ is currently ignored
+    assert visitor.calls[14] == ("MyClass", )
+    assert visitor.calls[15] == ("a", "fit")
+    assert visitor.calls[16] == ("type", )
