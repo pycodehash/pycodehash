@@ -1,16 +1,20 @@
 """Get source code based on fully qualified names"""
 from __future__ import annotations
 
-import importlib
 import inspect
-from types import ModuleType, FunctionType, MethodType
+from types import FunctionType, MethodType
+
+from pycodehash.inlining.fqn import get_module_by_name
 
 
-def get_module_by_name(module_name: str) -> ModuleType | None:
+def _get_source(o) -> str | None:
     try:
-        return importlib.import_module(module_name)
-    except ImportError:
+        source = inspect.getsource(o)
+    except OSError:
+        # no source code available for `o`
         return None
+
+    return source
 
 
 def get_function_by_name(function_name: str, module_name: str) -> FunctionType | None:
@@ -27,18 +31,21 @@ def get_method_by_name(method_name: str, class_name: str, module_name: str) -> M
     return getattr(function, method_name)
 
 
-def get_module_source(module_name: str) -> str:
+def get_module_source(module_name: str) -> str | None:
     module = get_module_by_name(module_name)
     if module is None:
-        return ""
-    return inspect.getsource(module)
+        return None
+
+    return _get_source(module)
 
 
-def get_function_source(function_name: str, module_name: str) -> str:
+def get_function_source(function_name: str, module_name: str) -> str | None:
     function = get_function_by_name(function_name, module_name)
     if function is None:
-        return ""
-    src = inspect.getsource(function)
+        return None
+    src = _get_source(function)
+    if src is None:
+        return None
     if len(src) > 4 and src[0:4] == "    ":
         # decorated
         return _deindent(src)
@@ -58,10 +65,12 @@ def _deindent(src: str) -> str:
     return "\n".join([line[4:] for line in src.splitlines()]) + "\n"
 
 
-def get_method_source(method_name: str, class_name: str, module_name: str) -> str:
+def get_method_source(method_name: str, class_name: str, module_name: str) -> str | None:
     method = get_method_by_name(method_name, class_name, module_name)
     if method is None:
-        return ""
-    src = inspect.getsource(method)
+        return None
+    src = _get_source(method)
+    if src is None:
+        return None
     news = _deindent(src)
     return news
