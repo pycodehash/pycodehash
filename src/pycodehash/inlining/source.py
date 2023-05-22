@@ -38,7 +38,11 @@ def get_function_source(function_name: str, module_name: str) -> str:
     function = get_function_by_name(function_name, module_name)
     if function is None:
         return ""
-    return inspect.getsource(function)
+    src = inspect.getsource(function)
+    if len(src) > 4 and src[0:4] == "    ":
+        # decorated
+        return _deindent(src)
+    return src
 
 
 def _deindent(src: str) -> str:

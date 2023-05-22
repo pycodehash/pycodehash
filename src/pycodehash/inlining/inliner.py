@@ -4,9 +4,10 @@ from __future__ import annotations
 import ast
 import dataclasses
 import logging
+from types import ModuleType
 
 from pycodehash.inlining.call_visitor import CallVisitor
-from pycodehash.inlining.source import get_module_source, get_function_source, get_method_source
+from pycodehash.inlining.source import get_module_source, get_function_source, get_method_source, get_module_by_name
 from pycodehash.node import Node
 from pycodehash.tracer import Tracer
 
@@ -110,11 +111,12 @@ def inline(source: str, module, first_party: list[str] | None = None, inlined: l
     """
     inlined_source = ""
 
-    # try:
-    src = ast.parse(source)
-    # except Exception as e:
-    #     print(module, "could not parse AST", e)
-    #     print(repr(source))
+    try:
+        src = ast.parse(source)
+    except Exception as e:
+        print(module, "could not parse AST", e)
+        print(repr(source))
+        raise 
     #     return ""
 
     # Trace module
@@ -135,7 +137,20 @@ def inline(source: str, module, first_party: list[str] | None = None, inlined: l
             # TODO: now bug with (module, module, function)
             # TODO: ('pandas.core.arrays', 'datetimelike', 'maybe_infer_freq') => ('pandas.core.arrays.datetimelike', 'maybe_infer_freq')
 
-            binding = (*all_bindings[module][call[0]], *call[1:])
+            prefx = all_bindings[module][call[0]]
+            if len(prefx) >= 2:
+                m = get_module_by_name(prefx[0])
+                if m is not None:
+                    if hasattr(m, prefx[1]):
+                        o = getattr(m, prefx[1])
+                        if isinstance(o, ModuleType):
+                            prefx = tuple([".".join(prefx)])
+                        else:
+                            print(prefx, "is of type", type(o))
+                            # print(prefx, "is a module!")
+
+            binding = (*prefx, *call[1:])
+
             print(binding)
             logger.debug(f"{call[0]} found in all_bindings[{module}]", binding)
 
