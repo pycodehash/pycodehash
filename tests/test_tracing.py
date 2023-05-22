@@ -1,22 +1,22 @@
 """Tests for the tracer"""
 import pytest
 
-from pycodehash.tracing import Tracer
+from pycodehash.tracer import Tracer
 
 
 @pytest.mark.parametrize("file_name", ["tracing_imports_std.py"])
 def test_tracing(resource_node):
-    v = Tracer()
+    v = Tracer("xyz")
     v.visit(resource_node)
-    assert v.import_bindings["hello"] == "__main__.hello"
-    assert v.import_bindings["F"] == "functools"
-    assert v.import_bindings["cache"] == "functools.lru_cache"
-    assert len(v.import_bindings) == 6
+    assert v.import_bindings["hello"] == ("xyz", "hello")
+    assert v.import_bindings["F"] == ("functools", )
+    assert v.import_bindings["cache"] == ("functools", "lru_cache")
+    assert len([1 for v in v.import_bindings.values() if v[0] != '__builtins__']) == 6
 
 
 @pytest.mark.parametrize("file_name", ["tracing_imports_star.py"])
 def test_tracing_star(resource_node):
-    v = Tracer()
+    v = Tracer("xyz")
     with pytest.raises(NotImplementedError) as msg:
         v.visit(resource_node)
 
@@ -25,7 +25,7 @@ def test_tracing_star(resource_node):
 
 @pytest.mark.parametrize("file_name", ["tracing_nested.py"])
 def test_tracing_nested(resource_node):
-    v = Tracer()
+    v = Tracer("xyz")
     v.visit(resource_node)
 
     assert "buzz" not in v.import_bindings
@@ -34,25 +34,21 @@ def test_tracing_nested(resource_node):
 
 @pytest.mark.parametrize("file_name", ["tliba/src/tliba/etl.py"])
 def test_tracing_package(resource_node):
-    v = Tracer()
+    v = Tracer("xyz")
     v.visit(resource_node)
 
-    assert v.import_bindings["pd"] == "pandas"
-    assert v.import_bindings["rng"] == "tliba.random.rng"
-    assert v.import_bindings["combine_random_samples"] == "__main__.combine_random_samples"
-    assert v.import_bindings["add_bernoulli_samples"] == "__main__.add_bernoulli_samples"
-
-    print(v.import_bindings)
-    # via __init__.py
-    assert v.import_bindings["draw_bernoulli_samples"] == "tliba.random.rng.draw_bernoulli_samples"
-    assert v.import_bindings["normal_samples"] == "tliba.random.rng.normal_samples"
-    assert len(v.import_bindings) == 6
+    assert v.import_bindings["pd"] == ("pandas", )
+    assert v.import_bindings["rng"] == ("tliba.random.rng", )
+    assert v.import_bindings["combine_random_samples"] == ("xyz", "combine_random_samples")
+    assert v.import_bindings["add_bernoulli_samples"] == ("xyz", "add_bernoulli_samples")
+    assert v.import_bindings["draw_bernoulli_samples"] == ("tliba.random", "draw_bernoulli_samples")
+    assert v.import_bindings["normal_samples"] == ("tliba.random", "draw_normal_samples")
+    assert len([1 for v in v.import_bindings.values() if v[0] != '__builtins__']) == 6
 
 
 @pytest.mark.parametrize("file_name", ["tracing_imports_relative.py"])
 def test_tracing_relative_imports(resource_node):
-    v = Tracer()
-
+    v = Tracer("xyz")
     with pytest.raises(NotImplementedError) as msg:
         v.visit(resource_node)
 
@@ -61,10 +57,29 @@ def test_tracing_relative_imports(resource_node):
 
 @pytest.mark.parametrize("file_name", ["tracing_imports_overwrite.py"])
 def test_tracing_overwrite(resource_node):
-    v = Tracer()
+    v = Tracer("xyz")
     v.visit(resource_node)
 
-    assert v.import_bindings["func1"] == "package2.func1"
-    assert v.import_bindings["hello"] == "__main__.hello"
-    assert v.import_bindings["bar"] == "__main__.hello"
-    assert len(v.import_bindings) == 3
+    assert v.import_bindings["func1"] == ("package2", "func1")
+    assert v.import_bindings["hello"] == ("xyz", "hello")
+    assert v.import_bindings["bar"] == ("xyz", "hello")
+    assert len([1 for v in v.import_bindings.values() if v[0] != '__builtins__']) == 3
+
+
+@pytest.mark.parametrize("file_name", ["tracing_class.py"])
+def test_tracing_class(resource_node):
+    v = Tracer("xyz")
+    v.visit(resource_node)
+
+    assert v.import_bindings["NDFrame"] == ("xyz", "NDFrame")
+    assert v.import_bindings["NDFrame.__init__"] == ("xyz", "NDFrame", "__init__")
+
+
+@pytest.mark.parametrize("file_name", ["tracing_builtins.py"])
+def test_tracing_builtins(resource_node):
+    v = Tracer("xyz")
+    v.visit(resource_node)
+
+    assert all(v[0] == "__builtins__" for v in v.import_bindings.values())
+    assert len(v.import_bindings) == 72
+
