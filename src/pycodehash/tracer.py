@@ -116,7 +116,7 @@ class Tracer(NodeVisitor):
             key = name.asname or name.name
             if hasattr(node, "module"):
                 if node.module is None:
-                    pass
+                    continue
                     # raise NotImplementedError("Relative imports are not supported")
 
                 self.import_bindings[key] = (node.module, name.name)
@@ -124,7 +124,7 @@ class Tracer(NodeVisitor):
                 self.import_bindings[key] = (name.name, )
 
             if name.name == "*":
-                pass
+                continue
                 # raise NotImplementedError("Star imports are not supported")
 
     def visit_Import(self, node: ast.Import) -> Any:

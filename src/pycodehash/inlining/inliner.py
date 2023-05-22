@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import ast
+import dataclasses
 import logging
 
 from pycodehash.inlining.call_visitor import CallVisitor
@@ -79,6 +80,22 @@ def _module_namespace(module: str) -> str:
 """
 
 
+@dataclasses.dataclass
+class FQN:
+    module_name: str
+
+
+@dataclasses.dataclass
+class FunctionFQN(FQN):
+    function_name: str
+
+
+@dataclasses.dataclass
+class MethodFQN(FQN):
+    class_name: str
+    method_name: str
+
+
 def inline(source: str, module, first_party: list[str] | None = None, inlined: list[str] | None = None) -> str:
     """Inline a function provided the source code
 
@@ -113,20 +130,13 @@ def inline(source: str, module, first_party: list[str] | None = None, inlined: l
         if call[0] not in all_bindings[module]:
             logger.debug(f"{call[0]} not found in all_bindings[{module}]", all_bindings[module].keys())
             continue
-            # x = call
-            # TODO: move resolving FQN to tracer (?)
-            # if x[0] in all_bindings[module]:
-            #     binding = (all_bindings[module][x[0]], x[1])
-            #     # print(all_bindings[module][x[0]])
-            # else:
-            #     print(call, all_bindings.keys())
-            #     continue
-            #     raise ValueError
         else:
-            # pd.concat => not in all bindings
-            # pd => in all bindings
-            # pandas.concat ?
+            # TODO: smarter way to go from FQN -> (module, class, method) vs (module, function) vs (module)
+            # TODO: now bug with (module, module, function)
+            # TODO: ('pandas.core.arrays', 'datetimelike', 'maybe_infer_freq') => ('pandas.core.arrays.datetimelike', 'maybe_infer_freq')
+
             binding = (*all_bindings[module][call[0]], *call[1:])
+            print(binding)
             logger.debug(f"{call[0]} found in all_bindings[{module}]", binding)
 
         if binding[0] == "__builtins__":
