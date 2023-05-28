@@ -42,3 +42,20 @@ allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/pycodehash", ]
+
+[tool.black]
+line-length = 120
+target-version = ["py38"]
+
+[tool.ruff]
+extend-select = ["TID"]
+target-version = "py38"
+line-length = 120
+select = [
+  # Enable Pyflakes `E`, `F` and `W` codes
+  "E",
+  "F",
+  "W",
+  # Sort imports
+  "I"
+]
