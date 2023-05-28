@@ -18,9 +18,15 @@ def _get_decorator_name(decorator: ast.expr):
 class DecoratorStripper(NodeTransformer):
     """Removes specific decorators from functions."""
     def __init__(self, decorators: list[str]):
+        """Initialize the DecoratorStripper
+
+        Args:
+            decorators: list of fully qualified function names (e.g. `functools.partial`)
+        """
         self.decorators = decorators
 
     def visit_FunctionDef(self, node: ast.FunctionDef):
+        # TODO: import visitor to resolve to FQN
         node.decorator_list = [
             decorator
             for decorator in node.decorator_list
