@@ -1,5 +1,4 @@
 import pytest
-
 from pycodehash.datasets.local import LocalFileHash
 
 

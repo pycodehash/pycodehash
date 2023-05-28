@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import importlib
 from dataclasses import dataclass
-from types import ModuleType, FunctionType
+from types import FunctionType, ModuleType
 
 
 @dataclass
@@ -19,7 +19,6 @@ class FunctionFQN(FQN):
 class MethodFQN(FQN):
     class_name: str
     method_name: str
-
 
 
 def get_module_by_name(module_name: str) -> ModuleType | None:

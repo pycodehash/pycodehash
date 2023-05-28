@@ -1,5 +1,6 @@
 """Decorators."""
 import inspect
+
 from pycodehash.hashing import hash_func_params
 
 

@@ -10,6 +10,7 @@ class WhitespaceNormalizer(LinesTransformer):
     and line breaks are replaced with a semicolon
     (for identical cross-platform hashes).
     """
+
     def __init__(self):
         self.sep = ";"
 
