@@ -1,4 +1,6 @@
 """Visitors used in call tracing."""
+from __future__ import annotations
+
 import ast
 from ast import NodeVisitor
 
@@ -12,7 +14,7 @@ class ImportCollector(NodeVisitor):
 
     def __init__(self):
         """Initialise the visitor."""
-        self.imports: dict[str, dict[str]] = dict()
+        self.imports: dict[str, dict[str]] = {}
 
     def visit_Import(self, node: ast.Import):
         """Visit each name of an Import."""
@@ -36,7 +38,7 @@ class ImportCollector(NodeVisitor):
 
 
 class LocalImportCollector(NodeVisitor):
-    """Collect non module level imports.
+    """Collect non-module level imports.
 
     Attributes:
         imports: the imports per definition (key) where the value is a dict.
@@ -46,8 +48,8 @@ class LocalImportCollector(NodeVisitor):
 
     def __init__(self):
         """Initialise the visitor."""
-        self.imports: dict[str, dict[str]] = dict()
-        self._local_imports: dict[str] = dict()
+        self.imports: dict[str, dict[str]] = {}
+        self._local_imports: dict[str] = {}
         self._collector = ImportCollector()
 
     def visit_FunctionDef(self, node: ast.FunctionDef):
@@ -55,14 +57,14 @@ class LocalImportCollector(NodeVisitor):
         self._collector.visit(node)
         if len(self._collector.imports) > 0:
             self.imports[node.name] = self._collector.imports
-            self._collector.imports = dict()
+            self._collector.imports = {}
 
     def visit_AsyncFunctionDef(self, node: ast.FunctionDef):
         """Collect imports from async function definitions."""
         self._collector.visit(node)
         if len(self._collector.imports) > 0:
             self.imports[node.name] = self._collector.imports
-            self._collector.imports = dict()
+            self._collector.imports = {}
 
 
 class ModuleImportCollector(ImportCollector):
