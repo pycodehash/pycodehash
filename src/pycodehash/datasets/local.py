@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from datetime import datetime
 import hashlib
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -50,8 +50,5 @@ class LocalFileHash(ApproximateHasher):
 
     def _collect_metadata_dir(self, path: Path) -> dict[str, Any]:
         all_files_in_dir = list(path.rglob("*"))
-        dict_to_hash = {
-            str(file_path): self._collect_metadata_file(file_path)
-            for file_path in all_files_in_dir
-        }
+        dict_to_hash = {str(file_path): self._collect_metadata_file(file_path) for file_path in all_files_in_dir}
         return dict_to_hash

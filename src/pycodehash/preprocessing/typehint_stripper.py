@@ -20,4 +20,3 @@ class TypeHintStripper(NodeTransformer):
         if node.value is None:
             return None
         return ast.Assign([node.target], node.value, lineno=node.lineno)
-

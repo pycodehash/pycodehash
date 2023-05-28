@@ -1,17 +1,17 @@
 """Functionality to hash the function body."""
 from __future__ import annotations
 
-from ast import NodeVisitor, FunctionDef
-import json
 import hashlib
+import json
+from ast import FunctionDef, NodeVisitor
 
-from pycodehash.unparse import _unparse
 from pycodehash.preprocessing import (
-    FunctionStripper,
     DocstringStripper,
+    FunctionStripper,
     TypeHintStripper,
     WhitespaceNormalizer,
 )
+from pycodehash.unparse import _unparse
 
 
 def hash_string(input_string: str) -> str:
@@ -26,9 +26,7 @@ def hash_string(input_string: str) -> str:
     return hashlib.sha256(input_string.encode("utf-8")).hexdigest()
 
 
-def hash_func_params(
-    keywords: tuple[str], args: tuple[any], kwargs: dict[str, any]
-) -> str:
+def hash_func_params(keywords: tuple[str], args: tuple[any], kwargs: dict[str, any]) -> str:
     """Hash args and kwargs of a function.
 
     Note that the params should adhere to the JSON specification.

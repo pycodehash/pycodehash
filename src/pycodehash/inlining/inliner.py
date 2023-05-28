@@ -6,10 +6,9 @@ import logging
 
 from pycodehash.inlining.call_visitor import CallVisitor
 from pycodehash.inlining.fqn import get_fqn
-from pycodehash.inlining.source import get_module_source, get_function_source, get_method_source, get_module_by_name
+from pycodehash.inlining.source import get_function_source, get_method_source, get_module_source
 from pycodehash.node import Node
 from pycodehash.tracer import Tracer
-
 
 logger = logging.getLogger(__name__)
 
