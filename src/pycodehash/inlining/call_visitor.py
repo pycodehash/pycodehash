@@ -31,8 +31,6 @@ class CallVisitor(NodeVisitor):
             # Subscript; currently ignored
             ...
         else:
-            # print(node)
-            # print(ast.dump(node))
             raise NotImplementedError
 
     def visit_Call(self, node: ast.Call):
