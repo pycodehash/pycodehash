@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from datetime import datetime
 import hashlib
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -35,6 +35,7 @@ class LocalFileHash(ApproximateHasher):
     Fast approximate hash for local files
     Based on last modification time and file size only.
     """
+
     def collect_metadata(self, file_path: str | Path) -> dict[str, Any]:
         path = Path(file_path)
 

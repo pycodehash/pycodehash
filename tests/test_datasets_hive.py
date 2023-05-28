@@ -1,26 +1,26 @@
 import pytest
-from pyspark.sql import SparkSession
-
 from pycodehash.datasets.hive import HiveTableHash
+from pyspark.sql import SparkSession
 
 
 @pytest.fixture(scope="function")
 def spark():
-    return (
-        SparkSession
-        .builder
-        .appName("spark-test")
-        .enableHiveSupport()
-        .getOrCreate()
-    )
+    return SparkSession.builder.appName("spark-test").enableHiveSupport().getOrCreate()
 
 
 @pytest.fixture(scope="function")
 def employee_dataset(spark, tmp_path):
     table_name = "employee"
-    employee = spark.sparkContext.parallelize([(1, "James", 30, "M"), (2, "Ann", 40, "F"),
-            (3, "Jeff", 41, "M"), (4, "Jennifer", 20, "F"), (5, "Noone", -1, "X")]).toDF(["id", "name", "age", "gender"])
-    employee.write.mode('overwrite').option("path", str(tmp_path)).saveAsTable(table_name)
+    employee = spark.sparkContext.parallelize(
+        [
+            (1, "James", 30, "M"),
+            (2, "Ann", 40, "F"),
+            (3, "Jeff", 41, "M"),
+            (4, "Jennifer", 20, "F"),
+            (5, "Noone", -1, "X"),
+        ]
+    ).toDF(["id", "name", "age", "gender"])
+    employee.write.mode("overwrite").option("path", str(tmp_path)).saveAsTable(table_name)
     return employee, tmp_path, table_name
 
 
@@ -42,7 +42,7 @@ def test_approximate_hasher_hive(spark, employee_dataset):
     assert initial_hash == second_hash
 
     # Append
-    employee_df.union(employee_df).write.mode('overwrite').option("path", str(tmp_path)).saveAsTable(table_name)
+    employee_df.union(employee_df).write.mode("overwrite").option("path", str(tmp_path)).saveAsTable(table_name)
 
     third_hash = hasher.compute_hash(table_name)
     assert initial_hash != third_hash

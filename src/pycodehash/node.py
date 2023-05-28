@@ -28,17 +28,13 @@ class Node:
         elif hasattr(func, "__qualname__"):
             self.qualname = func.__qualname__
         else:
-            raise TypeError(
-                "`func` must have attribute __qualname__ or `qualname` must not be None"
-            )
+            raise TypeError("`func` must have attribute __qualname__ or `qualname` must not be None")
 
         if module is not None:
             self.module = module
         elif hasattr(func, "__module__"):
             self.module = func.__module__
         else:
-            raise TypeError(
-                "`func` must have attribute __module__ or `module` must not be None"
-            )
+            raise TypeError("`func` must have attribute __module__ or `module` must not be None")
 
         self.source = inspect.getsource(func)

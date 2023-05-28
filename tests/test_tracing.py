@@ -1,6 +1,5 @@
 """Tests for the tracer"""
 import pytest
-
 from pycodehash.tracer import Tracer
 
 
@@ -9,9 +8,9 @@ def test_tracing(resource_node):
     v = Tracer("xyz")
     v.visit(resource_node)
     assert v.import_bindings["hello"] == ("xyz", "hello")
-    assert v.import_bindings["F"] == ("functools", )
+    assert v.import_bindings["F"] == ("functools",)
     assert v.import_bindings["cache"] == ("functools", "lru_cache")
-    assert len([1 for v in v.import_bindings.values() if v[0] != '__builtins__']) == 6
+    assert len([1 for v in v.import_bindings.values() if v[0] != "__builtins__"]) == 6
 
 
 @pytest.mark.parametrize("file_name", ["tracing_imports_star.py"])
@@ -37,13 +36,13 @@ def test_tracing_package(resource_node):
     v = Tracer("xyz")
     v.visit(resource_node)
 
-    assert v.import_bindings["pd"] == ("pandas", )
-    assert v.import_bindings["rng"] == ("tliba.random.rng", )
+    assert v.import_bindings["pd"] == ("pandas",)
+    assert v.import_bindings["rng"] == ("tliba.random.rng",)
     assert v.import_bindings["combine_random_samples"] == ("xyz", "combine_random_samples")
     assert v.import_bindings["add_bernoulli_samples"] == ("xyz", "add_bernoulli_samples")
     assert v.import_bindings["draw_bernoulli_samples"] == ("tliba.random", "draw_bernoulli_samples")
     assert v.import_bindings["normal_samples"] == ("tliba.random", "draw_normal_samples")
-    assert len([1 for v in v.import_bindings.values() if v[0] != '__builtins__']) == 6
+    assert len([1 for v in v.import_bindings.values() if v[0] != "__builtins__"]) == 6
 
 
 @pytest.mark.parametrize("file_name", ["tracing_imports_relative.py"])
@@ -63,7 +62,7 @@ def test_tracing_overwrite(resource_node):
     assert v.import_bindings["func1"] == ("package2", "func1")
     assert v.import_bindings["hello"] == ("xyz", "hello")
     assert v.import_bindings["bar"] == ("xyz", "hello")
-    assert len([1 for v in v.import_bindings.values() if v[0] != '__builtins__']) == 3
+    assert len([1 for v in v.import_bindings.values() if v[0] != "__builtins__"]) == 3
 
 
 @pytest.mark.parametrize("file_name", ["tracing_class.py"])
@@ -82,4 +81,3 @@ def test_tracing_builtins(resource_node):
 
     assert all(v[0] == "__builtins__" for v in v.import_bindings.values())
     assert len(v.import_bindings) == 72
-

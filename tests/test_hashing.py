@@ -1,6 +1,6 @@
 import ast
 
-from pycodehash.hashing import hash_string, FuncNodeHasher
+from pycodehash.hashing import FuncNodeHasher, hash_string
 
 # to_hash = "def _(x, y=None):;y = y or 10;z = 2 * x;return z + y"
 # hashlib.sha256(to_hash.encode("utf-8")).hexdigest()
@@ -8,31 +8,18 @@ _REF_FUNC_HASH = "da19d7c7d47231be0c466c457b41bb551a533c186d4a8cf3e2fee55a02311f
 
 
 def test_hash_string():
-    assert (
-        hash_string("hello world")
-        == "b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9"
-    )
+    assert hash_string("hello world") == "b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9"
 
 
 def test_FuncNodeHasher_smoke():
-    f_str = (
-        "def foo(x, y=None):\n"
-        "    y = y or 10\n"
-        "    z = 2 * x\n"
-        "    return z + y\n"
-    )
+    f_str = "def foo(x, y=None):\n" "    y = y or 10\n" "    z = 2 * x\n" "    return z + y\n"
     hasher = FuncNodeHasher()
     hasher.visit(ast.parse(f_str))
     assert hasher.hashes["foo"] == _REF_FUNC_HASH
 
 
 def test_FuncNodeHasher_name_invariance():
-    f_str = (
-        "def bar(x, y=None):\n"
-        "    y = y or 10\n"
-        "    z = 2 * x\n"
-        "    return z + y\n"
-    )
+    f_str = "def bar(x, y=None):\n" "    y = y or 10\n" "    z = 2 * x\n" "    return z + y\n"
     hasher = FuncNodeHasher()
     hasher.visit(ast.parse(f_str))
     assert hasher.hashes["bar"] == _REF_FUNC_HASH

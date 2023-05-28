@@ -1,10 +1,9 @@
 # Functionality to detect function/method calls in source code
 from __future__ import annotations
 
-import logging
 import ast
+import logging
 from ast import NodeVisitor
-
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +15,7 @@ class CallVisitor(NodeVisitor):
     def _visit_func(self, node: ast.expr, label: str) -> None:
         if isinstance(node, ast.Name):
             logger.info("%s function: %s", label, node.id)
-            self.calls.append((node.id, ))
+            self.calls.append((node.id,))
         elif isinstance(node, ast.Attribute):
             if isinstance(node.value, ast.Call):
                 # Chained; currently ignored

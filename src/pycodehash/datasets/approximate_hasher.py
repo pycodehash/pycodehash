@@ -21,6 +21,7 @@ class ApproximateHasher(ABC):
     For certain combinations (e.g. file size and modification date) the chance of collisions
     is workable for caching in practice
     """
+
     @abstractmethod
     def collect_metadata(self, *args, **kwargs) -> dict[str, Any]:
         pass

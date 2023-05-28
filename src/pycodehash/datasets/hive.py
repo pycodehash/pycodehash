@@ -5,12 +5,12 @@ from pyspark.errors.exceptions.captured import AnalysisException
 
 from pycodehash.datasets.approximate_hasher import ApproximateHasher
 
-
 logger = logging.getLogger(__name__)
 
 
 class HiveTableHash(ApproximateHasher):
     """Fast approximate hash for spark hive tables"""
+
     def __init__(self, spark):
         self.spark = spark
         super().__init__()
@@ -29,4 +29,4 @@ class HiveTableHash(ApproximateHasher):
         data = data[data["col_name"].isin(["Created Time", "Statistics"])]
 
         # Convert to dict
-        return data.set_index('col_name').to_dict()['data_type']
+        return data.set_index("col_name").to_dict()["data_type"]

@@ -1,11 +1,10 @@
 import pytest
-
 from pycodehash.datasets.local import LocalFileHash
 
 
 @pytest.fixture(scope="function")
 def local_dataset(tmp_path):
-    file_name = (tmp_path / "my_file.txt")
+    file_name = tmp_path / "my_file.txt"
     file_name.write_text("Hello World!")
 
     return file_name
