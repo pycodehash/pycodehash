@@ -1,24 +1,8 @@
+# TODO: obviated
 from __future__ import annotations
 
 import importlib
-from dataclasses import dataclass
 from types import FunctionType, ModuleType
-
-
-@dataclass
-class FQN:
-    module_name: str
-
-
-@dataclass
-class FunctionFQN(FQN):
-    function_name: str
-
-
-@dataclass
-class MethodFQN(FQN):
-    class_name: str
-    method_name: str
 
 
 def get_module_by_name(module_name: str) -> ModuleType | None:

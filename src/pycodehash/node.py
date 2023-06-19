@@ -1,4 +1,4 @@
-# Input class
+"""The Node class represents a python function and its metadata"""
 from __future__ import annotations
 
 import inspect
@@ -7,6 +7,8 @@ from typing import Callable
 
 class Node:
     """
+    The Node class consists of a function, fully qualified name and the fully qualified name of the module
+
     Args:
         qualname: the fully qualified name of the func
         module: the fully qualified name of the module
