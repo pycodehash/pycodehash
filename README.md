@@ -5,11 +5,8 @@ dataset := <id, type>
 pipeline := [nodes]
 
 hash(node) :=
--> preprocess (AST, Lines)
--> CallVisitor <-> calls
--> Resolve qualified name (tracer) <-> import bindings
--> Inliner
--> Hasher
+-> ...
+
 
 preprocess(AST) :=
 -> strip docstring
@@ -17,9 +14,17 @@ preprocess(AST) :=
 -> strip type hints
 
 preprocess(Lines) :=
--> normalize whitespace/newline
+-> normalize whitespace/newlines
 
 hash(dataset) :=
 -> map type => approximate hasher
 -> collect metadata
 -> hasher
+
+##
+
+https://tree-sitter.github.io/tree-sitter/playground
+https://github.com/kavigupta/ast_scope
+
+
+scope(ast.Node) -> {variable: value}

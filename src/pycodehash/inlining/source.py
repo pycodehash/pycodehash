@@ -52,6 +52,7 @@ def get_function_source(function_name: str, module_name: str) -> str | None:
     return src
 
 
+# TODO: remove, do via AST
 def _deindent(src: str) -> str:
     """Remove one level of indentation (assumes four spaces)
 

@@ -4,19 +4,19 @@ from pycodehash.preprocessing.lines_transformer import LinesTransformer
 
 
 class WhitespaceNormalizer(LinesTransformer):
-    """Normalize source code whitespace
+    """Normalize source code newlines
 
-    The leading and trailing whitespace is removed
+    The trailing whitespace is removed
     and line breaks are replaced with a semicolon
     (for identical cross-platform hashes).
     """
 
     def __init__(self):
-        self.sep = ";"
+        self.sep = "\n"
 
     def transform(self, src: str) -> str:
         """
-        Removes whitespace from lines, and joins lines with constant separator.
+        Removes whitespace from lines and joins lines with constant separator.
 
         Args:
             src: the source lines.
@@ -24,4 +24,4 @@ class WhitespaceNormalizer(LinesTransformer):
         Returns:
             The normalised string representation
         """
-        return self.sep.join(s.strip() for s in src.splitlines())
+        return self.sep.join(s.rstrip() for s in src.splitlines() if s)

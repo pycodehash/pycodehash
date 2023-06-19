@@ -5,7 +5,7 @@ from ast import NodeTransformer
 
 
 class TypeHintStripper(NodeTransformer):
-    """Removes type hint in the function signature and function body."""
+    """Removes the type hints in the function signature and function body."""
 
     def visit_FunctionDef(self, node):
         node.returns = None
