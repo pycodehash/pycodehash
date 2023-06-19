@@ -45,6 +45,7 @@ def hash_func_params(keywords: tuple[str], args: tuple[any], kwargs: dict[str, a
     return hash_string(json.dumps(params, ensure_ascii=False))
 
 
+# TODO: replace with new algo
 class FuncNodeHasher(NodeVisitor):
     """
     Create SHA256 hash of all function nodes.
@@ -56,7 +57,7 @@ class FuncNodeHasher(NodeVisitor):
     - set function name to "_" (see FunctionStripper)
     - remove docstring (see DocstringStripper)
     - remove type annotations (see TypehintStripper)
-    - strip whitespace (See WhitespaceNormalizer)
+    - strip white-space (See WhitespaceNormalizer)
     - strip line-endings (See WhitespaceNormalizer)
     """
 

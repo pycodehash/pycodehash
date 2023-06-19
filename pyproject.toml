@@ -20,6 +20,7 @@ authors = [
 
 dependencies = [
     'astunparse; python_version <= "3.9"',
+    'typing_extensions; python_version <= "3.11"',
 ]
 
 [project.optional-dependencies]
