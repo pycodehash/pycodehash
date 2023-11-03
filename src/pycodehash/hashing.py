@@ -1,9 +1,12 @@
 """Functionality to hash the function body."""
 from __future__ import annotations
 
+import ast
 import hashlib
+import inspect
 import json
 from ast import FunctionDef, NodeVisitor
+from types import FunctionType
 
 from pycodehash.preprocessing import (
     DocstringStripper,
@@ -11,6 +14,7 @@ from pycodehash.preprocessing import (
     TypeHintStripper,
     WhitespaceNormalizer,
 )
+from pycodehash.tracing.utils import get_func_location
 from pycodehash.unparse import _unparse
 
 
@@ -91,3 +95,32 @@ class FuncNodeHasher(NodeVisitor):
 
         # Hashing
         self.hashes[name] = hash_string(self.strings[name])
+
+
+def hash_function(
+    func: FunctionType, func_store, module_store, project_store, ast_transformers, lines_transformers
+) -> str:
+    src = inspect.getsource(func)
+    module = inspect.getmodule(func)
+    src_node = ast.parse(src)
+    # get module view from module store
+    mview = module_store.get(module)
+    ...
+    # get projects from project store
+    project = project_store.get(mview.pkg)
+
+    location = get_func_location(src, src_node, project)
+    if location in func_store:
+        return func_store[location]
+
+    # replace names of _tracked_ calls
+    src_node = HashCallNameTransformer(func_store, module_store, project_store).visit(src_node)
+    # Preprocessing of AST
+    for transformer in ast_transformers:
+        src_node = transformer.visit(src_node)
+    prc_src = _unparse(src_node)
+    for transformer in lines_transformers:
+        prc_src = transformer.transform(prc_src)
+    hash = hash_string(prc_src)
+    func_store[location] = hash
+    return hash
