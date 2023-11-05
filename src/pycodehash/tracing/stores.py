@@ -11,16 +11,23 @@ from types import FunctionType, ModuleType
 import asttokens
 from rope.base.libutils import analyze_modules
 from rope.base.project import Project
-from rope.contrib.findit import Location, find_definition
+from rope.contrib.findit import Location
 
 
 class FunctionStore:
+    # TODO(SB): perhaps just a typed dict instead of classes?
     def __init__(self):
         self.store: dict[Location, str] = {}
 
     def get(self, location: Location) -> str:
         """Get hash of function at `location`."""
         ...
+
+    def __getitem__(self, item: Location) -> str:
+        return self.store[item]
+
+    def __setitem__(self, key, value):
+        self.store[key] = value
 
 
 @dataclass
@@ -41,8 +48,8 @@ class ModuleStore:
         name = mod.__name__
         pkg, _sep, _stem = name.partition(".")
         path = Path(inspect.getsourcefile(mod))
-        code = (path.read_text(),)
-        tree = (ast.parse(code),)
+        code = path.read_text()
+        tree = ast.parse(code)
 
         return ModuleView(
             pkg=pkg,
@@ -62,7 +69,7 @@ class ModuleStore:
         self.store[name] = mod_view
 
     @singledispatchmethod
-    def get(self, key, error_if_missing: bool = False) -> ModuleView | None:
+    def get(self, key, error_if_missing: bool = False) -> ModuleView:
         """Retrieve ModuleView for `key`.
 
         Args:
@@ -118,10 +125,11 @@ class ModuleStore:
         return self.get_from_module(mod, error_if_missing)
 
     @get.register
-    def get_from_name(self, key: str, error_if_missing: bool = False) -> ModuleView | None:
+    def get_from_name(self, key: str, error_if_missing: bool = False) -> ModuleView:
         mod_view = self.store.get(key)
         if error_if_missing is True and mod_view is None:
             raise KeyError(f"Unknown name: {key}")
+        # TODO(SB): set mod_view = Default value
         return mod_view
 
 
@@ -136,7 +144,11 @@ class ProjectStore:
             pkg: package name
 
         """
-        project = Project(projectroot=find_spec(pkg).submodule_search_locations[0])
+        if pkg == "__main__":
+            raise ValueError("Cannot resolve `__main__` yet")
+
+        spec = find_spec(pkg)
+        project = Project(projectroot=spec.submodule_search_locations[0])
         analyze_modules(project)
         self.store[pkg] = project
 
@@ -157,14 +169,3 @@ class ProjectStore:
         """Create a list with all projects where the first project to which the module belongs to."""
         mod_project = self.get(mod.pkg)
         return [mod] + [v for v in self.store.values() if v != mod_project]
-
-
-def get_func_node(module: ast.Module) -> ast.FunctionDef:
-    for node in module.body:
-        if isinstance(node, ast.FunctionDef):
-            return node
-
-
-def get_func_location(code: str, module_tree: ast.Module, project, module) -> Location:
-    node = get_func_node(module_tree)
-    return find_definition(project, code, module.tree_tokens.get_text_range(node)[0])
