@@ -15,10 +15,16 @@ def get_func_node(module: ast.Module) -> ast.FunctionDef:
             return node
 
 
-def get_func_location(code: str, module_tree: ast.Module, project: Project, module: ModuleView) -> Location:
-    node = get_func_node(module_tree)
-    location = module.tree_tokens.get_text_range(node)
-    offset, _ = location
+def get_func_def_location(node: ast.Call, project: Project, module: ModuleView) -> Location:
+    """Get location of function defintion of a ast.Call node.
 
-    # TODO(SB): incomplete, offset needs to be the identifier, not function definition. Now manually increase by "def "
-    return find_definition(project, code, offset + 4)
+    Args:
+        node: the call node in the source function
+        project: the analysed project
+        module: the view on the module that contains the function in which `node` is called.
+
+    Returns:
+        location: the rope location object
+    """
+    token_offset = module.tree_tokens.get_text_range(node)
+    return find_definition(project, module.code, token_offset)
