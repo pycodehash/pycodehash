@@ -167,5 +167,7 @@ class ProjectStore:
 
     def get_projects(self, mod: ModuleView | None = None) -> list[Project]:
         """Create a list with all projects where the first project to which the module belongs to."""
+        if mod is None:
+            return list(self.store.values())
         mod_project = self.get(mod.pkg)
-        return [mod] + [v for v in self.store.values() if v != mod_project]
+        return [mod_project] + [v for v in self.store.values() if v != mod_project]
