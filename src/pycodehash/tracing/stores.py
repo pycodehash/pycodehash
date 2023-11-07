@@ -11,6 +11,7 @@ from types import FunctionType, ModuleType
 import asttokens
 from rope.base.libutils import analyze_modules
 from rope.base.project import Project
+from rope.base.pyobjectsdef import PyModule
 from rope.contrib.findit import Location
 
 
@@ -44,12 +45,46 @@ class ModuleStore:
     def __init__(self):
         self.store: dict[str, ModuleView] = {}
 
-    def _create_module_view(self, mod: ModuleType) -> ModuleView:
+    @singledispatchmethod
+    def _get_module_name(self, mod) -> str:
+        raise NotImplementedError("`mod` must a `ModuleType` or `rope.PyModule`.")
+
+    @_get_module_name.register
+    def _get_module_name_module_type(self, mod: ModuleType) -> str:
+        return mod.__name__
+
+    @_get_module_name.register
+    def _get_module_name_pymodule(self, mod: PyModule) -> str:
+        return mod.get_name()
+
+    @singledispatchmethod
+    def _create_module_view(self, mod) -> ModuleView:
+        raise NotImplementedError("`mod` must a `ModuleType` or `rope.PyModule`.")
+
+    @_create_module_view.register
+    def _create_module_view_from_module_type(self, mod: ModuleType) -> ModuleView:
         name = mod.__name__
         pkg, _sep, _stem = name.partition(".")
         path = Path(inspect.getsourcefile(mod))
         code = path.read_text()
         tree = ast.parse(code)
+
+        return ModuleView(
+            pkg=pkg,
+            name=name,
+            path=path,
+            code=code,
+            tree=tree,
+            tree_tokens=asttokens.ASTTokens(code, parse=False, tree=tree),
+        )
+
+    @_create_module_view.register
+    def _create_module_view_from_pymodule(self, mod: PyModule) -> ModuleView:
+        name = mod.get_name()
+        pkg, _sep, _stem = name.partition(".")
+        path = mod.get_resource().pathlib
+        code = mod.resource.read()
+        tree = mod.get_ast()
 
         return ModuleView(
             pkg=pkg,
@@ -84,8 +119,9 @@ class ModuleStore:
         """
         raise NotImplementedError("`key` must a `str` or `FunctionType`.")
 
-    @get.register
-    def get_from_module(self, key: ModuleType, error_if_missing: bool = False) -> ModuleView:
+    @get.register(ModuleType)
+    @get.register(PyModule)
+    def get_from_module(self, key: ModuleType | PyModule, error_if_missing: bool = False) -> ModuleView:
         """Retrieve ModuleView from module.
 
         Args:
@@ -97,7 +133,7 @@ class ModuleStore:
             KeyError: when `key` is unknown and `error_if_missing` is True
 
         """
-        name = key.__name__
+        name = self._get_module_name(key)
         mod_view = self.store.get(name)
 
         if mod_view is not None:
