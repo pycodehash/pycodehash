@@ -1,14 +1,17 @@
 """Functionality to hash the function body."""
 from __future__ import annotations
 
-import ast
 import hashlib
 import inspect
 import json
 from types import FunctionType
 
-from pycodehash.tracing.stores import ModuleStore, FunctionStore, ProjectStore
-from pycodehash.tracing.utils import get_func_location
+from rope.base.project import Project
+from rope.contrib.findit import Location
+
+from pycodehash.tracing.stores import FunctionStore, ModuleStore, ProjectStore
+from pycodehash.tracing.transfomers import HashCallNameTransformer
+from pycodehash.tracing.utils import get_func_def_location, get_func_node_from_location
 from pycodehash.unparse import _unparse
 
 
@@ -91,39 +94,50 @@ def hash_func_params(keywords: tuple[str], args: tuple[any], kwargs: dict[str, a
 #         self.hashes[name] = hash_string(self.strings[name])
 
 
-def hash_function(
-    func: FunctionType,
-    func_store: FunctionStore,
-    module_store: ModuleStore,
-    project_store: ProjectStore,
-    ast_transformers: list,
-    lines_transformers: list,
-) -> str:
-    src = inspect.getsource(func)
-    module = inspect.getmodule(func)
-    src_node = ast.parse(src)
-    # get module view from module store
-    mview = module_store.get(module)
-    ...
-    # get projects from project store
-    project = project_store.get(mview.pkg)
+class FunctionHasher:
+    def __init__(
+        self,
+        func_store: FunctionStore,
+        module_store: ModuleStore,
+        project_store: ProjectStore,
+        ast_transformers: list,
+        lines_transformers: list,
+    ):
+        self.func_store = func_store
+        self.module_store = module_store
+        self.project_store = project_store
+        self.ast_transformers = ast_transformers
+        self.lines_transformers = lines_transformers
 
-    location = get_func_location(src, src_node, project, mview)
-    if location in func_store.store:
-        return func_store[location]
+    def hash_location(self, location: Location, project: Project) -> str:
+        if location in self.func_store.store:
+            return self.func_store[location]
 
-    # replace names of _tracked_ calls
-    src_node = HashCallNameTransformer(func_store, module_store, project_store).visit(src_node)
+        # get the code for the function
+        src_node = get_func_node_from_location(location, project)
 
-    # Preprocessing of AST
-    for transformer in ast_transformers:
-        src_node = transformer.visit(src_node)
+        # replace names of _tracked_ calls
+        src_node = HashCallNameTransformer(self).visit(src_node)
 
-    prc_src = _unparse(src_node)
+        # Preprocessing of AST
+        for transformer in self.ast_transformers:
+            src_node = transformer.visit(src_node)
 
-    for transformer in lines_transformers:
-        prc_src = transformer.transform(prc_src)
+        prc_src = _unparse(src_node)
 
-    hash = hash_string(prc_src)
-    func_store[location] = hash
-    return hash
+        for transformer in self.lines_transformers:
+            prc_src = transformer.transform(prc_src)
+
+        hash = hash_string(prc_src)
+        self.func_store[location] = hash
+        return hash
+
+    def hash_func(self, func: FunctionType):
+        module = inspect.getmodule(func)
+        # get module view from module store
+        mview = self.module_store.get(module)
+        # get projects from project store
+        project = self.project_store.get(mview.pkg)
+
+        location = get_func_def_location(func, project)
+        return self.hash_location(location, project)
