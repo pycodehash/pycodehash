@@ -42,15 +42,13 @@ class LocalFileHash(ApproximateHasher):
             return self._collect_metadata_dir(path)
         return self._collect_metadata_file(path)
 
-    def _collect_metadata_file(self, file_path: str | Path) -> dict[str, Any]:
-        path = Path(file_path)
+    def _collect_metadata_file(self, path: Path) -> dict[str, Any]:
         last_modified = path.stat().st_mtime
         last_modified = datetime.fromtimestamp(last_modified)
         file_size = path.stat().st_size
         return {"last_modified": last_modified, "size": file_size}
 
-    def _collect_metadata_dir(self, dir_path: str | Path) -> dict[str, Any]:
-        path = Path(dir_path)
+    def _collect_metadata_dir(self, path: Path) -> dict[str, Any]:
         all_files_in_dir = list(path.rglob("*"))
         dict_to_hash = {
             str(file_path): self._collect_metadata_file(file_path)
