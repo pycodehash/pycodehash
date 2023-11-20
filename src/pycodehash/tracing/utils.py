@@ -27,6 +27,24 @@ def get_func_node_from_location(location: Location, project: Project) -> ast.Fun
     return func.ast_node
 
 
+def _get_text_range(node: ast.expr, tokens):
+    """Get string offset from ast Node
+    This is a workaround since `asttoken.get_text_range` needs to be an "EnhancedAST" node...
+
+    Args:
+        node: ast Node
+        tokens: asttoken tokens
+
+    Returns:
+        Offset tuple. Returns 0,0 if not found
+    """
+    for token in tokens:
+        if token.start == (node.lineno, node.col_offset) and token.end == (node.end_lineno, node.end_col_offset):
+            return token.startpos, token.endpos
+
+    return 0, 0
+
+
 def get_func_call_location(node: ast.Call, project: Project, module: ModuleView) -> Location | None:
     """Get location of function definition of an ast.Call node.
 
@@ -38,9 +56,12 @@ def get_func_call_location(node: ast.Call, project: Project, module: ModuleView)
     Returns:
         location: the rope location object or None if no location could be found
     """
-    token_offset = module.tree_tokens.get_text_range(node)
-    return find_definition(project, module.code, token_offset)
+    token_offset = _get_text_range(node, module.tree_tokens.tokens)
+    if token_offset == (0, 0):
+        logger.debug("Node not found")
+        return None
 
+    definition_location = find_definition(project, module.code, token_offset[0])
 
 
 def get_func_def_location(func: Callable, project: Project | ProjectStore) -> Location | None:
