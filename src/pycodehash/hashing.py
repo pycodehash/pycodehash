@@ -5,6 +5,7 @@ import hashlib
 import inspect
 import json
 from types import FunctionType
+from typing import Callable
 
 from rope.base.project import Project
 from rope.contrib.findit import Location
@@ -119,6 +120,7 @@ class FunctionHasher:
         Returns:
             Hash string based on the location
         """
+        # check if the location was already hashed, if so return
         if location in self.func_store.store:
             return self.func_store[location]
 
@@ -140,6 +142,7 @@ class FunctionHasher:
         hash = hash_string(prc_src)
         self.func_store[location] = hash
         return hash
+    def hash_func(self, func: Callable) -> str:
 
     def hash_func(self, func: FunctionType):
         module = inspect.getmodule(func)
