@@ -41,6 +41,7 @@ class HashCallNameTransformer(NodeTransformer):
         # here we make use of the fact that `NodeTransformer` perform a depth-first traversal
         # the first Name node should be the name of the call.
         super().generic_visit(node)
+        return node
 
     def visit_Name(self, node: ast.Name):
         if self.hash_repr is not None:
