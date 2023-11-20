@@ -23,6 +23,7 @@ class HashCallNameTransformer(NodeTransformer):
             if module is not None:
                 break
         self.module: ModuleView = self.hasher.module_store.get_from_module(module)
+        self.hash_repr = None
 
     def find_definition(self, node, project) -> Location | None:
         loc = get_func_call_location(node, project, self.module)

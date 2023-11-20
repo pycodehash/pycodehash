@@ -4,7 +4,7 @@ from __future__ import annotations
 import hashlib
 import inspect
 import json
-from types import FunctionType
+import logging
 from typing import Callable
 
 from rope.base.project import Project
@@ -139,12 +139,24 @@ class FunctionHasher:
         for transformer in self.lines_transformers:
             prc_src = transformer.transform(prc_src)
 
-        hash = hash_string(prc_src)
-        self.func_store[location] = hash
-        return hash
-    def hash_func(self, func: Callable) -> str:
+        logger.debug(f"lines-preprocessed source `{prc_src}`")
 
-    def hash_func(self, func: FunctionType):
+        function_hash = hash_string(prc_src)
+        self.func_store[location] = function_hash
+        return function_hash
+
+    def hash_func(self, func: Callable) -> str:
+        """Hash a Python function
+
+        Args:
+            func: the Python function
+
+        Returns:
+            The hash of the function
+        """
+        logger.debug(f"Hashing `{func.__name__}`")
+
+        # get the module from the function
         module = inspect.getmodule(func)
         # get module view from module store
         mview = self.module_store.get(module)

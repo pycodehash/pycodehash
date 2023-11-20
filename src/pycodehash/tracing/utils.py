@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import ast
-from types import FunctionType
+import logging
 from typing import Callable
 
 from rope.base.project import Project
@@ -42,8 +42,7 @@ def get_func_call_location(node: ast.Call, project: Project, module: ModuleView)
     return find_definition(project, module.code, token_offset)
 
 
-def get_func_def_location(func: FunctionType, project: Project | ProjectStore) -> Location | None:
-    """Get location of function defintion from a FunctionType.
+
 def get_func_def_location(func: Callable, project: Project | ProjectStore) -> Location | None:
     """Get the location of function definition from a FunctionType.
 
