@@ -24,7 +24,6 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-
 test = [
     "pytest",
     "tliba @ {root:uri}/tests/resources/tliba"
