@@ -35,10 +35,25 @@ class LocalFileHash(ApproximateHasher):
     Fast approximate hash for local files
     Based on last modification time and file size only.
     """
-    def collect_metadata(self, file_path: str | Path) -> dict[str, Any]:
-        path = Path(file_path)
 
+    def collect_metadata(self, path: str | Path) -> dict[str, Any]:
+        path = Path(path)
+        if path.is_dir():
+            return self._collect_metadata_dir(path)
+        return self._collect_metadata_file(path)
+
+    def _collect_metadata_file(self, file_path: str | Path) -> dict[str, Any]:
+        path = Path(file_path)
         last_modified = path.stat().st_mtime
         last_modified = datetime.fromtimestamp(last_modified)
         file_size = path.stat().st_size
         return {"last_modified": last_modified, "size": file_size}
+
+    def _collect_metadata_dir(self, dir_path: str | Path) -> dict[str, Any]:
+        path = Path(dir_path)
+        all_files_in_dir = list(path.rglob("*"))
+        dict_to_hash = {
+            str(file_path): self._collect_metadata_file(file_path)
+            for file_path in all_files_in_dir
+        }
+        return dict_to_hash
