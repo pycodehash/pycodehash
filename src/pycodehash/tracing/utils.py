@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import ast
 from types import FunctionType
+from typing import Callable
 
 from rope.base.project import Project
 from rope.base.pyobjectsdef import PyModule
@@ -43,6 +44,7 @@ def get_func_call_location(node: ast.Call, project: Project, module: ModuleView)
 
 def get_func_def_location(func: FunctionType, project: Project | ProjectStore) -> Location | None:
     """Get location of function defintion from a FunctionType.
+def get_func_def_location(func: Callable, project: Project | ProjectStore) -> Location | None:
     """Get the location of function definition from a FunctionType.
 
     Args:

@@ -35,7 +35,7 @@ class FunctionStore:
 class ModuleView:
     pkg: str
     name: str
-    path: str
+    path: Path
     code: str
     tree: ast.Module
     tree_tokens: asttokens.ASTTokens
