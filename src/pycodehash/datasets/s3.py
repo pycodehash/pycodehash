@@ -44,7 +44,7 @@ class S3Hash(ApproximateHasher):
         """Get metadata of s3 file (specifically the MD5 hash of the file on s3)
 
         Args:
-            s3_file_path:  path to the file on s3
+            s3_file_path: path to the file on s3
             bucket: name of the bucket
             key: bucket key
 

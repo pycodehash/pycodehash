@@ -126,7 +126,7 @@ class ModuleStore:
 
         Args:
             key: the module for which to retrieve its view
-            error_if_missing: raise error if `key` is unknown, otherwhise a ModuleView is created
+            error_if_missing: raise error if `key` is unknown, otherwise a ModuleView is created
                 and returned.
 
         Raises:
@@ -150,7 +150,7 @@ class ModuleStore:
 
         Args:
             key: the function for which to retrieve its module
-            error_if_missing: raise error if `key` is unknown, otherwhise a ModuleView is created
+            error_if_missing: raise error if `key` is unknown, otherwise a ModuleView is created
                 and returned.
 
         Raises:

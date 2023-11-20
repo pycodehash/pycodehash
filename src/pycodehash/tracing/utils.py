@@ -27,7 +27,7 @@ def get_func_node_from_location(location: Location, project: Project) -> ast.Fun
 
 
 def get_func_call_location(node: ast.Call, project: Project, module: ModuleView) -> Location | None:
-    """Get location of function defintion of a ast.Call node.
+    """Get location of function definition of an ast.Call node.
 
     Args:
         node: the call node in the source function
@@ -43,6 +43,7 @@ def get_func_call_location(node: ast.Call, project: Project, module: ModuleView)
 
 def get_func_def_location(func: FunctionType, project: Project | ProjectStore) -> Location | None:
     """Get location of function defintion from a FunctionType.
+    """Get the location of function definition from a FunctionType.
 
     Args:
         func: the function to obtain the location for

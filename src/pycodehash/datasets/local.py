@@ -31,8 +31,7 @@ def hash_file_full(file_path: str | Path):
 
 
 class LocalFileHash(ApproximateHasher):
-    """
-    Fast approximate hash for local files
+    """Fast approximate hash for local files
     Based on last modification time and file size only.
     """
 
