@@ -110,6 +110,15 @@ class FunctionHasher:
         self.lines_transformers = lines_transformers
 
     def hash_location(self, location: Location, project: Project) -> str:
+        """Hash a location (~text range) of Python code
+
+        Args:
+            location: rope Location
+            project: rope Project
+
+        Returns:
+            Hash string based on the location
+        """
         if location in self.func_store.store:
             return self.func_store[location]
 

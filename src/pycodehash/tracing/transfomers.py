@@ -12,6 +12,8 @@ from pycodehash.tracing.utils import get_func_call_location
 
 
 class HashCallNameTransformer(NodeTransformer):
+    """Replace the function names in a call with the hash of that call"""
+
     def __init__(self, hasher, location: Location):
         self._calls = []
         self.hasher = hasher
@@ -29,6 +31,7 @@ class HashCallNameTransformer(NodeTransformer):
         return loc
 
     def visit_Call(self, node: ast.Call):
+        """Find the hash each call"""
         # iterate over the projects until we find the location.
         # the first project is the one to which the module belongs.
         for project in self.project_store.get_projects(self.module):
@@ -44,6 +47,7 @@ class HashCallNameTransformer(NodeTransformer):
         return node
 
     def visit_Name(self, node: ast.Name):
+        """Replace the name of a call with the source hash"""
         if self.hash_repr is not None:
             node.id = self.hash_repr
             self.hash_repr = None

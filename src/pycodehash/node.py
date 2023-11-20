@@ -6,8 +6,7 @@ from typing import Callable
 
 
 class Node:
-    """
-    The Node class consists of a function, fully qualified name and the fully qualified name of the module
+    """The Node class consists of a function, fully qualified name and the fully qualified name of the module
 
     Args:
         qualname: the fully qualified name of the func

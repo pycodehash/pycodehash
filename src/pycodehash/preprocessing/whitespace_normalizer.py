@@ -15,8 +15,7 @@ class WhitespaceNormalizer(LinesTransformer):
         self.sep = "\n"
 
     def transform(self, src: str) -> str:
-        """
-        Removes whitespace from lines and joins lines with constant separator.
+        """Removes whitespace from lines and joins lines with constant separator.
 
         Args:
             src: the source lines.
