@@ -47,54 +47,6 @@ def hash_func_params(keywords: tuple[str], args: tuple[any], kwargs: dict[str, a
     return hash_string(json.dumps(params, ensure_ascii=False))
 
 
-# TODO: replace with new algo
-# class FuncNodeHasher(NodeVisitor):
-#     """
-#     Create SHA256 hash of all function nodes.
-#
-#     A sequence of preprocessing steps is applied to the code
-#     to ensure that equivalent code generates identical hashes.
-#
-#     The following preprocessing steps are taken:
-#     - set function name to "_" (see FunctionStripper)
-#     - remove docstring (see DocstringStripper)
-#     - remove type annotations (see TypehintStripper)
-#     - strip white-space (See WhitespaceNormalizer)
-#     - strip line-endings (See WhitespaceNormalizer)
-#     """
-#
-#     def __init__(self):
-#         self.strings: dict[str, str] = {}
-#         self.hashes: dict[str, str] = {}
-#         self.ast_transformers = [
-#             FunctionStripper(),
-#             DocstringStripper(),
-#             TypeHintStripper(),
-#         ]
-#         self.lines_transformers = [
-#             WhitespaceNormalizer(),
-#         ]
-#
-#     def visit_FunctionDef(self, node: FunctionDef):
-#         super().generic_visit(node)
-#
-#         # Save node name before it is stripped
-#         name = node.name
-#
-#         # Preprocessing of AST
-#         for transformer in self.ast_transformers:
-#             node = transformer.visit(node)
-#
-#         # Preprocessing of Lines
-#         src = _unparse(node)
-#         for transformer in self.lines_transformers:
-#             src = transformer.transform(src)
-#         self.strings[name] = src
-#
-#         # Hashing
-#         self.hashes[name] = hash_string(self.strings[name])
-
-
 class FunctionHasher:
     def __init__(
         self,
