@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import ast
+import logging
 from ast import NodeTransformer
+
+logger = logging.getLogger(__name__)
 
 
 class DocstringStripper(NodeTransformer):
@@ -22,5 +25,6 @@ class DocstringStripper(NodeTransformer):
             and isinstance(node.value, ast.Constant)
             and isinstance(node.value.value, str)
         ):
+            logger.debug("Remove docstring from function")
             return None
         return node
