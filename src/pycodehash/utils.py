@@ -38,9 +38,14 @@ def _get_text_range(node: ast.expr, tokens):
     Returns:
         Offset tuple. Returns 0,0 if not found
     """
+    start = end = None
     for token in tokens:
-        if token.start == (node.lineno, node.col_offset) and token.end == (node.end_lineno, node.end_col_offset):
-            return token.startpos, token.endpos
+        if token.start == (node.lineno, node.col_offset):
+            start = token.startpos
+        if token.end == (node.end_lineno, node.end_col_offset):
+            end = token.endpos
+    if start is not None and end is not None:
+        return start, end
 
     return 0, 0
 
