@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import hashlib
 import inspect
-import json
 import logging
 from typing import Callable
 
@@ -26,25 +25,6 @@ def hash_string(input_string: str) -> str:
         SHA256 hashed string
     """
     return hashlib.sha256(input_string.encode("utf-8")).hexdigest()
-
-
-def hash_func_params(keywords: tuple[str], args: tuple[any], kwargs: dict[str, any]) -> str:
-    """Hash args and kwargs of a function.
-
-    Note that the params should adhere to the JSON specification.
-
-    Args:
-        keywords: function parameter names
-        args: arguments passed
-        kwargs: keyword arguments passed
-
-    Returns:
-        hash representation of input parameters
-
-    """
-    params = {keywords[i]: arg for i, arg in enumerate(args)}
-    params.update(kwargs)
-    return hash_string(json.dumps(params, ensure_ascii=False))
 
 
 class FunctionHasher:

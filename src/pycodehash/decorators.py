@@ -1,8 +1,28 @@
 # TODO: move to utilipy?
 """Decorators."""
 import inspect
+import json
 
-from pycodehash.hashing import hash_func_params
+from pycodehash.hashing import hash_string
+
+
+def hash_func_params(keywords: tuple[str], args: tuple[any], kwargs: dict[str, any]) -> str:
+    """Hash args and kwargs of a function.
+
+    Note that the params should adhere to the JSON specification.
+
+    Args:
+        keywords: function parameter names
+        args: arguments passed
+        kwargs: keyword arguments passed
+
+    Returns:
+        hash representation of input parameters
+
+    """
+    params = {keywords[i]: arg for i, arg in enumerate(args)}
+    params.update(kwargs)
+    return hash_string(json.dumps(params, ensure_ascii=False))
 
 
 def cache(func):
