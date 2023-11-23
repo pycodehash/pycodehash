@@ -1,22 +1,14 @@
 from __future__ import annotations
 
 import ast
-import logging
 from typing import Callable
 
-from rope.base.project import Project
-from rope.base.pyobjectsdef import PyModule
+from rope.base.libutils import path_to_resource
+from rope.base.project import Project, NoProject
 from rope.contrib.findit import Location, find_definition
 from rope.refactor import occurrences
 
 from pycodehash.stores import ModuleView
-
-
-def get_func_node(module: ast.Module) -> ast.FunctionDef:
-    """Get function from module (`rope` always wraps functions)"""
-    for node in module.body:
-        if isinstance(node, ast.FunctionDef):
-            return node
 
 
 def get_func_node_from_location(location: Location, project: Project) -> ast.FunctionDef:
@@ -38,38 +30,46 @@ def get_func_call_location(node: ast.Call, project: Project, module: ModuleView)
 
     Returns:
         location: the rope location object or None if no location could be found
+
+    Raises:
+        ValueError: when Call is not found in the AST Tree
     """
     token_offset = module.tree_tokens.get_text_range(node)
     if token_offset == (0, 0):
-        logger.debug("Node not found")
-        return None
+        raise ValueError("Token not found")
 
     definition_location = find_definition(project, module.code, token_offset[0])
     return definition_location
 
 
 def get_func_def_location(func: Callable, project: Project | ProjectStore) -> Location | None:
+def get_func_def_location(func: Callable, project: Project) -> Location | None:
     """Get the location of function definition from a FunctionType.
 
     Args:
         func: the function to obtain the location for
-        project: the analysed project or all analysed projects.
+        project: the analysed project
 
     Returns:
         location: the rope location object or None if no location could be found
     """
-    if isinstance(project, ProjectStore):
-        for proj in project.get_projects():
-            module = proj.get_module(func.__module__)
-            if isinstance(module, PyModule):
-                break
-    else:
-        module = project.get_module(func.__module__)
-
-    if module is None:
-        raise RuntimeError(f"func `{func.__name__}` does not appear to be defined in the project(s).")
-
+    module = project.get_module(func.__module__)
     finder = occurrences.Finder(project, func.__name__)
     for occurrence in finder.find_occurrences(pymodule=module):
         return Location(occurrence)
     return None
+
+
+def find_call_definition(node: ast.expr, module, project) -> Location | None:
+    loc = get_func_call_location(node, project, module)
+    if loc is None:
+        return None
+
+    # Use current module is location resource is empty
+    if isinstance(loc, Location) and loc.resource is None:
+        loc.resource = path_to_resource(project, module.path, type="file")
+        # Important to be consistent with found Location objects!
+        loc.resource.project = NoProject()
+        loc.resource._path = str(module.path)
+
+    return loc

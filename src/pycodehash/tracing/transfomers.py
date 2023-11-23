@@ -4,40 +4,34 @@ from __future__ import annotations
 import ast
 from ast import NodeTransformer
 
-from rope.base.libutils import path_to_resource
 from rope.contrib.findit import Location
 
-from pycodehash.tracing.stores import ModuleView, ProjectStore
-from pycodehash.tracing.utils import get_func_call_location
 from pycodehash.stores import ModuleView, ProjectStore
+from pycodehash.utils import find_call_definition
 
 
 class HashCallNameTransformer(NodeTransformer):
     """Replace the function names in a call with the hash of that call"""
 
     def __init__(self, hasher, location: Location):
-        self._calls = []
         self.hasher = hasher
         self.project_store: ProjectStore = hasher.project_store
         for project in self.project_store.get_projects():
+        projects = self.project_store.get_projects()
+        for project in projects:
             module = project.get_pymodule(location.resource)
             if module is not None:
                 break
-        self.module: ModuleView = self.hasher.module_store.get_from_module(module)
+        self.module: ModuleView = self.hasher.module_store[module]
         self.hash_repr = None
-
-    def find_definition(self, node, project) -> Location | None:
-        loc = get_func_call_location(node, project, self.module)
-        if isinstance(loc, Location) and loc.resource is None:
-            loc.resource = path_to_resource(project, self.module.path)
-        return loc
 
     def visit_Call(self, node: ast.Call):
         """Find the hash each call"""
         # iterate over the projects until we find the location.
         # the first project is the one to which the module belongs.
-        for project in self.project_store.get_projects(self.module):
-            location = self.find_definition(node, project)
+        projects = self.project_store.get_projects(self.module)
+        for project in projects:
+            location = find_call_definition(node, self.module, project)
             if isinstance(location, Location):
                 # here we recurse into the hashing function
                 self.hash_repr = self.hasher.hash_location(location, project)
