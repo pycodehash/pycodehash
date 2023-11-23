@@ -16,7 +16,7 @@ class HashCallNameTransformer(NodeTransformer):
     def __init__(self, hasher, location: Location):
         self.hasher = hasher
         self.project_store: ProjectStore = hasher.project_store
-        for project in self.project_store.get_projects():
+
         projects = self.project_store.get_projects()
         for project in projects:
             module = project.get_pymodule(location.resource)
