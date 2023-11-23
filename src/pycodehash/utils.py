@@ -22,7 +22,8 @@ def get_func_node(module: ast.Module) -> ast.FunctionDef:
 def get_func_node_from_location(location: Location, project: Project) -> ast.FunctionDef:
     """Get func node from rope Location."""
     module = project.get_pymodule(location.resource)
-    fname = location.resource.read()[location.region[0] : location.region[1]]
+    src = location.resource.read()
+    fname = src[location.region[0] : location.region[1]]
     func = module.get_attribute(fname).get_object()
     return func.ast_node
 
