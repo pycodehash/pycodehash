@@ -60,7 +60,7 @@ class FunctionHasher:
         src_node = get_func_node_from_location(location, project)
 
         # replace names of _tracked_ calls
-        src_node = HashCallNameTransformer(self).visit(src_node)
+        src_node = HashCallNameTransformer(self, location).visit(src_node)
 
         logger.debug(f"transformed source `{_unparse(src_node)}`")
 
