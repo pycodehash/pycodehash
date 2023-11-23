@@ -62,7 +62,8 @@ class FunctionHasher:
         # replace names of _tracked_ calls
         src_node = HashCallNameTransformer(self).visit(src_node)
 
-        # Preprocessing of AST
+        logger.debug(f"transformed source `{_unparse(src_node)}`")
+
         # preprocessing of AST
         for transformer in self.ast_transformers:
             src_node = transformer.visit(src_node)
@@ -90,10 +91,19 @@ class FunctionHasher:
 
         # get the module from the function
         module = inspect.getmodule(func)
-        # get module view from module store
-        mview = self.module_store.get(module)
-        # get projects from project store
-        project = self.project_store.get(mview.pkg)
+        name = module.__name__
+        pkg, _, _ = name.partition(".")
 
+        # get the `rope` project from project store
+        project = self.project_store[pkg]
+
+        mod = project.get_module(name)
+
+        # get module view from module store
+        mview = self.module_store[mod]
+
+        # get the location (~text range) from the function using the project
         location = get_func_def_location(func, project)
+
+        # compute the hash
         return self.hash_location(location, project)
