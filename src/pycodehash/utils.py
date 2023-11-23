@@ -9,7 +9,7 @@ from rope.base.pyobjectsdef import PyModule
 from rope.contrib.findit import Location, find_definition
 from rope.refactor import occurrences
 
-from pycodehash.tracing.stores import ModuleView, ProjectStore
+from pycodehash.stores import ModuleView
 
 
 def get_func_node(module: ast.Module) -> ast.FunctionDef:
