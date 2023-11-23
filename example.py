@@ -1,17 +1,16 @@
-from pycodehash import hash_function
-from pycodehash.preprocessing import FunctionStripper, DocstringStripper, TypeHintStripper, WhitespaceNormalizer
-from pycodehash.tracing.stores import FunctionStore, ModuleStore, ProjectStore
+import logging
+
+from pycodehash import FunctionHasher
+from pycodehash.preprocessing import DocstringStripper, FunctionStripper, TypeHintStripper, WhitespaceNormalizer
+
+from tliba.etl import add_bernoulli_samples, combine_random_samples
+from tliba import compute_moments
+
+# Enable debugging
+logging.basicConfig(level=logging.DEBUG)
 
 
-def hello():
-    return None
-
-
-h1 = hash_function(
-    hash_function,
-    func_store=FunctionStore(),
-    module_store=ModuleStore(),
-    project_store=ProjectStore(),
+fh = FunctionHasher(
     ast_transformers=[
         FunctionStripper(),
         DocstringStripper(),
@@ -21,4 +20,14 @@ h1 = hash_function(
         WhitespaceNormalizer(),
     ],
 )
-print(h1)
+# Hash the function `add_bernoulli_samples`
+h1 = fh.hash_func(add_bernoulli_samples)
+print('Hash for `add_bernoulli_samples`', h1)
+
+# Hash the function `compute_moments`
+h2 = fh.hash_func(compute_moments)
+print('Hash for `compute_moments`', h2)
+
+# Hash the function `combine_random_samples`
+h3 = fh.hash_func(combine_random_samples)
+print('Hash for `combine_random_samples`', h3)

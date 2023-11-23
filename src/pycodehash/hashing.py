@@ -30,17 +30,17 @@ def hash_string(input_string: str) -> str:
 class FunctionHasher:
     def __init__(
         self,
-        func_store: FunctionStore,
-        module_store: ModuleStore,
-        project_store: ProjectStore,
-        ast_transformers: list,
-        lines_transformers: list,
+        ast_transformers: list | None = None,
+        lines_transformers: list | None = None,
+        func_store: FunctionStore | None = None,
+        module_store: ModuleStore | None = None,
+        project_store: ProjectStore | None = None,
     ):
-        self.func_store = func_store
-        self.module_store = module_store
-        self.project_store = project_store
-        self.ast_transformers = ast_transformers
-        self.lines_transformers = lines_transformers
+        self.func_store = func_store or FunctionStore()
+        self.module_store = module_store or ModuleStore()
+        self.project_store = project_store or ProjectStore()
+        self.ast_transformers = ast_transformers or []
+        self.lines_transformers = lines_transformers or []
 
     def hash_location(self, location: Location, project: Project) -> str:
         """Hash a location (~text range) of Python code
