@@ -63,15 +63,15 @@ class FunctionHasher:
         src_node = HashCallNameTransformer(self).visit(src_node)
 
         # Preprocessing of AST
+        # preprocessing of AST
         for transformer in self.ast_transformers:
             src_node = transformer.visit(src_node)
 
         prc_src = _unparse(src_node)
 
+        # preprocessing of the lines
         for transformer in self.lines_transformers:
             prc_src = transformer.transform(prc_src)
-
-        logger.debug(f"lines-preprocessed source `{prc_src}`")
 
         function_hash = hash_string(prc_src)
         self.func_store[location] = function_hash
