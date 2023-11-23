@@ -9,6 +9,7 @@ from rope.contrib.findit import Location
 
 from pycodehash.tracing.stores import ModuleView, ProjectStore
 from pycodehash.tracing.utils import get_func_call_location
+from pycodehash.stores import ModuleView, ProjectStore
 
 
 class HashCallNameTransformer(NodeTransformer):

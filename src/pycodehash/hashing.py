@@ -9,7 +9,7 @@ from typing import Callable
 from rope.base.project import Project
 from rope.contrib.findit import Location
 
-from pycodehash.tracing.stores import FunctionStore, ModuleStore, ProjectStore
+from pycodehash.stores import FunctionStore, ModuleStore, ProjectStore
 from pycodehash.tracing.transfomers import HashCallNameTransformer
 from pycodehash.utils import get_func_def_location, get_func_node_from_location
 from pycodehash.unparse import _unparse
