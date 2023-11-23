@@ -42,7 +42,6 @@ def get_func_call_location(node: ast.Call, project: Project, module: ModuleView)
     return definition_location
 
 
-def get_func_def_location(func: Callable, project: Project | ProjectStore) -> Location | None:
 def get_func_def_location(func: Callable, project: Project) -> Location | None:
     """Get the location of function definition from a FunctionType.
 
