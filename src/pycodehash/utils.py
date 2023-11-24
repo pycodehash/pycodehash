@@ -4,11 +4,12 @@ import ast
 from typing import Callable
 
 from rope.base.libutils import path_to_resource
-from rope.base.project import Project, NoProject
-from rope.contrib.findit import Location, find_definition
+from rope.base.project import NoProject, Project
+from rope.contrib.findit import Location
 from rope.refactor import occurrences
 
 from pycodehash.stores import ModuleView
+from pycodehash.tracing import check_func_definition, robust_find_definition
 
 
 def get_func_node_from_location(location: Location, project: Project) -> ast.FunctionDef:
@@ -34,12 +35,8 @@ def get_func_call_location(node: ast.Call, project: Project, module: ModuleView)
     Raises:
         ValueError: when Call is not found in the AST Tree
     """
-    token_offset = module.tree_tokens.get_text_range(node)
-    if token_offset == (0, 0):
-        raise ValueError("Token not found")
-
-    definition_location = find_definition(project, module.code, token_offset[0])
-    return definition_location
+    # TODO[RU] decide on how to structure this better
+    return robust_find_definition(node, module, project)
 
 
 def get_func_def_location(func: Callable, project: Project) -> Location | None:
@@ -53,7 +50,8 @@ def get_func_def_location(func: Callable, project: Project) -> Location | None:
         location: the rope location object or None if no location could be found
     """
     module = project.get_module(func.__module__)
-    finder = occurrences.Finder(project, func.__name__)
+
+    finder = occurrences.Finder(project, func.__name__, [check_func_definition])
     for occurrence in finder.find_occurrences(pymodule=module):
         return Location(occurrence)
     return None
