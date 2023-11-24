@@ -27,7 +27,7 @@ def robust_find_definition(
     """Return the definition location of the function being called.
 
     A `Location` object is returned if the definition location can be
-    determined, otherwise ``None`` is returned.
+    determined, otherwise `None` is returned.
     """
     code = mview.code
     offset_start, offset_end = mview.tree_tokens.get_text_range(node)
@@ -51,7 +51,7 @@ def robust_find_definition(
             for occurrence in finder.find_occurrences(pymodule=module):
                 return Location(occurrence)
 
-    # handle import wich are not properly traced by rope
+    # handle imports which are not properly traced by rope
     if isinstance(pyname, (ImportedName, ImportedModule)):
         if isinstance(pyname, ImportedModule):
             # we assume that as this is an ImportedModule that the node has an ast.Attribute
