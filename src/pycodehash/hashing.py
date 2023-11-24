@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import hashlib
 import inspect
-import logging
 from typing import Callable
 
 from rope.base.project import Project
@@ -13,8 +12,6 @@ from pycodehash.stores import FunctionStore, ModuleStore, ProjectStore
 from pycodehash.transfomers import HashCallNameTransformer
 from pycodehash.unparse import _unparse
 from pycodehash.utils import get_func_def_location, get_func_node_from_location
-
-logger = logging.getLogger(__name__)
 
 
 def hash_string(input_string: str) -> str:
@@ -57,18 +54,13 @@ class FunctionHasher:
         # check if the location was already hashed, if so return
         if location in self.func_store.store:
             function_hash = self.func_store[location]
-            logger.debug(f"Cache hit for location hash, return {function_hash}")
             return function_hash
 
         # get the code for the function
         src_node = get_func_node_from_location(location, project)
 
-        logger.debug(f"source code `{_unparse(src_node)}`")
-
         # replace names of _tracked_ calls
         src_node = HashCallNameTransformer(self, location).visit(src_node)
-
-        logger.debug(f"transformed source `{_unparse(src_node)}`")
 
         # preprocessing of AST
         for transformer in self.ast_transformers:
@@ -93,7 +85,6 @@ class FunctionHasher:
         Returns:
             The hash of the function
         """
-        logger.debug(f"Hashing `{func.__name__}`")
 
         # get the module from the function
         module = inspect.getmodule(func)
@@ -103,19 +94,13 @@ class FunctionHasher:
         # get the `rope` project from project store
         project = self.project_store[pkg]
 
-        logger.debug(f"Loaded project `{project}`")
-
         mod = project.get_module(name)
 
         # get module view from module store
         mview = self.module_store[mod]
 
-        logger.debug(f"Loaded module view `{mview}`")
-
         # get the location (~text range) from the function using the project
         location = get_func_def_location(func, project)
-
-        logger.debug(f"Location `{location}`, {location.resource}")
 
         # compute the hash
         return self.hash_location(location, project)
