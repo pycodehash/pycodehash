@@ -28,6 +28,9 @@ test = [
     "pytest",
     "tliba @ {root:uri}/tests/resources/tliba"
 ]
+sql = [
+    "sqlfluff"
+]
 
 [project.urls]
 Source = "https://github.com/RUrlus/pycodehash"

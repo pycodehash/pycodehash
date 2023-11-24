@@ -11,8 +11,8 @@ from rope.contrib.findit import Location
 
 from pycodehash.stores import FunctionStore, ModuleStore, ProjectStore
 from pycodehash.transfomers import HashCallNameTransformer
-from pycodehash.utils import get_func_def_location, get_func_node_from_location
 from pycodehash.unparse import _unparse
+from pycodehash.utils import get_func_def_location, get_func_node_from_location
 
 logger = logging.getLogger(__name__)
 
