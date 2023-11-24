@@ -35,6 +35,11 @@ class HashCallNameTransformer(NodeTransformer):
             if isinstance(location, Location):
                 # here we recurse into the hashing function
                 self.hash_repr = self.hasher.hash_location(location, project)
+                if isinstance(node.func, ast.Attribute):
+                    node = ast.Call(
+                        func=ast.Name(id=self.hash_repr, ctx=node.func.ctx), args=node.args, keywords=node.keywords
+                    )
+                    self.hash_repr = None
                 break
 
         # here we make use of the fact that `NodeTransformer` perform a depth-first traversal
