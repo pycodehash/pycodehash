@@ -52,7 +52,7 @@ class FunctionHasher:
             Hash string based on the location
         """
         # check if the location was already hashed, if so return
-        if location in self.func_store.store:
+        if location in self.func_store:
             function_hash = self.func_store[location]
             return function_hash
 

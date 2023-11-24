@@ -12,15 +12,25 @@ from rope.base.pyobjectsdef import PyModule
 from rope.contrib.findit import Location
 
 
+def _item_to_key(item: Location):
+    return item.resource.path, item.region[0], item.region[1], item.lineno
+
+
 class FunctionStore:
     def __init__(self):
-        self.store: dict[Location, str] = {}
+        self.store: dict[tuple[str, int, int, int], str] = {}
 
     def __getitem__(self, item: Location) -> str:
-        return self.store[item]
+        key = _item_to_key(item)
+        return self.store[key]
 
-    def __setitem__(self, key: Location, value: str) -> None:
+    def __setitem__(self, item: Location, value: str) -> None:
+        key = _item_to_key(item)
         self.store[key] = value
+
+    def __contains__(self, item):
+        key = _item_to_key(item)
+        return key in self.store
 
 
 @dataclass
