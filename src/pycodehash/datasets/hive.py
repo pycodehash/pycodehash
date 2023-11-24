@@ -25,6 +25,12 @@ class HiveTableHash(ApproximateHasher):
         # DataFrame logging for debugging
         logger.debug("%s", data)
 
+        if not data[data["col_name"] == "# Partition Information"].empty:
+            logger.warning(
+                "The Hive table is partitioned. "
+                "It is recommended to hash each partition to deal with incremental load."
+            )
+
         # Select relevant columns
         data = data[data["col_name"].isin(["Created Time", "Statistics"])]
 
