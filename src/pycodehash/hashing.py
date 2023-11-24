@@ -101,11 +101,6 @@ class FunctionHasher:
         # get the `rope` project from project store
         project = self.project_store[pkg]
 
-        mod = project.get_module(name)
-
-        # get module view from module store
-        mview = self.module_store[mod]
-
         # get the location (~text range) from the function using the project
         location = get_func_def_location(func, project)
 
