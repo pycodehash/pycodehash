@@ -8,6 +8,7 @@ from rope.contrib.findit import Location
 
 from pycodehash.stores import ModuleView, ProjectStore
 from pycodehash.utils import find_call_definition
+from pycodehash.visitors import contains_call
 
 
 class HashCallNameTransformer(NodeTransformer):
@@ -35,11 +36,12 @@ class HashCallNameTransformer(NodeTransformer):
             if isinstance(location, Location):
                 # here we recurse into the hashing function
                 self.hash_repr = self.hasher.hash_location(location, project)
-                if isinstance(node.func, ast.Attribute):
+                if isinstance(node.func, ast.Attribute) and (not contains_call(node.func)):
                     node = ast.Call(
                         func=ast.Name(id=self.hash_repr, ctx=node.func.ctx), args=node.args, keywords=node.keywords
                     )
                     self.hash_repr = None
+                    return node
                 break
 
         # here we make use of the fact that `NodeTransformer` perform a depth-first traversal
