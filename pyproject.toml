@@ -31,6 +31,9 @@ test = [
 sql = [
     "sqlfluff"
 ]
+s3 = [
+    "boto3"
+]
 
 [project.urls]
 Source = "https://github.com/RUrlus/pycodehash"
