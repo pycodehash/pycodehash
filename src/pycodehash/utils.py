@@ -3,8 +3,8 @@ from __future__ import annotations
 import ast
 from typing import Callable
 
-from rope.base.libutils import path_to_resource
 from rope.base.project import NoProject, Project
+from rope.base.resources import File
 from rope.contrib.findit import Location
 from rope.refactor import occurrences
 
@@ -64,9 +64,7 @@ def find_call_definition(node: ast.expr, module, project) -> Location | None:
 
     # Use current module is location resource is empty
     if isinstance(loc, Location) and loc.resource is None:
-        loc.resource = path_to_resource(project, module.path, type="file")
         # Important to be consistent with found Location objects!
-        loc.resource.project = NoProject()
-        loc.resource._path = str(module.path)
+        loc.resource = File(project=NoProject(), name=str(module.path))
 
     return loc
