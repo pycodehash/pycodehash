@@ -8,6 +8,7 @@ from typing import Callable
 from rope.base.project import Project
 from rope.contrib.findit import Location
 
+from pycodehash.preprocessing import DocstringStripper, FunctionStripper, TypeHintStripper, WhitespaceNormalizer
 from pycodehash.stores import FunctionStore, ModuleStore, ProjectStore
 from pycodehash.transfomers import HashCallNameTransformer
 from pycodehash.unparse import _unparse
@@ -38,8 +39,14 @@ class FunctionHasher:
         self.func_store = func_store or FunctionStore()
         self.module_store = module_store or ModuleStore()
         self.project_store = project_store or ProjectStore()
-        self.ast_transformers = ast_transformers or []
-        self.lines_transformers = lines_transformers or []
+        self.ast_transformers = ast_transformers or [
+            FunctionStripper(),
+            DocstringStripper(),
+            TypeHintStripper(),
+        ]
+        self.lines_transformers = lines_transformers or [
+            WhitespaceNormalizer(),
+        ]
 
     def hash_location(self, location: Location, project: Project) -> str:
         """Hash a location (~text range) of Python code
