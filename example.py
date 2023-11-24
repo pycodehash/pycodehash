@@ -1,25 +1,14 @@
 import logging
 
 from pycodehash import FunctionHasher
-from pycodehash.preprocessing import DocstringStripper, FunctionStripper, TypeHintStripper, WhitespaceNormalizer
-
-from tliba.etl import add_bernoulli_samples, combine_random_samples
 from tliba import compute_moments
+from tliba.etl import add_bernoulli_samples, combine_random_samples
 
 # Enable debugging
 logging.basicConfig(level=logging.DEBUG)
 
 
-fh = FunctionHasher(
-    ast_transformers=[
-        FunctionStripper(),
-        DocstringStripper(),
-        TypeHintStripper(),
-    ],
-    lines_transformers=[
-        WhitespaceNormalizer(),
-    ],
-)
+fh = FunctionHasher()
 # Hash the function `add_bernoulli_samples`
 h1 = fh.hash_func(add_bernoulli_samples)
 print('Hash for `add_bernoulli_samples`', h1)
