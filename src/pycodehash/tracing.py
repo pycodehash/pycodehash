@@ -32,7 +32,7 @@ def robust_find_definition(
     code = mview.code
     offset_start, offset_end = mview.tree_tokens.get_text_range(node)
     if offset_end == 0:
-        raise ValueError("Token not found")
+        return None
 
     fixer = fixsyntax.FixSyntax(project, code, resource, maxfixes)
     pyname = fixer.pyname_at(offset_start)
