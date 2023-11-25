@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import ast
+import inspect
 from dataclasses import dataclass
 from importlib.util import find_spec
 from pathlib import Path
+from typing import Callable
 
 import asttokens
 from rope.base.libutils import analyze_modules
@@ -110,6 +112,13 @@ class ProjectStore:
         project = Project(projectroot=spec.submodule_search_locations[0])
         analyze_modules(project)
         self.store[pkg] = project
+
+    def get_from_func(self, func: Callable) -> Project:
+        # get the module from the function
+        module = inspect.getmodule(func)
+        name = module.__name__
+        pkg, _, _ = name.partition(".")
+        return self.__getitem__(pkg)
 
     # TODO: this should be refactored
     def get_projects(self, mod: ModuleView | None = None) -> list[Project]:
