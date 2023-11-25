@@ -1,5 +1,5 @@
 import pytest
-from pycodehash.datasets.local import LocalFileHash
+from pycodehash.datasets.local import LocalDirectoryHash, LocalFileHash
 
 
 @pytest.fixture(scope="function")
@@ -47,8 +47,8 @@ def test_approximate_hasher_local_file(local_dataset):
 
 
 def test_approximate_hasher_local_directory(local_dataset_directory):
-    hasher = LocalFileHash()
-    initial_metadata = hasher.collect_metadata(local_dataset_directory)
+    hasher = LocalDirectoryHash()
+    initial_metadata = hasher.collect_hashes(local_dataset_directory)
     assert isinstance(initial_metadata, dict)
     assert len(initial_metadata.keys()) == 3
 

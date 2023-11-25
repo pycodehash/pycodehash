@@ -5,10 +5,10 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from pycodehash.datasets.approximate_hasher import ApproximateHasher
+from pycodehash.datasets.approximate_hasher import ApproximateHasher, PartitionedApproximateHasher
 
 
-def hash_file_full(file_path: str | Path):
+def hash_file_full(file_path: str | Path) -> str:
     """Find SHA256 hash string of a local file
 
     Function capable of handling large files, loops over file blocks.
@@ -24,7 +24,7 @@ def hash_file_full(file_path: str | Path):
 
     sha256_hash = hashlib.sha256()
     with path.open("rb") as fb:
-        # Read and update hash string value in blocks of 4K
+        # Read and update hash string value in blocks of 8K
         for byte_block in iter(lambda: fb.read(8192), b""):
             sha256_hash.update(byte_block)
     return sha256_hash.hexdigest()
@@ -38,16 +38,17 @@ class LocalFileHash(ApproximateHasher):
     def collect_metadata(self, path: str | Path) -> dict[str, Any]:
         path = Path(path)
         if path.is_dir():
-            return self._collect_metadata_dir(path)
-        return self._collect_metadata_file(path)
+            raise TypeError("Directories not supported. Please use `LocalDirectoryHash`")
 
-    def _collect_metadata_file(self, path: Path) -> dict[str, Any]:
         last_modified = path.stat().st_mtime
         last_modified = datetime.fromtimestamp(last_modified)
         file_size = path.stat().st_size
         return {"last_modified": last_modified, "size": file_size}
 
-    def _collect_metadata_dir(self, path: Path) -> dict[str, Any]:
-        all_files_in_dir = list(path.rglob("*"))
-        dict_to_hash = {str(file_path): self._collect_metadata_file(file_path) for file_path in all_files_in_dir}
-        return dict_to_hash
+
+class LocalDirectoryHash(PartitionedApproximateHasher):
+    def __init__(self):
+        self.hasher = LocalFileHash()
+
+    def collect_hashes(self, path: Path) -> dict[str, Any]:
+        return {str(file_path): self.hasher.compute_hash(file_path) for file_path in path.rglob("*")}
