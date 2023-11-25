@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import hashlib
-import inspect
 from typing import Callable
 
 from rope.base.project import Project
@@ -47,7 +46,7 @@ class FunctionHasher:
         self.lines_transformers = lines_transformers or [
             WhitespaceNormalizer(),
         ]
-        self.ir_store = FunctionStore()
+        self.func_ir_store = FunctionStore()
 
     def hash_location(self, location: Location, project: Project) -> str:
         """Hash a location (~text range) of Python code
@@ -81,9 +80,15 @@ class FunctionHasher:
             prc_src = transformer.transform(prc_src)
 
         function_hash = hash_string(prc_src)
-        self.ir_store[location] = prc_src
+        self.func_ir_store[location] = prc_src
         self.func_store[location] = function_hash
         return function_hash
+
+    def _get_location_and_project(self, func: Callable) -> tuple[Location, Project]:
+        project = self.project_store.get_from_func(func)
+        # get the location (~text range) from the function using the project
+        location = get_func_def_location(func, project)
+        return location, project
 
     def hash_func(self, func: Callable) -> str:
         """Hash a Python function
@@ -94,17 +99,17 @@ class FunctionHasher:
         Returns:
             The hash of the function
         """
-
-        # get the module from the function
-        module = inspect.getmodule(func)
-        name = module.__name__
-        pkg, _, _ = name.partition(".")
-
-        # get the `rope` project from project store
-        project = self.project_store[pkg]
-
-        # get the location (~text range) from the function using the project
-        location = get_func_def_location(func, project)
-
         # compute the hash
-        return self.hash_location(location, project)
+        return self.hash_location(*self._get_location_and_project(func))
+
+    def get_func_location(self, func: Callable) -> Location | None:
+        """
+
+        Args:
+            func: the Python function
+
+        Returns:
+            The hash of the function
+        """
+        location, _ = self._get_location_and_project(func)
+        return location
