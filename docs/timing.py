@@ -1,8 +1,8 @@
 from pathlib import Path
-from time import time
+from statistics import mean, stdev
+from timeit import repeat
 
 import pandas as pd
-from datasets.local import LocalFileHash, hash_file_full
 from faker import Faker
 from faker.providers import profile
 
@@ -33,21 +33,36 @@ for n in n_records:
     )
     df.to_csv(data_file, index=False)
 
-print("timing")
+# Repeat the function this number of times
+number = 10
+repeats = 3
+
+
 for n in n_records:
     data_file = Path(f"data_{n}.csv")
 
-    print("n", n)
-    print("file size", data_file.stat().st_size)
+    print(f"{n} records, {data_file.stat().st_size} bytes")
 
-    start = time()
-    fh = LocalFileHash()
-    fh.compute_hash(data_file)
-    end = time()
-
-    print((end - start) * 1000.0, "ms")
-
-    start = time()
-    hash_file_full(data_file)
-    end = time()
-    print((end - start) * 1000.0, "ms")
+    measurements1 = repeat(
+        f'hash_file_full("data_{n}.csv")',
+        setup="from datasets.local import hash_file_full",
+        number=number,
+        repeat=repeats,
+    )
+    measurements2 = repeat(
+        f'fh.compute_hash("data_{n}.csv")',
+        setup="from datasets.local import LocalFileHash\nfh = LocalFileHash()",
+        number=number,
+        repeat=repeats,
+    )
+    print("full hash 8KB reads", mean(measurements1) * 1000, "ms +/-", stdev(measurements1) * 1000, "ms 1x")
+    print(
+        "approximate hash",
+        mean(measurements2) * 1000,
+        "ms +/-",
+        stdev(measurements2) * 1000,
+        "ms",
+        round(mean(measurements1) / mean(measurements2)),
+        "x",
+    )
+    print("")
