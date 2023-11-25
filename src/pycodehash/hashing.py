@@ -47,6 +47,7 @@ class FunctionHasher:
         self.lines_transformers = lines_transformers or [
             WhitespaceNormalizer(),
         ]
+        self.ir_store = FunctionStore()
 
     def hash_location(self, location: Location, project: Project) -> str:
         """Hash a location (~text range) of Python code
@@ -80,6 +81,7 @@ class FunctionHasher:
             prc_src = transformer.transform(prc_src)
 
         function_hash = hash_string(prc_src)
+        self.ir_store[location] = prc_src
         self.func_store[location] = function_hash
         return function_hash
 
