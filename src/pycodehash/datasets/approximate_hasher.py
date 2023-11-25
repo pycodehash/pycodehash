@@ -28,3 +28,12 @@ class ApproximateHasher(ABC):
         metadata = self.collect_metadata(*args, **kwargs)
         inlined_metadata = inline_metadata(metadata)
         return hash_string(inlined_metadata)
+
+
+class PartitionedApproximateHasher(ApproximateHasher):
+    @abstractmethod
+    def collect_hashes(self, *args, **kwargs) -> dict[str, Any]:
+        pass
+
+    def collect_metadata(self, *args, **kwargs) -> dict[str, Any]:
+        return self.collect_hashes(*args, **kwargs)
