@@ -46,6 +46,9 @@ class FunctionHasher:
         self.lines_transformers = lines_transformers or [
             WhitespaceNormalizer(),
         ]
+        # Function store is re-used to store the intermediate representation (IR)
+        # of the function that is hashed. Not strictly needed but does make debugging
+        # or evaluation a lot easier.
         self.func_ir_store = FunctionStore()
 
     def hash_location(self, location: Location, project: Project) -> str:
