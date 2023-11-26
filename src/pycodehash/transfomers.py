@@ -33,14 +33,17 @@ class HashCallNameTransformer(NodeTransformer):
         projects = self.project_store.get_projects(self.module)
         for project in projects:
             location = find_call_definition(node, self.module, project)
+
             if isinstance(location, Location):
                 # here we recurse into the hashing function
                 self.hash_repr = self.hasher.hash_location(location, project)
                 if isinstance(node.func, ast.Attribute) and (not contains_call(node.func)):
+                    # here we assume that we are looking at chained attributes
                     node = ast.Call(
                         func=ast.Name(id=self.hash_repr, ctx=node.func.ctx), args=node.args, keywords=node.keywords
                     )
                     self.hash_repr = None
+                    # we don't need to traverse down this node as we just created it and know what it contains...
                     return node
                 break
 
