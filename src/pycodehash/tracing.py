@@ -13,6 +13,27 @@ from rope.refactor import occurrences
 from pycodehash.stores import ModuleView
 
 
+def _get_text_range(node: ast.expr, tokens):
+    """Get string offset from ast Node
+    This is a workaround since `asttoken.get_text_range` needs to be an "EnhancedAST" node...
+    Args:
+        node: ast Node
+        tokens: asttoken tokens
+    Returns:
+        Offset tuple. Returns 0,0 if not found
+    """
+    start = end = None
+    for token in tokens:
+        if token.start == (node.lineno, node.col_offset):
+            start = token.startpos
+        if token.end == (node.end_lineno, node.end_col_offset):
+            end = token.endpos
+    if start is not None and end is not None:
+        return start, end
+
+    return 0, 0
+
+
 def check_func_definition(occurrence):
     return occurrence.is_defined()
 
@@ -31,6 +52,10 @@ def robust_find_definition(
     """
     code = mview.code
     offset_start, offset_end = mview.tree_tokens.get_text_range(node)
+    if offset_end == 0:
+        # try slower workaround when tree tokens seem to be out of date
+        # TODO[RU]: figure out why this needed.
+        offset_start, offset_end = _get_text_range(node, mview.tree_tokens.tokens)
     if offset_end == 0:
         return None
 
