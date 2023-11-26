@@ -82,8 +82,27 @@ class ModuleStore:
 
 
 class ProjectStore:
-    def __init__(self):
+    """Caching mechanism for rope.projects.
+
+    Each package result in a project which is analyzed by Rope.
+    Note that analyzing a large package can be fairly slow.
+    To prevent certain packages from being analyzed you can set a whitelist.
+    """
+
+    def __init__(self, whitelist: list[str] | tuple[str] | set[str] | None = None):
+        """Initialise the class.
+
+        Args:
+            whitelist: set of packages that are allowed to be analyzed.
+                By default all packages are allowed.
+        """
         self.store: dict[str, Project] = {}
+        # TODO[RU]: see if we can come up with a nice way to limit tracing to first party
+        # packges by default
+        self._whitelist = set(whitelist) if whitelist is not None else whitelist
+
+    def _in_whitelist(self, pkg: str) -> bool:
+        return self._whitelist is None or pkg in self._whitelist
 
     def __getitem__(self, item: str) -> Project:
         """Get rope project from package name.
@@ -94,7 +113,7 @@ class ProjectStore:
         Returns:
             project: analyzed rope project
         """
-        if item not in self.store:
+        if item not in self.store and self._in_whitelist(item):
             self._initialize_project(item)
         return self.store[item]
 
