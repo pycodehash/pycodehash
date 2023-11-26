@@ -8,7 +8,10 @@ from rope.contrib.findit import Location
 
 from pycodehash.stores import ModuleView, ProjectStore
 from pycodehash.utils import find_call_definition
-from pycodehash.visitors import contains_call
+
+
+def _contains_call(node: ast.Expr):
+    return any(isinstance(child, ast.Call) for child in ast.walk(node))
 
 
 class HashCallNameTransformer(NodeTransformer):
@@ -37,7 +40,7 @@ class HashCallNameTransformer(NodeTransformer):
             if isinstance(location, Location):
                 # here we recurse into the hashing function
                 self.hash_repr = self.hasher.hash_location(location, project)
-                if isinstance(node.func, ast.Attribute) and (not contains_call(node.func)):
+                if isinstance(node.func, ast.Attribute) and not _contains_call(node.func):
                     # here we assume that we are looking at chained attributes
                     node = ast.Call(
                         func=ast.Name(id=self.hash_repr, ctx=node.func.ctx), args=node.args, keywords=node.keywords
