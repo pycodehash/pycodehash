@@ -51,6 +51,14 @@ class FunctionHasher:
         # or evaluation a lot easier.
         self.func_ir_store = FunctionStore()
 
+    def add_package_to_trace(self, pkg: str):
+        """Analyze package s.t. functions in it can be traced.
+
+        Args:
+            pkg: the name of the package, must be importable
+        """
+        self.project_store.add_project(pkg)
+
     def hash_location(self, location: Location, project: Project) -> str:
         """Hash a location (~text range) of Python code
 

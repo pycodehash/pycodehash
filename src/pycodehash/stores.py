@@ -84,12 +84,11 @@ class ModuleStore:
 class ProjectStore:
     """Caching mechanism for rope.projects.
 
-    Each package result in a project which is analyzed by Rope.
+    Each package results in a project which is analyzed by Rope.
     Note that analyzing a large package can be fairly slow.
-    To prevent certain packages from being analyzed you can set a whitelist.
     """
 
-    def __init__(self, whitelist: list[str] | tuple[str] | set[str] | None = None):
+    def __init__(self):
         """Initialise the class.
 
         Args:
@@ -97,12 +96,6 @@ class ProjectStore:
                 By default all packages are allowed.
         """
         self.store: dict[str, Project] = {}
-        # TODO[RU]: see if we can come up with a nice way to limit tracing to first party
-        # packges by default
-        self._whitelist = set(whitelist) if whitelist is not None else whitelist
-
-    def _in_whitelist(self, pkg: str) -> bool:
-        return self._whitelist is None or pkg in self._whitelist
 
     def __getitem__(self, item: str) -> Project:
         """Get rope project from package name.
@@ -113,7 +106,7 @@ class ProjectStore:
         Returns:
             project: analyzed rope project
         """
-        if item not in self.store and self._in_whitelist(item):
+        if item not in self.store:
             self._initialize_project(item)
         return self.store[item]
 
@@ -131,6 +124,14 @@ class ProjectStore:
         project = Project(projectroot=spec.submodule_search_locations[0])
         analyze_modules(project)
         self.store[pkg] = project
+
+    def add_project(self, pkg: str):
+        """Explicitely add project for tracing.
+
+        Args:
+            pkg: the name of the package to be analyzed
+        """
+        self._initialize_project(pkg)
 
     def get_from_func(self, func: Callable) -> Project:
         # get the module from the function
