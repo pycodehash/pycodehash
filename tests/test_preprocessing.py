@@ -1,4 +1,5 @@
 import ast
+import sys
 
 from pycodehash.preprocessing import DocstringStripper, FunctionStripper, TypeHintStripper, WhitespaceNormalizer
 from pycodehash.unparse import _unparse
@@ -9,8 +10,15 @@ def _strip(src: str) -> str:
     return "".join(src.split())
 
 
+def _compatible(src: str) -> str:
+    """Backwards compatibility error in `astunparse`"""
+    if sys.version_info < (3, 9):
+        return src.replace("(", "").replace(")", "")
+    return src
+
+
 def _to_stripped_str(src: ast.Module) -> str:
-    return _strip(_unparse(src))
+    return _compatible(_strip(_unparse(src)))
 
 
 _RAW_REFERENCE_FUNC = """
@@ -19,13 +27,13 @@ def foo(x, y=None):
     z = 2 * x
     return z + y
 """
-_REFERENCE_FUNC = _strip(_RAW_REFERENCE_FUNC)
+_REFERENCE_FUNC = _compatible(_strip(_RAW_REFERENCE_FUNC))
 
 
 def test_to_normalised_string_smoke():
     ref = "def foo(x, y=None):;    y = y or 10;    z = 2 * x;    return z + y"
     res = WhitespaceNormalizer(";").transform(_unparse(ast.parse(_RAW_REFERENCE_FUNC)))
-    assert ref == res
+    assert _compatible(ref) == _compatible(res)
 
 
 def test_smoke_docstring():
@@ -179,4 +187,4 @@ def test_function_name_stripper():
     f_str = "def foo(x, y):\n" "    y = y or 10\n" "    z = 2 * x\n" "    return z + y"
     processed = _unparse(FunctionStripper().visit(ast.parse(f_str)))
     f_str_ref = "def _(x, y):\n" "    y = y or 10\n" "    z = 2 * x\n" "    return z + y"
-    assert processed == f_str_ref
+    assert _compatible(processed) == _compatible(f_str_ref)
