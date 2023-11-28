@@ -5,6 +5,7 @@ nav:
   - Introduction: 'index.md'
   - 'Detecting changes':
     - 'Python Functions': 'python_functions.md'
+    - 'SQL Queries': 'sql_queries.md'
     - 'Datasets': 'datasets.md'
 
 theme:
