@@ -19,7 +19,7 @@ authors = [
 ]
 
 dependencies = [
-    'astunparse @ git+https://github.com/eff-kay/astunparse@fix-extra-parens ; python_version <= "3.9"',
+    'astunparse; python_version <= "3.9"',
     'typing_extensions; python_version <= "3.11"',
     'asttokens',
     'rope',
