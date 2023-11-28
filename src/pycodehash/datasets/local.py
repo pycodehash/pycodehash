@@ -8,7 +8,7 @@ from typing import Any
 from pycodehash.datasets.approximate_hasher import ApproximateHasher, PartitionedApproximateHasher
 
 
-def hash_file_full(file_path: str | Path) -> str:
+def hash_file_full(file_path: str | Path, block_size: int = 8192) -> str:
     """Find SHA256 hash string of a local file
 
     Function capable of handling large files, loops over file blocks.
@@ -16,6 +16,7 @@ def hash_file_full(file_path: str | Path) -> str:
 
     Args:
         file_path: path to the file to hash
+        block_size: read and update hash string in blocks (default: 8K)
 
     Returns:
         SHA256 hash
@@ -24,8 +25,8 @@ def hash_file_full(file_path: str | Path) -> str:
 
     sha256_hash = hashlib.sha256()
     with path.open("rb") as fb:
-        # Read and update hash string value in blocks of 8K
-        for byte_block in iter(lambda: fb.read(8192), b""):
+        # Read and update hash string value in blocks
+        for byte_block in iter(lambda: fb.read(block_size), b""):
             sha256_hash.update(byte_block)
     return sha256_hash.hexdigest()
 
@@ -51,4 +52,9 @@ class LocalDirectoryHash(PartitionedApproximateHasher):
         self.hasher = LocalFileHash()
 
     def collect_hashes(self, path: Path) -> dict[str, Any]:
-        return {str(file_path): self.hasher.compute_hash(file_path) for file_path in path.rglob("*")}
+        return {
+            str(file_path): self.hasher.compute_hash(file_path)
+            if file_path.is_file()
+            else self.collect_hashes(file_path)
+            for file_path in path.rglob("*")
+        }
