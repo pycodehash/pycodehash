@@ -1,12 +1,6 @@
-import logging
-
 from pycodehash import FunctionHasher
 from tliba import compute_moments
 from tliba.etl import add_bernoulli_samples, combine_random_samples
-
-# Enable debugging
-logging.basicConfig(level=logging.DEBUG)
-
 
 fh = FunctionHasher()
 # Hash the function `add_bernoulli_samples`
