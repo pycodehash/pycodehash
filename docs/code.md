@@ -1,10 +1,90 @@
 # Detecting code changes
 
-TODO: expand
-
 ## Python
 
-`pycodehash`
+`pycodehash` attempts to reliably hash code that reflects changes to:
+
+- the implementation
+- the dependencies of the implementation
+- the dependencies of the dependencies
+- ...
+
+but it is invariant to non-functional changes:
+
+- function name
+- formatting
+- comments and docstrings
+- type hints
+
+### Algorithm
+
+Given a Python function as source code we:
+
+1. Create an Abstract Syntax Tree (AST)
+2. **Replace the name of called functions with the hash of the function definition**
+3. Remove invariant changes 
+   - AST: Strip docstrings and type hints, and remove the function name
+   - Unparse the AST to a string presentation
+   - Lines: Normalize whitespace
+4. Hash
+
+#### Abstract Syntax Tree
+
+The AST is parsed using Pythons [standard library](https://docs.python.org/3/library/ast.html).
+This step removed comments and normalises formatting.
+
+The current implementation in addition uses the `asttokens` package to map AST nodes to their offset in the Python source code.
+This is required to interact with `rope` (see below)
+
+#### Find call definitions
+
+The inspiration for solving the dependency invariance comes from compilers/interpreters:
+
+> Source code -> ... -> Interpreted/compiled -> ... -> Machine instructions 
+
+Compilers often _inline_ code to enable additional transformations.
+PyCodeHash applies the same concept.
+
+For example, in the following code:
+
+```python
+def multiply(y, z):
+    return y * z
+
+def shift_left(x):
+    return multiply(x, 2)
+```
+
+If we hash the source code of `shift_left`, then the hash is invariant to changes in multiply. This does not meet our desiderata.
+By inlining `multiply`, this is no longer true:
+
+```python
+def shift_left(x):
+    def multiply(y, z):
+        return y * z
+    return multiply(x, 2)
+```
+
+In our implementation, the function call is replaced with the hash of the source definition, rather than inlined:
+
+```python
+def shift_left(x):
+    return 9e8c617fe2e0d524469d75f43edb1ff91f9a5387af6c444017ddcd194c983aed(x, 2) 
+```
+
+#### Strip invariant changes
+
+In this step, PyCodeHash transforms the AST to remove invariant syntax.
+For this we implemented multiple `NodeTransformers` that can be found in `src/pycodehash/preprocessing/`.
+
+Then we unparse the AST representation to obtain the Python source code (without comments and formatting).
+
+On this string, we apply whitespace normalisation to ensure platform-independent hashes.
+
+#### Hashing
+
+Finally, the resulting source code is hashed using `hash_string`.
+The function uses the SHA256 algorithm provided by the [standard library](https://docs.python.org/3/library/hashlib.html).
 
 ### What makes it hard to find call definitions in Python
 
@@ -61,10 +141,4 @@ Read more on the [LEGB Rule for Python Scope](https://realpython.com/python-scop
 
 ## SQL
 
-
-## Pipelines and nodes
-
-Always end up with a framework of some kind
-_Nodes_ and _Pipelines_
-Kedro, Airflow, dagster, [ZenML](https://docs.zenml.io/getting-started/introduction)
-dbt
+TODO: write SQL approach
