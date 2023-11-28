@@ -32,12 +32,41 @@ def hash_string(input_string: str) -> str:
 
 
 class FunctionHasher:
+    """Function hashing algorithm.
+
+    Main entry point for hashing functions.
+    It provides a deterministic hash that reflects changes to the funtion itself
+    but also to functions that are called and in scope.
+    The scope is the first-party library by default but more packages can be set.
+
+    Attributes:
+        func_store (FunctionStore): container that caches hashed functions
+        module_store (ModuleStore): container that caches ast representations of the mdoules
+        project_store (ProjectStore): container that caches analyzed packages
+        ast_transformers (list): set of ast.Transformers to be applied to function's AST representation
+        lines_transformers (list): set of functions to be applied to the textual representation
+        func_ir_store (FunctionStore): container that store the intermediate representations of functions
+    """
+
     def __init__(
         self,
         packages: list[str] | None = None,
         ast_transformers: list | None = None,
         lines_transformers: list | None = None,
     ):
+        """Initialise the class.
+
+        Args:
+            packages: list of packages to trace.
+                By default we only trace within the first-party libary, aka for a function `liba.foo`
+                we trace and hash all calls to functions in `liba`.
+            ast_transformers: set of transformers to be applied to function's AST representation.
+                They are ran before the `lines_transformers` and should inherit from `ast.NodeTransformer`
+                By default these are: `DocstringStripper`, `FunctionStore`, `TypeHintStripper`
+            lines_transformers: list of functions that transform the textual representation.
+                By default this is: `WhitespaceNormalizer`
+
+        """
         self.func_store = FunctionStore()
         self.module_store = ModuleStore()
         self.project_store = ProjectStore()
@@ -120,13 +149,15 @@ class FunctionHasher:
         return self.hash_location(*self._get_location_and_project(func))
 
     def get_func_location(self, func: Callable) -> Location | None:
-        """
+        """Get the rope.Location of a function.
+
+        The location is can be used to access the function and ir function store.
 
         Args:
             func: the Python function
 
         Returns:
-            The hash of the function
+            location (Location | None): location of the function definition if found otherwise None
         """
         location, _ = self._get_location_and_project(func)
         return location
