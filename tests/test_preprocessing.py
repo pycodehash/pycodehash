@@ -13,7 +13,7 @@ def _strip(src: str) -> str:
 def _compatible(src: str) -> str:
     """Backwards compatibility error in `astunparse`"""
     if sys.version_info < (3, 9):
-        return src.replace("(", "").replace(")", "")
+        return src.replace("(", "").replace(")", "").strip()
     return src
 
 
