@@ -39,6 +39,12 @@ Then you can serve the docs locally:
 mkdocs serve
 ```
 
+To update the docs on GitHub Pages run:
+
+```shell
+mkdocs gh-deploy --remote-branch gh-pages
+```
+
 ## Release
 
 The flow for releasing a new version of `pycodehash` is:
