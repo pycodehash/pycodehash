@@ -4,7 +4,7 @@ import ast
 
 from rope.base import worder
 from rope.base.project import Project
-from rope.base.pynamesdef import ImportedModule, ImportedName
+from rope.base.pynamesdef import AssignedName, ImportedModule, ImportedName
 from rope.base.resources import Resource
 from rope.contrib import fixsyntax
 from rope.contrib.findit import Location
@@ -62,6 +62,9 @@ def robust_find_definition(
     fixer = fixsyntax.FixSyntax(project, code, resource, maxfixes)
     pyname = fixer.pyname_at(offset_start)
     if pyname is not None:
+        # TODO[RU] Check if we can whitelist rather than blacklist this case
+        if isinstance(pyname, AssignedName):
+            return None
         module, lineno = pyname.get_definition_location()
         name = worder.Worder(code).get_word_at(offset_start)
         if lineno is not None:
