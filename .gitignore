@@ -139,3 +139,6 @@ dmypy.json
 
 # Benchmark data
 /docs/*.csv
+
+# Playground
+/playgrounds/
