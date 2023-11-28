@@ -11,8 +11,13 @@ class WhitespaceNormalizer(LinesTransformer):
     (for identical cross-platform hashes).
     """
 
-    def __init__(self):
-        self.sep = "\n"
+    def __init__(self, sep="\n"):
+        """Initialize the WhitespaceNormalizer
+
+        Args:
+            sep: the token to replace newlines with
+        """
+        self.sep = sep
 
     def transform(self, src: str) -> str:
         """Removes whitespace from lines and joins lines with constant separator.
