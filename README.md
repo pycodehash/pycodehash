@@ -17,7 +17,7 @@ Read more on the [documentation site](https://pycodehash.github.io/pycodehash/).
 The canonical way to check if two things are equal is to compare their hashes.
 Learn more on how PyCodeHash detects changes in:
 
-- [Code](https://pycodehash.github.io/pycodehash/code/): Python, SQL
+- [Python Functions](https://pycodehash.github.io/pycodehash/python_functions/)
 - [Dataset](https://pycodehash.github.io/pycodehash/datasets/): Files, Directories, S3, Hive
 
 ## Installation
