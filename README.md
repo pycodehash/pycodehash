@@ -10,13 +10,15 @@ Often, there are parts of the pipeline that have not changed.
 Recomputing these nodes is wasteful, especially for larger datasets.
 PyCodeHash is a generic data and code hashing library that facilitates downstream caching.
 
+Read more on the [documentation site](https://pycodehash.github.io/pycodehash/).
+
 ## Detecting changes in data pipelines
 
 The canonical way to check if two things are equal is to compare their hashes.
 Learn more on how PyCodeHash detects changes in:
 
-- [Code](https://github.com/pycodehash/pycodehash/blob/dev/docs/code.md): Python, SQL
-- [Dataset](https://github.com/pycodehash/pycodehash/blob/dev/docs/datasets.md): Files, Directories, S3, Hive
+- [Code](https://pycodehash.github.io/pycodehash/code/): Python, SQL
+- [Dataset](https://pycodehash.github.io/pycodehash/datasets/): Files, Directories, S3, Hive
 
 ## Installation
 
