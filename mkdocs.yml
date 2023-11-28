@@ -1,0 +1,15 @@
+site_name: PyCodeHash Documentation
+site_url: https://pycodehash.github.io/pycodehash
+
+nav:
+  - Introduction: 'index.md'
+  - 'Detecting changes':
+    - 'Code': 'code.md'
+    - 'Datasets': 'datasets.md'
+
+theme:
+  name: readthedocs
+
+plugins:
+  - macros:
+      include_dir: .

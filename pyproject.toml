@@ -35,6 +35,10 @@ sql = [
 s3 = [
     "boto3"
 ]
+docs = [
+    "mkdocs",
+    "mkdocs-macros-plugin"
+]
 
 [project.urls]
 Source = "https://github.com/RUrlus/pycodehash"
