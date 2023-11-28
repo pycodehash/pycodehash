@@ -50,13 +50,6 @@ allow-direct-references = true
 [tool.hatch.build.targets.wheel]
 packages = ["src/pycodehash", ]
 
-[tool.black]
-line-length = 120
-target-version = ["py38"]
-
-[tool.isort]
-profile = "black"
-
 [tool.ruff]
 extend-select = ["TID"]
 target-version = "py38"
