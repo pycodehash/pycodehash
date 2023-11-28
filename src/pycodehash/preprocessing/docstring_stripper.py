@@ -1,10 +1,7 @@
 from __future__ import annotations
 
 import ast
-import logging
 from ast import NodeTransformer
-
-logger = logging.getLogger(__name__)
 
 
 class DocstringStripper(NodeTransformer):
