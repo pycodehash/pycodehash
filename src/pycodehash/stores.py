@@ -111,7 +111,8 @@ class ProjectStore:
         return self.store[item]
 
     def _initialize_project(self, pkg: str):
-        """Create and set a project.
+        """Create and set a project. If the package name is not provided, then assume the project root is the current
+        working directory.
 
         Args:
             pkg: package name
@@ -121,12 +122,16 @@ class ProjectStore:
             raise ValueError("Cannot resolve `__main__` yet")
 
         spec = find_spec(pkg)
-        project = Project(projectroot=spec.submodule_search_locations[0])
+        if spec.submodule_search_locations is None:
+            project_root = Path.cwd()
+        else:
+            project_root = spec.submodule_search_locations[0]
+        project = Project(projectroot=project_root)
         analyze_modules(project)
         self.store[pkg] = project
 
     def add_project(self, pkg: str):
-        """Explicitely add project for tracing.
+        """Explicitly add project for tracing.
 
         Args:
             pkg: the name of the package to be analyzed
