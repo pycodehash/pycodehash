@@ -26,7 +26,7 @@ Given a Python function as source code we:
    - Lines: Normalize whitespace
 4. Hash
 
-### Abstract Syntax Tree
+## Abstract Syntax Tree
 
 The AST is parsed using Pythons [standard library](https://docs.python.org/3/library/ast.html).
 This step removed comments and normalises formatting.
@@ -34,7 +34,7 @@ This step removed comments and normalises formatting.
 The current implementation in addition uses the `asttokens` package to map AST nodes to their offset in the Python source code.
 This is required to interact with `rope` (see below)
 
-### Find call definitions
+## Find call definitions
 
 The inspiration for solving the dependency invariance comes from compilers/interpreters:
 
@@ -70,7 +70,10 @@ def shift_left(x):
     return 9e8c617fe2e0d524469d75f43edb1ff91f9a5387af6c444017ddcd194c983aed(x, 2) 
 ```
 
-### Strip invariant changes
+The implementation builds on [`rope`](https://github.com/python-rope/rope), an advanced open-source Python refactoring library.
+This package performs a lot of heavy lifting. See the section "What makes it hard to find call definitions in Python" for details.
+
+## Strip invariant changes
 
 In this step, PyCodeHash transforms the AST to remove invariant syntax.
 For this we implemented multiple `NodeTransformers` that can be found in `src/pycodehash/preprocessing/`.
@@ -79,7 +82,7 @@ Then we unparse the AST representation to obtain the Python source code (without
 
 On this string, we apply whitespace normalisation to ensure platform-independent hashes.
 
-### Hashing
+## Hashing
 
 Finally, the resulting source code is hashed using `hash_string`.
 The function uses the SHA256 algorithm provided by the [standard library](https://docs.python.org/3/library/hashlib.html).
