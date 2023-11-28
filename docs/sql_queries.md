@@ -11,6 +11,7 @@ The Abstract Syntax Tree (AST) parsing from the excellent [`SQLFluff`](https://d
 Currently, our implementation is invariant to newlines and whitespace.
 
 This results in many dialects of SQL being [supported](https://docs.sqlfluff.com/en/stable/dialects.html) out of the box, e.g.:
+
 - ANSI
 - BigQuery
 - PostgreSQL
