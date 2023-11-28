@@ -20,7 +20,7 @@ Learn more on how PyCodeHash detects changes in:
 
 ## Installation
 
-PyCodeHash is available from [Pypi](https://pypi.org/project/pycodehash/):
+PyCodeHash is available from [PyPI](https://pypi.org/project/pycodehash/):
 
 ```shell
 pip install pycodehash
