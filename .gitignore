@@ -133,3 +133,9 @@ dmypy.json
 
 # Pycharm
 .idea/
+
+# Ruff
+/.ruff_cache/
+
+# Benchmark data
+/docs/*.csv
