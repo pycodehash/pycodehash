@@ -102,7 +102,7 @@ class FunctionHasher:
             project: rope Project
 
         Returns:
-            Hash string based on the location
+            function_hash: hash string based on the location
         """
         # check if the location was already hashed, if so return
         if location in self.func_store:
@@ -157,7 +157,7 @@ class FunctionHasher:
             func: the Python function
 
         Returns:
-            location (Location | None): location of the function definition if found otherwise None
+            location: location of the function definition if found otherwise None
         """
         location, _ = self._get_location_and_project(func)
         return location
