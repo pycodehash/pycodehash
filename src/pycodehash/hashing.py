@@ -29,14 +29,12 @@ def hash_string(input_string: str) -> str:
 class FunctionHasher:
     def __init__(
         self,
+        project_store: ProjectStore | None = None,
         ast_transformers: list | None = None,
         lines_transformers: list | None = None,
-        func_store: FunctionStore | None = None,
-        module_store: ModuleStore | None = None,
-        project_store: ProjectStore | None = None,
     ):
-        self.func_store = func_store or FunctionStore()
-        self.module_store = module_store or ModuleStore()
+        self.func_store = FunctionStore()
+        self.module_store = ModuleStore()
         self.project_store = project_store or ProjectStore()
         self.ast_transformers = ast_transformers or [
             FunctionStripper(),
