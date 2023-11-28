@@ -7,7 +7,12 @@ from typing import Callable
 from rope.base.project import Project
 from rope.contrib.findit import Location
 
-from pycodehash.preprocessing import DocstringStripper, FunctionStripper, TypeHintStripper, WhitespaceNormalizer
+from pycodehash.preprocessing import (
+    DocstringStripper,
+    FunctionStripper,
+    TypeHintStripper,
+    WhitespaceNormalizer,
+)
 from pycodehash.stores import FunctionStore, ModuleStore, ProjectStore
 from pycodehash.transfomers import HashCallNameTransformer
 from pycodehash.unparse import _unparse
@@ -29,13 +34,16 @@ def hash_string(input_string: str) -> str:
 class FunctionHasher:
     def __init__(
         self,
-        project_store: ProjectStore | None = None,
+        packages: list[str] | None = None,
         ast_transformers: list | None = None,
         lines_transformers: list | None = None,
     ):
         self.func_store = FunctionStore()
         self.module_store = ModuleStore()
-        self.project_store = project_store or ProjectStore()
+        self.project_store = ProjectStore()
+        if packages is not None:
+            for pkg in packages:
+                self.project_store.add_project(pkg)
         self.ast_transformers = ast_transformers or [
             FunctionStripper(),
             DocstringStripper(),
