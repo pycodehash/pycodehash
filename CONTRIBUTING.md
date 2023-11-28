@@ -25,6 +25,20 @@ TYP: static typing
 REL: related to releasing numpy
 ```
 
+## Documentation
+
+The documentation is built with Mkdocs. Install using:
+
+```shell
+pip install pycodehash[docs]
+```
+
+Then you can serve the docs locally:
+
+```shell
+mkdocs serve
+```
+
 ## Release
 
 The flow for releasing a new version of `pycodehash` is:
