@@ -1,6 +1,12 @@
 import pytest
-from pycodehash.datasets.hive import HiveTableHash
-from pyspark.sql import SparkSession
+
+try:
+    from pycodehash.datasets.hive import HiveTableHash
+    from pyspark.sql import SparkSession
+
+    spark_found = True
+except (ModuleNotFoundError, AttributeError):
+    spark_found = False
 
 
 @pytest.fixture(scope="function")
@@ -24,6 +30,10 @@ def employee_dataset(spark, tmp_path):
     return employee, tmp_path, table_name
 
 
+@pytest.mark.skipif(
+    not spark_found,
+    reason="spark not found - install spark",
+)
 def test_approximate_hasher_hive(spark, employee_dataset):
     employee_df, tmp_path, table_name = employee_dataset
 
