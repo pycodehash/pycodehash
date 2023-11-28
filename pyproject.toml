@@ -21,6 +21,7 @@ authors = [
 dependencies = [
     'astunparse; python_version <= "3.9"',
     'typing_extensions; python_version <= "3.11"',
+    'rope',
 ]
 
 [project.optional-dependencies]
