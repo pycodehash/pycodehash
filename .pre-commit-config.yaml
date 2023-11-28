@@ -4,6 +4,6 @@ repos:
   hooks:
     - id: ruff
       args: [--fix]
-      exclude: tests/resources/|playgrounds/
+      exclude: tests/resources/|playgrounds/|docs/example_find_definition_sum.py
     - id: ruff-format
       exclude: tests/resources/|playgrounds/
