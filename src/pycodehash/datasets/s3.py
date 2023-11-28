@@ -19,7 +19,7 @@ class S3Hash(ApproximateHasher):
     def __init__(
         self,
         s3_client: Any = None,
-        endpoint_url: str = os.env["AWS_S3_ENDPOINT_URL"],
+        endpoint_url: str = os.environ.get("AWS_S3_ENDPOINT_URL", ""),
     ):
         """Initialization of S3Hash
 
@@ -39,7 +39,6 @@ class S3Hash(ApproximateHasher):
         s3_file_path: str | None = None,
         bucket: str | None = None,
         key: str | None = None,
-        endpoint_url: str = os.env["AWS_S3_ENDPOINT_URL"],
     ) -> dict[str, Any]:
         """Get metadata of s3 file (specifically the MD5 hash of the file on s3)
 
@@ -55,10 +54,8 @@ class S3Hash(ApproximateHasher):
             bucket, key = s3path_to_bucket_key(s3_file_path=s3_file_path)
         assert None not in [bucket, key]
 
-        s3 = boto3.client("s3", endpoint_url=endpoint_url)
-
         # The head_object() method in s3 client object will fetch the metadata (headers) of a given object
         # stored in the s3 bucket. Not the object itself.
-        obj = s3.head_object(Bucket=bucket, Key=key)
+        obj = self.s3_client.head_object(Bucket=bucket, Key=key)
         etag = obj["ETag"].strip('"')
         return {"etag": etag}
