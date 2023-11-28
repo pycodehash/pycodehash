@@ -48,7 +48,7 @@ path = "src/pycodehash/version.py"
 allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/pycodehash", ]
+packages = ["src/pycodehash"]
 
 [tool.ruff]
 extend-select = ["TID"]
