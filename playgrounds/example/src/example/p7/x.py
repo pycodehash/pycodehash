@@ -1,2 +1,0 @@
-def yes():
-    print("yes")
