@@ -1,5 +1,9 @@
 # Contributing
 
+Contributions are welcome!
+Please open an [issue](https://github.com/pycodehash/pycodehash/issues)
+or create a [pull request](https://github.com/pycodehash/pycodehash/pulls).
+
 ## Commit message convention
 
 `pycodehash` follows a [numpy-inspired](https://numpy.org/devdocs/dev/development_workflow.html#writing-the-commit-message) commit message convention:
