@@ -25,6 +25,5 @@ class DocstringStripper(NodeTransformer):
             and isinstance(node.value, ast.Constant)
             and isinstance(node.value.value, str)
         ):
-            logger.debug("Remove docstring from function")
             return None
         return node

@@ -1,10 +1,6 @@
 from __future__ import annotations
 
-import logging
-
 from pycodehash.preprocessing.lines_transformer import LinesTransformer
-
-logger = logging.getLogger(__name__)
 
 
 class WhitespaceNormalizer(LinesTransformer):
@@ -27,5 +23,4 @@ class WhitespaceNormalizer(LinesTransformer):
         Returns:
             The normalised string representation
         """
-        logger.debug(f"Strip whitespace and replace platform-dependent line endings with {self.sep!r}")
         return self.sep.join(s.rstrip() for s in src.splitlines() if s)
