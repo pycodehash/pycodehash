@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import hashlib
-from typing import Callable
+from types import BuiltinFunctionType, FunctionType
 
 from rope.base.project import Project
 from rope.contrib.findit import Location
@@ -35,13 +35,13 @@ class FunctionHasher:
     """Function hashing algorithm.
 
     Main entry point for hashing functions.
-    It provides a deterministic hash that reflects changes to the funtion itself
+    It provides a deterministic hash that reflects changes to the function itself
     but also to functions that are called and in scope.
     The scope is the first-party library by default but more packages can be set.
 
     Attributes:
         func_store (FunctionStore): container that caches hashed functions
-        module_store (ModuleStore): container that caches ast representations of the mdoules
+        module_store (ModuleStore): container that caches the AST representations of the modules
         project_store (ProjectStore): container that caches analyzed packages
         ast_transformers (list): set of ast.Transformers to be applied to function's AST representation
         lines_transformers (list): set of functions to be applied to the textual representation
@@ -85,6 +85,9 @@ class FunctionHasher:
         # of the function that is hashed. Not strictly needed but does make debugging
         # or evaluation a lot easier.
         self.func_ir_store = FunctionStore()
+
+    def _get_func_name(self, func: FunctionType, default: str = "<unnamed>") -> str:
+        return getattr(func, "__name__", default)
 
     def add_package_to_trace(self, pkg: str):
         """Analyze package s.t. functions in it can be traced.
@@ -130,31 +133,62 @@ class FunctionHasher:
         self.func_store[location] = function_hash
         return function_hash
 
-    def _get_location_and_project(self, func: Callable) -> tuple[Location, Project]:
-        project = self.project_store.get_from_func(func)
-        # get the location (~text range) from the function using the project
-        location = get_func_def_location(func, project)
-        return location, project
-
-    def hash_func(self, func: Callable) -> str:
+    def _get_location_and_project(self, func: FunctionType) -> tuple[Location, Project]:
         """Hash a Python function
 
         Args:
             func: the Python function
 
+        Raises:
+            TypeError: when `func` is a `BuiltinFunctionType` as these do not have accessible source code
+            ValueError: when the source code for `func` cannot be found but it is not a `BuiltinFunctionType`
+
+        Returns:
+            location, project: the location of the function definition and the project it belongs to
+
+        """
+        # exit path for when we cannot hash the source
+        if isinstance(func, BuiltinFunctionType):
+            fname = self._get_func_name(func)
+            raise TypeError(f"builtin function `{fname}` cannot be hashed as there is no Python source code.")
+
+        project = self.project_store.get_or_create_for_func(func)
+
+        # get the location (~text range) from the function using the project
+        location = get_func_def_location(func, project)
+        if location is None:
+            fname = self._get_func_name(func)
+            raise ValueError(f"Source code for function `{fname}` could not be found or does not exist.")
+
+        return location, project
+
+    def hash_func(self, func: FunctionType) -> str:
+        """Hash a Python function
+
+        Args:
+            func: the Python function
+
+        Raises:
+            TypeError: when `func` is a `BuiltinFunctionType` as these do not have accessible source code
+            ValueError: when the source code for `func` cannot be found but it is not a `BuiltinFunctionType`
+
         Returns:
             The hash of the function
+
         """
-        # compute the hash
         return self.hash_location(*self._get_location_and_project(func))
 
-    def get_func_location(self, func: Callable) -> Location | None:
+    def get_func_location(self, func: FunctionType) -> Location | None:
         """Get the rope.Location of a function.
 
         The location is can be used to access the function and ir function store.
 
         Args:
             func: the Python function
+
+        Raises:
+            TypeError: when `func` is a `BuiltinFunctionType` as these do not have accessible source code
+            ValueError: when the source code for `func` cannot be found but it is not a `BuiltinFunctionType`
 
         Returns:
             location: location of the function definition if found otherwise None
