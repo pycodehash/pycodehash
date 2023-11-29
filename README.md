@@ -53,7 +53,7 @@ print("Hash for `compute_moments`", h2)
 h3 = fh.hash_func(combine_random_samples)
 print("Hash for `combine_random_samples`", h3)
 ```
-_[Python Usage Example](https://github.com/pycodehash/pycodehash/blob/dev/example.py)_
+_[Python Usage Example](https://github.com/pycodehash/pycodehash/blob/main/example.py)_
 
 ### SQL
 
@@ -84,7 +84,7 @@ print(hasher.hash_query(query_1))
 # Or pass a path
 print(hasher.hash_file(query_2_file))
 ```
-_[SQL Usage Example](https://github.com/pycodehash/pycodehash/blob/dev/example_sql.py)_
+_[SQL Usage Example](https://github.com/pycodehash/pycodehash/blob/main/example_sql.py)_
 
 ## Datasets
 
@@ -112,7 +112,7 @@ dh = LocalDirectoryHash()
 print(len(dh.collect_hashes(Path(__file__).parent / "src")))
 # 29
 ```
-_[Dataset Usage Example](example_data.py)_
+_[Dataset Usage Example](https://github.com/pycodehash/pycodehash/blob/main/example_data.py)_
 
 ## License
 
