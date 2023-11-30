@@ -19,7 +19,7 @@ Learn more on how PyCodeHash detects changes in:
 
 - [Python Functions](https://pycodehash.github.io/pycodehash/python_functions/)
 - [SQL Queries](https://pycodehash.github.io/pycodehash/sql_queries/)
-- [Dataset](https://pycodehash.github.io/pycodehash/datasets/): Files, Directories, S3, Hive
+- [Datasets](https://pycodehash.github.io/pycodehash/datasets/): Files, Directories, S3, Hive
 
 ## Installation
 
