@@ -1,6 +1,6 @@
 # PyCodeHash
 
-[![Build](https://github.com/pycodehash/pycodehash/workflows/build/badge.svg)](https://github.com/pycodehash/pycodehash/actions)
+[![Build](https://github.com/pycodehash/pycodehash/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/pycodehash/pycodehash/actions)
 [![Latest Github release](https://img.shields.io/github/v/release/pycodehash/pycodehash)](https://github.com/pycodehash/pycodehash/releases)
 [![GitHub release date](https://img.shields.io/github/release-date/pycodehash/pycodehash)](https://github.com/pycodehash/pycodehash/releases)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/charliermarsh/ruff/main/assets/badge/v1.json)](https://github.com/astral-sh/ruff)
