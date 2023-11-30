@@ -19,6 +19,4 @@ class TypeHintStripper(NodeTransformer):
         return node
 
     def visit_AnnAssign(self, node):
-        if node.value is None:
-            return None
         return ast.Assign([node.target], node.value, lineno=node.lineno)
