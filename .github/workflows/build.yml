@@ -28,6 +28,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
+        pip install tests/resources/tliba tests/resources/tlibb
         pip install -e .[test]
     - name: Lint with pre-commit
       run: |
