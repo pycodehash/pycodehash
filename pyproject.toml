@@ -28,6 +28,9 @@ dependencies = [
 [project.optional-dependencies]
 test = [
     "pytest",
+    "pytest-cov",
+    "pycodehash[sql,s3]",
+    "moto[s3]"
 ]
 sql = [
     "sqlfluff"
