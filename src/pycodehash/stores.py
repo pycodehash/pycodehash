@@ -106,8 +106,6 @@ class ProjectStore:
         Returns:
             project: analyzed rope project
         """
-        if item not in self.store:
-            self._initialize_project(item)
         return self.store[item]
 
     def _initialize_project(self, pkg: str):
@@ -138,17 +136,20 @@ class ProjectStore:
         """
         self._initialize_project(pkg)
 
-    def get_from_func(self, func: Callable) -> Project:
+    def get_or_create_for_func(self, func: Callable) -> Project:
         # get the module from the function
         module = inspect.getmodule(func)
         name = module.__name__
         pkg, _, _ = name.partition(".")
+        if pkg not in self.store:
+            self._initialize_project(pkg)
         return self.__getitem__(pkg)
 
     # TODO: this should be refactored
     def get_projects(self, mod: ModuleView | None = None) -> list[Project]:
         """Create a list with all projects where the first project to which the module belongs to."""
-        if mod is None:
+        if mod is None or (mod.pkg not in self.store):
             return list(self.store.values())
+
         mod_project = self[mod.pkg]
         return [mod_project] + [v for v in self.store.values() if v != mod_project]
