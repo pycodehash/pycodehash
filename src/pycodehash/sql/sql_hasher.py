@@ -7,6 +7,7 @@ from sqlfluff import parse
 from pycodehash.datasets.approximate_hasher import inline_metadata
 from pycodehash.hashing import hash_string
 from pycodehash.sql.ast_transformer import ASTTransformer
+from pycodehash.sql.whitespace_filter import WhitespaceFilter
 
 
 class SQLHasher:
@@ -29,7 +30,7 @@ class SQLHasher:
         """
         self.dialect = dialect
         self.config_path = config_path
-        self.ast_transformers = ast_transformers or []
+        self.ast_transformers = ast_transformers or [WhitespaceFilter()]
 
     def hash_file(self, file_path: Path | str):
         """Hash the query in a file
