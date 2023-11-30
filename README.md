@@ -63,7 +63,6 @@ Hash SQL queries and files using the `SQLHasher` (requires `pip install pycodeha
 from pathlib import Path
 
 from pycodehash.sql.sql_hasher import SQLHasher
-from pycodehash.sql.whitespace_filter import WhitespaceFilter
 
 # First query
 query_1 = "SELECT * FROM db.templates"
@@ -76,7 +75,7 @@ query_2_file = Path("/tmp/query.sql")
 query_2_file.write_text(query_2)
 
 # Create the SQLHasher object for SparkSQL
-hasher = SQLHasher(ast_transformers=[WhitespaceFilter()], dialect="sparksql")
+hasher = SQLHasher(dialect="sparksql")
 
 # We can hash a string
 print(hasher.hash_query(query_1))
