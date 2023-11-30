@@ -25,6 +25,26 @@ TYP: static typing
 REL: related to releasing numpy
 ```
 
+## Testing
+
+To install the testing dependencies:
+
+```shell
+pip install -e .[test]
+```
+
+To run the tests:
+
+```shell
+pytest
+```
+
+To run testing and code coverage:
+
+```shell
+pytest --cov=./src/pycodehash/
+```
+
 ## Documentation
 
 The documentation is built with Mkdocs. Install using:

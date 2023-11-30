@@ -2,16 +2,21 @@ from __future__ import annotations
 
 import os
 from typing import Any
+from urllib.parse import urlparse
 
 import boto3
 
 from pycodehash.datasets.approximate_hasher import ApproximateHasher
 
 
-def s3path_to_bucket_key(s3_file_path: str):
-    split = [s for s in s3_file_path.split("/") if not s.startswith("s3") and len(s) > 0]
-    bucket = split[0]
-    key = "/".join(split[1:])
+def s3path_to_bucket_key(s3_file_path: str) -> tuple[str, str]:
+    result = urlparse(s3_file_path)
+
+    bucket = result.netloc
+    key = result.path.lstrip("/")
+    if result.query:
+        key += "?" + result.query
+
     return bucket, key
 
 
