@@ -57,7 +57,7 @@ class S3Hash(ApproximateHasher):
         """
         if s3_file_path is not None:
             bucket, key = s3path_to_bucket_key(s3_file_path=s3_file_path)
-        assert None not in [bucket, key]
+        assert None not in {bucket, key}
 
         # The head_object() method in s3 client object will fetch the metadata (headers) of a given object
         # stored in the s3 bucket. Not the object itself.

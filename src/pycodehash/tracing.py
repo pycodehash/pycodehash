@@ -1,25 +1,33 @@
 from __future__ import annotations
 
-import ast
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from rope.base import worder
-from rope.base.project import Project
 from rope.base.pynamesdef import DefinedName, ImportedModule, ImportedName
-from rope.base.resources import Resource
 from rope.contrib import fixsyntax
 from rope.contrib.findit import Location
 from rope.refactor import occurrences
 
-from pycodehash.stores import ModuleView
+if TYPE_CHECKING:
+    import ast
+
+    from asttokens.util import Token
+    from rope.base.project import Project
+    from rope.base.resources import Resource
+    from rope.refactor.occurrences import Occurrence
+
+    from pycodehash.stores import ModuleView
 
 
-def _get_text_range(node: ast.expr, tokens):
+def _get_text_range(node: ast.expr, tokens: list[Token]):
     """Get string offset from ast Node
     This is a workaround since `asttoken.get_text_range` needs to be an "EnhancedAST" node...
+
     Args:
         node: ast Node
         tokens: asttoken tokens
+
     Returns:
         Offset tuple. Returns 0,0 if not found
     """
@@ -35,7 +43,7 @@ def _get_text_range(node: ast.expr, tokens):
     return 0, 0
 
 
-def check_func_definition(occurrence):
+def check_func_definition(occurrence: Occurrence):
     return occurrence.is_defined()
 
 
@@ -54,7 +62,7 @@ def robust_find_definition(
     code = mview.code
     offset_start, offset_end = mview.tree_tokens.get_text_range(node)
     if offset_end == 0:
-        # TODO[RU]: figure out why this needed.
+        # TODO(RU): figure out why this needed.
         # try slower workaround when tree tokens seem to be out of date
         offset_start, offset_end = _get_text_range(node, mview.tree_tokens.tokens)
     if offset_end == 0:
@@ -74,9 +82,10 @@ def robust_find_definition(
     if lineno is not None:
         start = module.lines.get_line_start(lineno)
 
-        def check_offset(occurrence):
+        def check_offset(occurrence: Occurrence):
             if occurrence.offset < start:
                 return False
+            return None
 
         pyname_filter = occurrences.PyNameFilter(pyname)
         finder = occurrences.Finder(project, name, [check_offset, pyname_filter])
@@ -85,12 +94,10 @@ def robust_find_definition(
 
     # handle imports which are not properly traced by rope
     if isinstance(pyname, (ImportedName, ImportedModule)):
-        if isinstance(pyname, ImportedModule):
-            # we assume that as this is an ImportedModule that the node has an ast.Attribute
-            # as func rather than an ast.Name
-            name = node.func.attr
-        else:
-            name = pyname.imported_name
+        # we assume that as this is an ImportedModule that the node has an ast.Attribute
+        # as func rather than an ast.Name
+        name = node.func.attr if isinstance(pyname, ImportedModule) else pyname.imported_name
         finder = occurrences.Finder(project, name, [check_func_definition])
         for occurrence in finder.find_occurrences(pymodule=module):
             return Location(occurrence)
+    return None

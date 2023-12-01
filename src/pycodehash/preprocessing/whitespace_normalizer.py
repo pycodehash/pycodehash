@@ -11,7 +11,7 @@ class WhitespaceNormalizer(LinesTransformer):
     (for identical cross-platform hashes).
     """
 
-    def __init__(self, sep="\n"):
+    def __init__(self, sep: str = "\n"):
         """Initialize the WhitespaceNormalizer
 
         Args:

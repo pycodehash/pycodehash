@@ -3,9 +3,7 @@ from __future__ import annotations
 
 import hashlib
 from types import BuiltinFunctionType, FunctionType
-
-from rope.base.project import Project
-from rope.contrib.findit import Location
+from typing import TYPE_CHECKING
 
 from pycodehash.preprocessing import (
     DocstringStripper,
@@ -16,11 +14,11 @@ from pycodehash.preprocessing import (
 from pycodehash.stores import FunctionStore, ModuleStore, ProjectStore
 from pycodehash.transfomers import HashCallNameTransformer
 from pycodehash.unparse import _unparse
-from pycodehash.utils import (
-    get_func_def_location,
-    get_func_name,
-    get_func_node_from_location,
-)
+from pycodehash.utils import get_func_def_location, get_func_name, get_func_node_from_location
+
+if TYPE_CHECKING:
+    from rope.base.project import Project
+    from rope.contrib.findit import Location
 
 
 def hash_string(input_string: str) -> str:
@@ -110,8 +108,7 @@ class FunctionHasher:
         """
         # check if the location was already hashed, if so return
         if location in self.func_store:
-            function_hash = self.func_store[location]
-            return function_hash
+            return self.func_store[location]
 
         # get the code for the function
         src_node = get_func_node_from_location(location, project)

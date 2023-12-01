@@ -65,4 +65,4 @@ for n in n_records:
         round(mean(measurements1) / mean(measurements2)),
         "x",
     )
-    print("")
+    print()

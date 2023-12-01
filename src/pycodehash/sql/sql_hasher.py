@@ -1,19 +1,20 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from sqlfluff import parse
 
 from pycodehash.datasets.approximate_hasher import inline_metadata
 from pycodehash.hashing import hash_string
-from pycodehash.sql.ast_transformer import ASTTransformer
 from pycodehash.sql.whitespace_filter import WhitespaceFilter
+
+if TYPE_CHECKING:
+    from pycodehash.sql.ast_transformer import ASTTransformer
 
 
 class SQLHasher:
-    """
-    Hash an SQL file or query using `SQLFluff <https://docs.sqlfluff.com/en/stable/index.html>`_.
-    """
+    """Hash an SQL file or query using `SQLFluff <https://docs.sqlfluff.com/en/stable/index.html>`_."""
 
     def __init__(
         self,

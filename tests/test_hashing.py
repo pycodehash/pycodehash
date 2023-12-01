@@ -1,11 +1,14 @@
 from __future__ import annotations
 
-from types import FunctionType
+from typing import TYPE_CHECKING
 
 import pytest
 import tliba
 from pycodehash import FunctionHasher
 from tlibb.etl import combine_random_samples as tlibb_etl_combine_random_samples
+
+if TYPE_CHECKING:
+    from types import FunctionType
 
 _REFERNCE_HASHES: dict[FunctionType, str] = {
     tliba.random.draw_beta_samples: "d36952212d075fc821149f80ca84f5c7974afd46f9aa19027e0db112e1b2a649",
@@ -74,7 +77,7 @@ def test_lambda_handling():
     # default setting: error="raise"
     fh = FunctionHasher()
     with pytest.raises(ValueError) as e_info:
-        fh.hash_func(lambda x: print(x))
+        fh.hash_func(lambda x: print(x))  # noqa: PLW0108
     exp_msg = "Source code for function `<lambda>` could not be found or does not exist."
     assert e_info.type is ValueError
     assert e_info.value.args[0] == exp_msg
