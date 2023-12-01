@@ -48,11 +48,7 @@ def check_func_definition(occurrence: Occurrence):
 
 
 def robust_find_definition(
-    node: ast.Call,
-    mview: ModuleView,
-    project: Project,
-    resource: Resource | None = None,
-    maxfixes: int = 1,
+    node: ast.Call, mview: ModuleView, project: Project, resource: Resource | None = None, maxfixes: int = 1
 ):
     """Return the definition location of the function being called.
 

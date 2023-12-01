@@ -6,16 +6,7 @@ import pandas as pd
 from faker import Faker
 from faker.providers import profile
 
-n_records = [
-    1,
-    10,
-    100,
-    1_000,
-    10_000,
-    100_000,
-    1_000_000,
-    10_000_000,
-]
+n_records = [1, 10, 100, 1_000, 10_000, 100_000, 1_000_000, 10_000_000]
 
 
 for n in n_records:
@@ -28,9 +19,7 @@ for n in n_records:
     Faker.seed(42)
     fake = Faker()
     fake.add_provider(profile)
-    df = pd.DataFrame(
-        [fake.profile() for _ in range(n)],
-    )
+    df = pd.DataFrame([fake.profile() for _ in range(n)])
     df.to_csv(data_file, index=False)
 
 # Repeat the function this number of times

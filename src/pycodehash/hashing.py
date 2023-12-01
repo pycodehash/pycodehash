@@ -5,12 +5,7 @@ import hashlib
 from types import BuiltinFunctionType, FunctionType
 from typing import TYPE_CHECKING
 
-from pycodehash.preprocessing import (
-    DocstringStripper,
-    FunctionStripper,
-    TypeHintStripper,
-    WhitespaceNormalizer,
-)
+from pycodehash.preprocessing import DocstringStripper, FunctionStripper, TypeHintStripper, WhitespaceNormalizer
 from pycodehash.stores import FunctionStore, ModuleStore, ProjectStore
 from pycodehash.transfomers import HashCallNameTransformer
 from pycodehash.unparse import _unparse
@@ -75,14 +70,8 @@ class FunctionHasher:
         if packages is not None:
             for pkg in packages:
                 self.project_store.add_project(pkg)
-        self.ast_transformers = ast_transformers or [
-            FunctionStripper(),
-            DocstringStripper(),
-            TypeHintStripper(),
-        ]
-        self.lines_transformers = lines_transformers or [
-            WhitespaceNormalizer(),
-        ]
+        self.ast_transformers = ast_transformers or [FunctionStripper(), DocstringStripper(), TypeHintStripper()]
+        self.lines_transformers = lines_transformers or [WhitespaceNormalizer()]
         # Function store is re-used to store the intermediate representation (IR)
         # of the function that is hashed. Not strictly needed but does make debugging
         # or evaluation a lot easier.

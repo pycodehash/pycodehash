@@ -21,11 +21,7 @@ def s3path_to_bucket_key(s3_file_path: str) -> tuple[str, str]:
 
 
 class S3Hash(ApproximateHasher):
-    def __init__(
-        self,
-        s3_client: Any = None,
-        endpoint_url: str = os.environ.get("AWS_S3_ENDPOINT_URL", ""),
-    ):
+    def __init__(self, s3_client: Any = None, endpoint_url: str = os.environ.get("AWS_S3_ENDPOINT_URL", "")):
         """Initialization of S3Hash
 
         Args:
@@ -40,10 +36,7 @@ class S3Hash(ApproximateHasher):
         self.s3_client = s3_client
 
     def collect_metadata(
-        self,
-        s3_file_path: str | None = None,
-        bucket: str | None = None,
-        key: str | None = None,
+        self, s3_file_path: str | None = None, bucket: str | None = None, key: str | None = None
     ) -> dict[str, Any]:
         """Get metadata of s3 file (specifically the MD5 hash of the file on s3)
 

@@ -100,3 +100,9 @@ exclude_also = [
     "@(abc\\.)?abstractmethod",
     "if TYPE_CHECKING:",
 ]
+
+[tool.ruff.isort]
+split-on-trailing-comma = false
+
+[tool.ruff.format]
+skip-magic-trailing-comma = true
