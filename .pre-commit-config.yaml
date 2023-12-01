@@ -3,7 +3,7 @@ repos:
   rev: v0.1.6
   hooks:
     - id: ruff
-      args: [--fix]
+      args: [--fix, --preview]
       exclude: tests/resources/|playgrounds/
     - id: ruff-format
       exclude: tests/resources/|playgrounds/

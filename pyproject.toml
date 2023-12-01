@@ -58,21 +58,45 @@ allow-direct-references = true
 packages = ["src/pycodehash"]
 
 [tool.ruff]
-extend-select = ["TID"]
 target-version = "py38"
 line-length = 120
-select = [
-  # Enable Pyflakes `E`, `F` and `W` codes
-  "E",
-  "F",
-  "W",
-  # Sort imports
-  "I"
+extend-select = [
+    "E", # pyflakes `E`
+    "W", # pyflakes `W`
+    "I", # isort
+    "TID", # flake8-tidy-imports
+    "UP", # pyupgrade
+    "D212", # pydocstyle
+    "D411", # pydocstyle
+    "ANN001", # flake8-annotations
+    "C4",  # flake8-comprehensions
+    "EM", # flake8-errmsg
+    "FA", # flake8-future-annotations
+    "INP", # flake8-no-pep420
+    "PIE", # flake8-pie
+    "RET", # flake8-return
+    "SIM", # flake8-simplify
+    "TCH", # flake8-type-checking
+    "PTH", # flake8-use-pathlib
+    "TD002", # flake8-todos
+    "PL", # pylint
+    "PERF", # perflint
+    "FURB", # refurb
 ]
+
+[tool.ruff.lint.per-file-ignores]
+"{tests,docs}/*" = ["ANN001", "INP", "PLR2004"]
+"src/pycodehash/preprocessing/{typehint_stripper,function_stripper}.py" = [
+    "PLR6301"  # ununsed self in combination with NodeVisitor
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
 
 [tool.coverage.report]
 exclude_also = [
     "raise AssertionError",
     "raise NotImplementedError",
     "@(abc\\.)?abstractmethod",
+    "if TYPE_CHECKING:",
 ]
