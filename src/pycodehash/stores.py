@@ -109,8 +109,10 @@ class ProjectStore:
         return self.store[item]
 
     def _initialize_project(self, pkg: str):
-        """Create and set a project. If the package name is not provided, then assume the project root is the current
-        working directory.
+        """Create and set a project.
+
+        If the package name is not provided, then assume
+        the project root is the current working directory.
 
         Args:
             pkg: package name
@@ -120,6 +122,10 @@ class ProjectStore:
             raise ValueError("Cannot resolve `__main__` yet")
 
         spec = find_spec(pkg)
+        if spec is None:
+            msg = f"Could not import package {pkg}."
+            raise ImportError(msg)
+
         if spec.submodule_search_locations is None:
             project_root = Path.cwd()
         else:
@@ -148,7 +154,7 @@ class ProjectStore:
     # TODO: this should be refactored
     def get_projects(self, mod: ModuleView | None = None) -> list[Project]:
         """Create a list with all projects where the first project to which the module belongs to."""
-        if mod is None or (mod.pkg not in self.store):
+        if mod is None or mod.pkg not in self.store:
             return list(self.store.values())
 
         mod_project = self[mod.pkg]
