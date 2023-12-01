@@ -4,7 +4,7 @@ import inspect
 from dataclasses import dataclass
 from importlib.util import find_spec
 from pathlib import Path
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING, Callable, Iterable
 
 import asttokens
 from rope.base.libutils import analyze_modules
@@ -145,11 +145,5 @@ class ProjectStore:
             self._initialize_project(pkg)
         return self.__getitem__(pkg)
 
-    # TODO(SB): this should be refactored
-    def get_projects(self, mod: ModuleView | None = None) -> list[Project]:
-        """Create a list with all projects where the first project to which the module belongs to."""
-        if mod is None or mod.pkg not in self.store:
-            return list(self.store.values())
-
-        mod_project = self[mod.pkg]
-        return [mod_project] + [v for v in self.store.values() if v != mod_project]
+    def __iter__(self) -> Iterable[Project]:
+        yield from self.store.values()

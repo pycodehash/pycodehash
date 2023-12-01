@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import ast
 from ast import NodeTransformer
+from itertools import chain
 from typing import TYPE_CHECKING
 
 from rope.contrib.findit import Location
@@ -24,10 +25,10 @@ class HashCallNameTransformer(NodeTransformer):
         self.hasher = hasher
         self.project_store: ProjectStore = hasher.project_store
 
-        projects = self.project_store.get_projects()
-        for project in projects:
+        for project in self.project_store:
             module = project.get_pymodule(location.resource)
             if module is not None:
+                self.project = project
                 break
         self.module: ModuleView = self.hasher.module_store[module]
         self.hash_repr = None
@@ -36,7 +37,7 @@ class HashCallNameTransformer(NodeTransformer):
         """Find the hash each call"""
         # iterate over the projects until we find the location.
         # the first project is the one to which the module belongs.
-        projects = self.project_store.get_projects(self.module)
+        projects = chain([self.project], (project for project in self.project_store if project != self.project))
         for project in projects:
             location = find_call_definition(node, self.module, project)
 
