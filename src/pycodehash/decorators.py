@@ -1,9 +1,15 @@
-# TODO: move to utilipy?
+# TODO(SB): move to plumify?
 """Decorators."""
+from __future__ import annotations
+
 import inspect
 import json
+from typing import TYPE_CHECKING
 
 from pycodehash.hashing import hash_string
+
+if TYPE_CHECKING:
+    from types import FunctionType
 
 
 def hash_func_params(keywords: tuple[str], args: tuple[any], kwargs: dict[str, any]) -> str:
@@ -25,7 +31,7 @@ def hash_func_params(keywords: tuple[str], args: tuple[any], kwargs: dict[str, a
     return hash_string(json.dumps(params, ensure_ascii=False))
 
 
-def cache(func):
+def cache(func: FunctionType):
     """Attach a cache to the function.
 
     The cache assumes that the function is:

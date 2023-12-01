@@ -3,10 +3,13 @@ from __future__ import annotations
 
 import ast
 from ast import NodeTransformer
+from typing import TYPE_CHECKING
 
 from rope.contrib.findit import Location
 
-from pycodehash.stores import ModuleView, ProjectStore
+if TYPE_CHECKING:
+    from pycodehash.hashing import FunctionHasher
+    from pycodehash.stores import ModuleView, ProjectStore
 from pycodehash.utils import find_call_definition
 
 
@@ -17,7 +20,7 @@ def _contains_call(node: ast.Expr):
 class HashCallNameTransformer(NodeTransformer):
     """Replace the function names in a call with the hash of that call"""
 
-    def __init__(self, hasher, location: Location):
+    def __init__(self, hasher: FunctionHasher, location: Location):
         self.hasher = hasher
         self.project_store: ProjectStore = hasher.project_store
 

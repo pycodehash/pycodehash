@@ -1,17 +1,20 @@
 from __future__ import annotations
 
-import ast
 import inspect
 from dataclasses import dataclass
 from importlib.util import find_spec
 from pathlib import Path
-from typing import Callable
+from typing import TYPE_CHECKING, Callable
 
 import asttokens
 from rope.base.libutils import analyze_modules
 from rope.base.project import Project
-from rope.base.pyobjectsdef import PyModule
-from rope.contrib.findit import Location
+
+if TYPE_CHECKING:
+    import ast
+
+    from rope.base.pyobjectsdef import PyModule
+    from rope.contrib.findit import Location
 
 
 def _item_to_key(item: Location):
@@ -30,7 +33,7 @@ class FunctionStore:
         key = _item_to_key(item)
         self.store[key] = value
 
-    def __contains__(self, item):
+    def __contains__(self, item: Location):
         key = _item_to_key(item)
         return key in self.store
 
@@ -64,7 +67,7 @@ class ModuleStore:
             self._initialize_module_view(name, item)
         return self.store[name]
 
-    def _initialize_module_view(self, name, module: PyModule) -> None:
+    def _initialize_module_view(self, name: str, module: PyModule) -> None:
         pkg, _, _ = name.partition(".")
         path = module.get_resource().pathlib
         code = module.resource.read()
@@ -119,17 +122,15 @@ class ProjectStore:
 
         """
         if pkg == "__main__":
-            raise ValueError("Cannot resolve `__main__` yet")
+            msg = "Cannot resolve `__main__` yet"
+            raise ValueError(msg)
 
         spec = find_spec(pkg)
         if spec is None:
             msg = f"Could not import package {pkg}."
             raise ImportError(msg)
 
-        if spec.submodule_search_locations is None:
-            project_root = Path.cwd()
-        else:
-            project_root = spec.submodule_search_locations[0]
+        project_root = Path.cwd() if spec.submodule_search_locations is None else spec.submodule_search_locations[0]
         project = Project(projectroot=project_root)
         analyze_modules(project)
         self.store[pkg] = project
@@ -151,7 +152,7 @@ class ProjectStore:
             self._initialize_project(pkg)
         return self.__getitem__(pkg)
 
-    # TODO: this should be refactored
+    # TODO(SB): this should be refactored
     def get_projects(self, mod: ModuleView | None = None) -> list[Project]:
         """Create a list with all projects where the first project to which the module belongs to."""
         if mod is None or mod.pkg not in self.store:

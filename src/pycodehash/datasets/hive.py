@@ -1,7 +1,12 @@
+from __future__ import annotations
+
 import logging
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from pyspark.errors.exceptions.captured import AnalysisException
+
+if TYPE_CHECKING:
+    from pyspark.sql import SparkSession
 
 from pycodehash.datasets.approximate_hasher import ApproximateHasher
 
@@ -11,7 +16,7 @@ logger = logging.getLogger(__name__)
 class HiveTableHash(ApproximateHasher):
     """Fast approximate hash for spark hive tables"""
 
-    def __init__(self, spark):
+    def __init__(self, spark: SparkSession):
         self.spark = spark
         super().__init__()
 

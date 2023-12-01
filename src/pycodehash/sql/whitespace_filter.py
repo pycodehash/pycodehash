@@ -18,13 +18,11 @@ def _should_flatten(data: list[Any]) -> bool:
 
 
 class WhitespaceFilter(ASTTransformer):
-    """
-    Whitespace and newlines are removed
-    """
+    """Whitespace and newlines are removed"""
 
-    def transform(self, node):
+    def transform(self, node: Any):
         if isinstance(node, dict):
-            return {k: self.transform(v) for k, v in node.items() if k not in ["whitespace", "newline"]}
+            return {k: self.transform(v) for k, v in node.items() if k not in {"whitespace", "newline"}}
         if isinstance(node, list):
             data = [self.transform(v) for v in node]
             # Filter nones

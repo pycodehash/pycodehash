@@ -120,21 +120,21 @@ def test_smoke_typehints():
 
 def test_typehints_return_simple():
     """Test that return type annotation is removed."""
-    f_str = "def foo(x, y=None) -> int:\n" "    y = y or 10\n" "    z = 2 * x\n" "    return z + y\n"
+    f_str = "def foo(x, y=None) -> int:\n    y = y or 10\n    z = 2 * x\n    return z + y\n"
     processed = TypeHintStripper().visit(ast.parse(f_str))
     assert _to_stripped_str(processed) == _REFERENCE_FUNC
 
 
 def test_typehints_return_complex():
     """Test that return type annotation is removed."""
-    f_str = "def foo(x, y=None) -> int | tuple[int, int]:\n" "    y = y or 10\n" "    z = 2 * x\n" "    return z + y\n"
+    f_str = "def foo(x, y=None) -> int | tuple[int, int]:\n    y = y or 10\n    z = 2 * x\n    return z + y\n"
     processed = TypeHintStripper().visit(ast.parse(f_str))
     assert _to_stripped_str(processed) == _REFERENCE_FUNC
 
 
 def test_typehints_params():
     """Test that return type annotation is removed."""
-    f_str = "def foo(x: int, y : Optional[int] = None):\n" "    y = y or 10\n" "    z = 2 * x\n" "    return z + y\n"
+    f_str = "def foo(x: int, y : Optional[int] = None):\n    y = y or 10\n    z = 2 * x\n    return z + y\n"
     processed = TypeHintStripper().visit(ast.parse(f_str))
     assert _to_stripped_str(processed) == _REFERENCE_FUNC
 
@@ -153,7 +153,7 @@ def test_typehints_params_complex():
 
 def test_typehints_assign_simple():
     """Test that return type annotation is removed."""
-    f_str = "def foo(x, y=None):\n" "    y : int = y or 10\n" "    z : int = 2 * x\n" "    return z + y\n"
+    f_str = "def foo(x, y=None):\n    y : int = y or 10\n    z : int = 2 * x\n    return z + y\n"
     processed = TypeHintStripper().visit(ast.parse(f_str))
     assert _to_stripped_str(processed) == _REFERENCE_FUNC
 
@@ -184,7 +184,7 @@ def test_typehints_all():
 
 def test_function_name_stripper():
     """Test if the function name is removed."""
-    f_str = "def foo(x, y):\n" "    y = y or 10\n" "    z = 2 * x\n" "    return z + y"
+    f_str = "def foo(x, y):\n    y = y or 10\n    z = 2 * x\n    return z + y"
     processed = _unparse(FunctionStripper().visit(ast.parse(f_str)))
-    f_str_ref = "def _(x, y):\n" "    y = y or 10\n" "    z = 2 * x\n" "    return z + y"
+    f_str_ref = "def _(x, y):\n    y = y or 10\n    z = 2 * x\n    return z + y"
     assert _compatible(processed) == _compatible(f_str_ref)

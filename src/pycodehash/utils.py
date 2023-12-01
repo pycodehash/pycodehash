@@ -1,16 +1,19 @@
 from __future__ import annotations
 
-import ast
-from types import FunctionType
-from typing import Callable
+from typing import TYPE_CHECKING, Callable
 
 from rope.base.project import NoProject, Project
 from rope.base.resources import File
 from rope.contrib.findit import Location
 from rope.refactor import occurrences
 
-from pycodehash.stores import ModuleView
 from pycodehash.tracing import check_func_definition, robust_find_definition
+
+if TYPE_CHECKING:
+    import ast
+    from types import FunctionType
+
+    from pycodehash.stores import ModuleView
 
 
 def get_func_node_from_location(location: Location, project: Project) -> ast.FunctionDef:
@@ -36,7 +39,7 @@ def get_func_call_location(node: ast.Call, project: Project, module: ModuleView)
     Raises:
         ValueError: when Call is not found in the AST Tree
     """
-    # TODO[RU] decide on how to structure this better
+    # TODO(RU): decide on how to structure this better
     return robust_find_definition(node, module, project)
 
 
@@ -58,7 +61,7 @@ def get_func_def_location(func: Callable, project: Project) -> Location | None:
     return None
 
 
-def find_call_definition(node: ast.expr, module, project) -> Location | None:
+def find_call_definition(node: ast.expr, module: ModuleView, project: Project) -> Location | None:
     loc = get_func_call_location(node, project, module)
     if loc is None:
         return None

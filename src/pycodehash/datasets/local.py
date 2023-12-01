@@ -36,10 +36,12 @@ class LocalFileHash(ApproximateHasher):
     Based on last modification time and file size only.
     """
 
-    def collect_metadata(self, path: str | Path) -> dict[str, Any]:
+    @staticmethod
+    def collect_metadata(path: str | Path) -> dict[str, Any]:
         path = Path(path)
         if path.is_dir():
-            raise TypeError("Directories not supported. Please use `LocalDirectoryHash`")
+            msg = "Directories not supported. Please use `LocalDirectoryHash`"
+            raise TypeError(msg)
 
         last_modified = path.stat().st_mtime
         last_modified = datetime.fromtimestamp(last_modified)

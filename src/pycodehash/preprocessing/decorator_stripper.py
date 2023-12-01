@@ -27,7 +27,7 @@ class DecoratorStripper(NodeTransformer):
         self.decorators = decorators
 
     def visit_FunctionDef(self, node: ast.FunctionDef):
-        # TODO: import visitor to resolve to FQN
+        # TODO(SB): import visitor to resolve to FQN
         node.decorator_list = [
             decorator for decorator in node.decorator_list if _get_decorator_name(decorator) not in self.decorators
         ]
