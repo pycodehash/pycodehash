@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+from pathlib import Path
 
 from rope.base import worder
 from rope.base.project import Project
@@ -53,30 +54,34 @@ def robust_find_definition(
     code = mview.code
     offset_start, offset_end = mview.tree_tokens.get_text_range(node)
     if offset_end == 0:
-        # try slower workaround when tree tokens seem to be out of date
         # TODO[RU]: figure out why this needed.
+        # try slower workaround when tree tokens seem to be out of date
         offset_start, offset_end = _get_text_range(node, mview.tree_tokens.tokens)
     if offset_end == 0:
         return None
 
     fixer = fixsyntax.FixSyntax(project, code, resource, maxfixes)
     pyname = fixer.pyname_at(offset_start)
-    if pyname is not None:
-        if not isinstance(pyname, (DefinedName, ImportedModule, ImportedName)):
-            return None
-        module, lineno = pyname.get_definition_location()
-        name = worder.Worder(code).get_word_at(offset_start)
-        if lineno is not None:
-            start = module.lines.get_line_start(lineno)
+    if pyname is None or not isinstance(pyname, (DefinedName, ImportedModule, ImportedName)):
+        return None
+    module, lineno = pyname.get_definition_location()
+    # restrict tracing to first party modules
+    if Path(project.address) not in module.get_resource().pathlib.parents:
+        return None
 
-            def check_offset(occurrence):
-                if occurrence.offset < start:
-                    return False
+    # -- default rope tracing block
+    name = worder.Worder(code).get_word_at(offset_start)
+    if lineno is not None:
+        start = module.lines.get_line_start(lineno)
 
-            pyname_filter = occurrences.PyNameFilter(pyname)
-            finder = occurrences.Finder(project, name, [check_offset, pyname_filter])
-            for occurrence in finder.find_occurrences(pymodule=module):
-                return Location(occurrence)
+        def check_offset(occurrence):
+            if occurrence.offset < start:
+                return False
+
+        pyname_filter = occurrences.PyNameFilter(pyname)
+        finder = occurrences.Finder(project, name, [check_offset, pyname_filter])
+        for occurrence in finder.find_occurrences(pymodule=module):
+            return Location(occurrence)
 
     # handle imports which are not properly traced by rope
     if isinstance(pyname, (ImportedName, ImportedModule)):
