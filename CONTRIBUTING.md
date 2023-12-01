@@ -13,6 +13,8 @@ API: an (incompatible) API change
 BENCH: changes to the benchmark suite
 BLD/PKG: change related to building pycodehash
 BUG: bug fix
+CHG: functional code change
+CICD: CI/CD changes
 DEP: deprecate something, or remove a deprecated object
 DEV: development tool or utility
 DOC: documentation
