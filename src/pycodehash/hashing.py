@@ -16,7 +16,11 @@ from pycodehash.preprocessing import (
 from pycodehash.stores import FunctionStore, ModuleStore, ProjectStore
 from pycodehash.transfomers import HashCallNameTransformer
 from pycodehash.unparse import _unparse
-from pycodehash.utils import get_func_def_location, get_func_node_from_location
+from pycodehash.utils import (
+    get_func_def_location,
+    get_func_name,
+    get_func_node_from_location,
+)
 
 
 def hash_string(input_string: str) -> str:
@@ -86,9 +90,6 @@ class FunctionHasher:
         # or evaluation a lot easier.
         self.func_ir_store = FunctionStore()
 
-    def _get_func_name(self, func: FunctionType, default: str = "<unnamed>") -> str:
-        return getattr(func, "__name__", default)
-
     def add_package_to_trace(self, pkg: str):
         """Analyze package s.t. functions in it can be traced.
 
@@ -134,7 +135,7 @@ class FunctionHasher:
         return function_hash
 
     def _get_location_and_project(self, func: FunctionType) -> tuple[Location, Project]:
-        """Hash a Python function
+        """Hash a Python function.
 
         Args:
             func: the Python function
@@ -149,21 +150,21 @@ class FunctionHasher:
         """
         # exit path for when we cannot hash the source
         if isinstance(func, BuiltinFunctionType):
-            fname = self._get_func_name(func)
-            raise TypeError(f"builtin function `{fname}` cannot be hashed as there is no Python source code.")
+            msg = f"builtin function `{get_func_name(func)}` cannot be hashed as there is no Python source code."
+            raise TypeError(msg)
 
         project = self.project_store.get_or_create_for_func(func)
 
         # get the location (~text range) from the function using the project
         location = get_func_def_location(func, project)
         if location is None:
-            fname = self._get_func_name(func)
-            raise ValueError(f"Source code for function `{fname}` could not be found or does not exist.")
+            msg = f"Source code for function `{get_func_name(func)}` could not be found or does not exist."
+            raise ValueError(msg)
 
         return location, project
 
     def hash_func(self, func: FunctionType) -> str:
-        """Hash a Python function
+        """Hash a Python function.
 
         Args:
             func: the Python function

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+from types import FunctionType
 from typing import Callable
 
 from rope.base.project import NoProject, Project
@@ -68,3 +69,7 @@ def find_call_definition(node: ast.expr, module, project) -> Location | None:
         loc.resource = File(project=NoProject(), name=str(module.path))
 
     return loc
+
+
+def get_func_name(func: FunctionType, default: str = "<unnamed>") -> str:
+    return getattr(func, "__name__", default)
