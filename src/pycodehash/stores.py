@@ -74,14 +74,7 @@ class ModuleStore:
         tree = module.get_ast()
         tree_tokens = asttokens.ASTTokens(code, parse=False, tree=tree)
 
-        self.store[name] = ModuleView(
-            pkg=pkg,
-            name=name,
-            path=path,
-            code=code,
-            tree=tree,
-            tree_tokens=tree_tokens,
-        )
+        self.store[name] = ModuleView(pkg=pkg, name=name, path=path, code=code, tree=tree, tree_tokens=tree_tokens)
 
 
 class ProjectStore:
