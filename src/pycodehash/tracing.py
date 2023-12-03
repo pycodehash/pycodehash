@@ -70,7 +70,8 @@ def robust_find_definition(
         return None
     module, lineno = pyname.get_definition_location()
     # restrict tracing to first party modules
-    if Path(project.address) not in module.get_resource().pathlib.parents:
+    module_resource = module.get_resource()
+    if module_resource is not None and Path(project.address) not in module_resource.pathlib.parents:
         return None
 
     # -- default rope tracing block
