@@ -15,6 +15,7 @@ _REFERNCE_HASHES: dict[FunctionType, str] = {
     tliba.random.draw_bernoulli_samples: "88abbb3570d3e10d94c2b961459bd9a0098f72a7c2efca793ac705d214cb4e74",
     tliba.etl.combine_random_samples: "f390f9124ae848c40990c6306ac68145ee29131165c9973e17c9ceeff7fb9681",
     tlibb_etl_combine_random_samples: "482acd40279d561126e281ddc57be141e3f474ae466cdfc25ab82896a71e8fba",
+    tliba.summary.add_bernoulli_samples: "9f084968cc4a3baf0743f49df222ca88d32db8d241b089f6d09d1adbc9014a74",
 }
 
 
@@ -39,6 +40,15 @@ def test_within_module_fp_calls():
 def test_across_module_fp_calls():
     """Test hash of reference with across module first party calls."""
     tfunc = tliba.etl.combine_random_samples
+    fh = FunctionHasher()
+    result = fh.hash_func(tfunc)
+    print(fh.func_ir_store[fh.get_func_location(tfunc)])
+    assert _REFERNCE_HASHES[tfunc] == result
+
+
+def test_example_bernoulli_tliba():
+    """Test hash of `add_bernoulli_samples` (which is used in `example.py`)"""
+    tfunc = tliba.summary.add_bernoulli_samples
     fh = FunctionHasher()
     result = fh.hash_func(tfunc)
     print(fh.func_ir_store[fh.get_func_location(tfunc)])
