@@ -55,7 +55,7 @@ class FunctionHasher:
 
         Args:
             packages: list of packages to trace.
-                By default we only trace within the first-party libary, aka for a function `liba.foo`
+                By default we only trace within the first-party library, aka for a function `liba.foo`
                 we trace and hash all calls to functions in `liba`.
             ast_transformers: set of transformers to be applied to function's AST representation.
                 They are ran before the `lines_transformers` and should inherit from `ast.NodeTransformer`
@@ -168,7 +168,7 @@ class FunctionHasher:
     def get_func_location(self, func: FunctionType) -> Location | None:
         """Get the rope.Location of a function.
 
-        The location is can be used to access the function and ir function store.
+        The location can be used to access the function and ir function store.
 
         Args:
             func: the Python function
