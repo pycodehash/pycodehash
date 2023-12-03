@@ -51,12 +51,19 @@ class LocalFileHash(ApproximateHasher):
 
 class LocalDirectoryHash(PartitionedApproximateHasher):
     def __init__(self):
-        self.hasher = LocalFileHash()
+        super().__init__(LocalFileHash())
 
-    def collect_hashes(self, path: Path) -> dict[str, Any]:
-        return {
-            str(file_path): self.hasher.compute_hash(file_path)
-            if file_path.is_file()
-            else self.collect_hashes(file_path)
+    def collect_partitions(self, path: Path) -> list[str]:
+        return [
+            str(file_path) if file_path.is_file() else self.collect_partitions(file_path)
             for file_path in path.rglob("*")
-        }
+        ]
+
+
+class LocalFilesHash(PartitionedApproximateHasher):
+    def __init__(self):
+        super().__init__(LocalFileHash())
+
+    @staticmethod
+    def collect_partitions(files: list[str]) -> list[str]:
+        return files

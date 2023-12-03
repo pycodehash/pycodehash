@@ -53,6 +53,7 @@ _Table 2: Comparison of SHA256 hashing of the full file and fast approximate has
 In the above table, we can see that the larger the dataset gets, the higher speedup ratio is.
 To create an `ApproximateHasher` in `pycodehash`, we only need to code the logic to obtain this metadata as a
 dictionary in the `collect_metadata` method, and the class does the rest.
+The hash of the metadata is invariant to the ordering of the keys.
 
 ## Supported Dataset types
 
@@ -75,5 +76,9 @@ Many datasets consist of collections of objects, or subsets of data:
 
 Hashing these datasets on the object level, allows for only recomputing the parts of the data that have changed.
 For these cases, `pycodehash` has the `PartitionedApproximateHasher` base class.
-It requires an `ApproximateHasher` and implements the `collect_hashes` method.
+It requires an `ApproximateHasher` and implements the `collect_partitions` method.
 Currently, there is an implementation of `LocalDirectoryHash` recursively collects the hashes for each file in that directory.
+Another implementation of the `PartitionedApproximateHasher` is `LocalFilesHash`, which operates on a list of files.
+
+The `PartitionedApproximateHasher` is an `ApproximateHasher` in itself, which means that the `compute_hash` method is supported.
+This hash is invariant to the ordering of the partitions.
