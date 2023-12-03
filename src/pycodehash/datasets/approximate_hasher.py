@@ -10,8 +10,9 @@ from pycodehash.hashing import hash_string
 def inline_metadata(metadata: dict[str, Any]) -> str:
     """Convert dict of metadata to string
     (all dictionary items should be serializable to string)
+    Inlined metadata is invariant to the ordering of keys.
     """
-    return "|".join([f"{key}: {value}" for key, value in metadata.items()])
+    return "|".join([f"{key}: {value}" for key, value in sorted(metadata.items())])
 
 
 class ApproximateHasher(ABC):
