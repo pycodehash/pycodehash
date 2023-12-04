@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 import pytest
 import tliba
 from pycodehash import FunctionHasher
+from resources.standalone import standalone_func, wrapper_func
 from tlibb.etl import combine_random_samples as tlibb_etl_combine_random_samples
 
 if TYPE_CHECKING:
@@ -16,6 +17,8 @@ _REFERNCE_HASHES: dict[FunctionType, str] = {
     tliba.etl.combine_random_samples: "f390f9124ae848c40990c6306ac68145ee29131165c9973e17c9ceeff7fb9681",
     tlibb_etl_combine_random_samples: "482acd40279d561126e281ddc57be141e3f474ae466cdfc25ab82896a71e8fba",
     tliba.summary.add_bernoulli_samples: "9f084968cc4a3baf0743f49df222ca88d32db8d241b089f6d09d1adbc9014a74",
+    standalone_func: "1b4196e28cc1e2a4658d151d1a31ae77a96ac190d98d31cadc80ccbc720ef6e3",
+    wrapper_func: "e74296ec2f6c2e44970642164aba5e4804ae193ad1558750fd293f99978f53f7",
 }
 
 _REFERNCE_CALLS = {
@@ -73,6 +76,21 @@ def test_across_package_calls():
     assert ref_no_tliba == result
 
     fh = FunctionHasher(packages=["tliba", "tlibb"])
+    result = fh.hash_func(tfunc)
+    print(fh.func_ir_store[fh.get_func_location(tfunc)])
+    assert _REFERNCE_HASHES[tfunc] == result
+
+
+def test_standalone_module():
+    """Test that functions from standalone modules can be picked up."""
+    fh = FunctionHasher()
+
+    tfunc = standalone_func
+    result = fh.hash_func(tfunc)
+    print(fh.func_ir_store[fh.get_func_location(tfunc)])
+    assert _REFERNCE_HASHES[tfunc] == result
+
+    tfunc = wrapper_func
     result = fh.hash_func(tfunc)
     print(fh.func_ir_store[fh.get_func_location(tfunc)])
     assert _REFERNCE_HASHES[tfunc] == result
