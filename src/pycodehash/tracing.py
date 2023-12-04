@@ -68,10 +68,12 @@ def robust_find_definition(
     pyname = fixer.pyname_at(offset_start)
     if pyname is None or not isinstance(pyname, (DefinedName, ImportedModule, ImportedName)):
         return None
+
     module, lineno = pyname.get_definition_location()
     # restrict tracing to first party modules
+    project_path = Path(project.address)
     module_resource = module.get_resource()
-    if module_resource is not None and Path(project.address) not in module_resource.pathlib.parents:
+    if module_resource is not None and project_path not in module_resource.pathlib.parents:
         return None
 
     # -- default rope tracing block
@@ -87,7 +89,9 @@ def robust_find_definition(
         pyname_filter = occurrences.PyNameFilter(pyname)
         finder = occurrences.Finder(project, name, [check_offset, pyname_filter])
         for occurrence in finder.find_occurrences(pymodule=module):
-            return Location(occurrence)
+            location = Location(occurrence)
+            if location.resource is None or project_path in location.resource.pathlib.parents:
+                return location
 
     # handle imports which are not properly traced by rope
     if isinstance(pyname, (ImportedName, ImportedModule)):
@@ -96,5 +100,7 @@ def robust_find_definition(
         name = node.func.attr if isinstance(pyname, ImportedModule) else pyname.imported_name
         finder = occurrences.Finder(project, name, [check_func_definition])
         for occurrence in finder.find_occurrences(pymodule=module):
-            return Location(occurrence)
+            location = Location(occurrence)
+            if location.resource is None or project_path in location.resource.pathlib.parents:
+                return location
     return None
