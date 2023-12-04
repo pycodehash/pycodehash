@@ -11,7 +11,7 @@ from rope.contrib.findit import Location
 if TYPE_CHECKING:
     from pycodehash.hashing import FunctionHasher
     from pycodehash.stores import ModuleView, ProjectStore
-from pycodehash.utils import find_call_definition
+from pycodehash.tracing import find_call_definition
 
 
 def _contains_call(node: ast.Expr):
