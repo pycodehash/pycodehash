@@ -32,19 +32,24 @@ class ApproximateHasher(ABC):
 
 
 class PartitionedApproximateHasher(ApproximateHasher):
+    """Compute the hash of multiple objects"""
+
     def __init__(self, hasher: ApproximateHasher):
         self.hasher = hasher
 
     @abstractmethod
-    def collect_partitions(self, *args, **kwargs) -> list[str]:
+    def collect_partitions(self, *args, **kwargs) -> list[str] | dict[str]:
         pass
 
-    def _hash_partitions(self, partitions: list[str | list[str]]):
+    def _hash_partitions(self, partitions: list[str] | dict[str, Any]):
+        if isinstance(partitions, list):
+            partitions = dict(zip(partitions, partitions))
+
         return {
-            partition: self.hasher.compute_hash(partition)
-            if not isinstance(partition, list)
-            else self._hash_partitions(partition)
-            for partition in partitions
+            partition_key: self.hasher.compute_hash(partition_value)
+            if not isinstance(partition_value, dict)
+            else self._hash_partitions(partition_value)
+            for partition_key, partition_value in partitions.items()
         }
 
     def collect_metadata(self, *args, **kwargs) -> dict[str, Any]:
