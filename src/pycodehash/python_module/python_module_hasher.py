@@ -83,7 +83,7 @@ class PythonModuleHasher(PartitionedApproximateHasher):
             if module_reference not in self.modules:
                 self.visit_module(self.module_paths[module_reference])
 
-    def collect_partitions(self, func: Callable) -> list[str]:
+    def collect_partitions(self, func: Callable) -> dict[str]:
         file_name = inspect.getsourcefile(func)
         self.visit_module(file_name)
-        return [str(x) for x in self.module_paths.values()]
+        return {module_name: str(module_path) for module_name, module_path in self.module_paths.items()}

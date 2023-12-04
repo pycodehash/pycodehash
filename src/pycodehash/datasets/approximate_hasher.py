@@ -21,12 +21,16 @@ class ApproximateHasher(ABC):
     is workable for caching in practice
     """
 
+    METADATA = None
+
     @abstractmethod
     def collect_metadata(self, *args, **kwargs) -> dict[str, Any]:
-        pass
+        """Collect metadata used for hashing"""
 
     def compute_hash(self, *args, **kwargs) -> str:
         metadata = self.collect_metadata(*args, **kwargs)
+        if self.METADATA is not None:
+            metadata = {key: value for key, value in metadata.items() if key in self.METADATA}
         inlined_metadata = inline_metadata(metadata)
         return hash_string(inlined_metadata)
 
@@ -39,7 +43,7 @@ class PartitionedApproximateHasher(ApproximateHasher):
 
     @abstractmethod
     def collect_partitions(self, *args, **kwargs) -> list[str] | dict[str]:
-        pass
+        """Collect partitions (key, value) or list of keys for hashing"""
 
     def _hash_partitions(self, partitions: list[str] | dict[str, Any]):
         if isinstance(partitions, list):

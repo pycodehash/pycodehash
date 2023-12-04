@@ -67,7 +67,7 @@ def test_approximate_hasher_local_directory(local_dataset_directory):
     assert initial_hash == second_hash
 
     file_name5 = local_dataset_directory / "my_file5.txt"
-    file_name5.write_text("Hello Jupiter!")
+    file_name5.write_text("Hello Jupyter!")
 
     third_hash = hasher.compute_hash(local_dataset_directory)
     assert initial_hash != third_hash
