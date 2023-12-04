@@ -59,11 +59,13 @@ The hash of the metadata is invariant to the ordering of the keys.
 
 The following approximate hashers are implemented at this time:
 
-| **Dataset Type**                                                                                   | **Implemented Metadata**            |
-|----------------------------------------------------------------------------------------------------|-------------------------------------|
-| [Local Files](https://github.com/pycodehash/pycodehash/blob/main/src/pycodehash/datasets/local.py) | File Size, Modification Date        |
-| [Files on S3](https://github.com/pycodehash/pycodehash/blob/main/src/pycodehash/datasets/s3.py)    | ETag                                |
-| [Hive Tables](https://github.com/pycodehash/pycodehash/blob/main/src/pycodehash/datasets/hive.py)  | Size, Creation Date, Is Partitioned |
+| **Dataset Type**                                                                                     | **Implemented Metadata**                |
+|------------------------------------------------------------------------------------------------------|-----------------------------------------|
+| [Local Files](https://github.com/pycodehash/pycodehash/blob/main/src/pycodehash/datasets/local.py)   | File Size, Modification Date            |
+| [Files on S3](https://github.com/pycodehash/pycodehash/blob/main/src/pycodehash/datasets/s3.py)      | ETag                                    |
+| [Hive Tables](https://github.com/pycodehash/pycodehash/blob/main/src/pycodehash/datasets/hive.py)    | Size, Creation Date, Is Partitioned     |
+| [Python Files](https://github.com/pycodehash/pycodehash/blob/main/src/pycodehash/datasets/python.py) | Magic, Size, Timestamp, Hash, Bit Field |
+
 
 Feel free to open a Pull Request if you would like to contribute additional dataset types or metadata. 
 
