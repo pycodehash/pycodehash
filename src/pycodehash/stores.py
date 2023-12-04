@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import inspect
+from collections import defaultdict
 from dataclasses import dataclass
 from importlib.util import find_spec
 from pathlib import Path
@@ -32,6 +33,22 @@ class FunctionStore:
     def __setitem__(self, item: Location, value: str) -> None:
         key = _item_to_key(item)
         self.store[key] = value
+
+    def __contains__(self, item: Location) -> bool:
+        key = _item_to_key(item)
+        return key in self.store
+
+
+class FunctionCallStore:
+    def __init__(self):
+        self.store: defaultdict[tuple[str, int, int, int], list[Location]] = defaultdict(list)
+
+    def __getitem__(self, item: Location) -> list[Location]:
+        return self.store[_item_to_key(item)]
+
+    def __setitem__(self, item: Location, value: Location) -> None:
+        key = _item_to_key(item)
+        self.store[key].append(value)
 
     def __contains__(self, item: Location) -> bool:
         key = _item_to_key(item)
