@@ -50,14 +50,16 @@ class LocalFileHash(ApproximateHasher):
 
 
 class LocalDirectoryHash(PartitionedApproximateHasher):
+    """Recursively find files in the provided directory and compute the hash for each of the files."""
+
     def __init__(self):
         super().__init__(LocalFileHash())
 
-    def collect_partitions(self, path: Path) -> list[str]:
-        return [
-            str(file_path) if file_path.is_file() else self.collect_partitions(file_path)
-            for file_path in path.rglob("*")
-        ]
+    @staticmethod
+    def collect_partitions(path: Path) -> dict[str]:
+        return {
+            str(file_path.relative_to(path)): str(file_path) for file_path in path.rglob("*") if file_path.is_file()
+        }
 
 
 class LocalFilesHash(PartitionedApproximateHasher):
@@ -65,5 +67,5 @@ class LocalFilesHash(PartitionedApproximateHasher):
         super().__init__(LocalFileHash())
 
     @staticmethod
-    def collect_partitions(files: list[str]) -> list[str]:
+    def collect_partitions(files: list[str] | dict[str]) -> list[str] | dict[str]:
         return files
