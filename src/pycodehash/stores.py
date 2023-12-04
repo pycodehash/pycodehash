@@ -33,7 +33,7 @@ class FunctionStore:
         key = _item_to_key(item)
         self.store[key] = value
 
-    def __contains__(self, item: Location):
+    def __contains__(self, item: Location) -> bool:
         key = _item_to_key(item)
         return key in self.store
 
