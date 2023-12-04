@@ -36,6 +36,8 @@ class LocalFileHash(ApproximateHasher):
     Based on last modification time and file size only.
     """
 
+    METADATA = ["size"]
+
     @staticmethod
     def collect_metadata(path: str | Path) -> dict[str, Any]:
         path = Path(path)
@@ -46,6 +48,7 @@ class LocalFileHash(ApproximateHasher):
         last_modified = path.stat().st_mtime
         last_modified = datetime.fromtimestamp(last_modified)
         file_size = path.stat().st_size
+
         return {"last_modified": last_modified, "size": file_size}
 
 
