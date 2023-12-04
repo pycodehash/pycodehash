@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 from pathlib import Path
 from typing import TYPE_CHECKING, Callable
 
@@ -11,9 +12,9 @@ from rope.contrib import fixsyntax
 from rope.contrib.findit import Location
 from rope.refactor import occurrences
 
-if TYPE_CHECKING:
-    import ast
+from pycodehash.utils import contains_call
 
+if TYPE_CHECKING:
     from asttokens.util import Token
     from rope.refactor.occurrences import Occurrence
 
@@ -45,6 +46,19 @@ def _get_text_range(node: ast.expr, tokens: list[Token]):
 
 def check_func_definition(occurrence: Occurrence):
     return occurrence.is_defined()
+
+
+def robust_extract_name(node: ast.Call, code: str, offset: int) -> str:
+    """Extract correct name by accounting for chained calls.
+
+    We extract the first call name of the first encountered attribute.
+    """
+    if not contains_call(node.func):
+        return worder.Worder(code).get_word_at(offset)
+    for child in ast.walk(node.func):
+        if isinstance(child, ast.Attribute):
+            return child.attr
+    return ""
 
 
 def get_func_call_location(node: ast.Call, project: Project, mview: ModuleView) -> Location | None:
@@ -82,8 +96,10 @@ def get_func_call_location(node: ast.Call, project: Project, mview: ModuleView) 
     if module_resource is not None and project_path not in module_resource.pathlib.parents:
         return None
 
+    # handle name selection when there are chained calls
+    name = robust_extract_name(node, code, offset_start)
+
     # -- default rope tracing block
-    name = worder.Worder(code).get_word_at(offset_start)
     if lineno is not None:
         start = module.lines.get_line_start(lineno)
 
@@ -135,7 +151,9 @@ def get_func_def_location(func: Callable, project: Project) -> Location | None:
 
     finder = occurrences.Finder(project, func.__name__, [check_func_definition])
     for occurrence in finder.find_occurrences(pymodule=module):
-        return Location(occurrence)
+        location = Location(occurrence)
+        if location.resource is None or Path(project.address) in location.resource.pathlib.parents:
+            return location
     return None
 
 
