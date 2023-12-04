@@ -108,7 +108,7 @@ print(fh.compute_hash("example.py"))
 dh = LocalDirectoryHash()
 
 # Recursively hash all files in a directory
-print(len(dh.collect_hashes(Path(__file__).parent / "src")))
+print(len(dh.collect_partitions(Path(__file__).parent / "src")))
 # 29
 ```
 _[Dataset Usage Example](https://github.com/pycodehash/pycodehash/blob/main/example_data.py)_
