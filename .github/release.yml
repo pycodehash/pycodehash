@@ -1,0 +1,19 @@
+changelog:
+  categories:
+    - title: Changes
+      labels:
+        - change
+    - title: Enhancements
+      labels:
+        - enhancement
+    - title: Fixes
+      labels:
+        - bug
+    - title: Chores
+      labels:
+        - '*'
+      exclude:
+        labels:
+          - change
+          - bug
+          - enhancement
