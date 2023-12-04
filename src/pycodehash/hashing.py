@@ -7,9 +7,10 @@ from typing import TYPE_CHECKING
 
 from pycodehash.preprocessing import DocstringStripper, FunctionStripper, TypeHintStripper, WhitespaceNormalizer
 from pycodehash.stores import FunctionStore, ModuleStore, ProjectStore
+from pycodehash.tracing import get_func_def_location, get_func_node_from_location
 from pycodehash.transfomers import HashCallNameTransformer
 from pycodehash.unparse import _unparse
-from pycodehash.utils import get_func_def_location, get_func_name, get_func_node_from_location
+from pycodehash.utils import get_func_name
 
 if TYPE_CHECKING:
     from rope.base.project import Project
