@@ -18,6 +18,13 @@ _REFERNCE_HASHES: dict[FunctionType, str] = {
     tliba.summary.add_bernoulli_samples: "9f084968cc4a3baf0743f49df222ca88d32db8d241b089f6d09d1adbc9014a74",
 }
 
+_REFERNCE_CALLS = {
+    tliba.summary.add_bernoulli_samples: ("combine_random_samples", "draw_bernoulli_samples"),
+    tliba.etl.combine_random_samples: ("draw_beta_samples", "draw_normal_samples"),
+    tliba.random.draw_bernoulli_samples: ("draw_beta_samples",),
+    tliba.summary.compute_conditional_moments: ("add_bernoulli_samples",),
+}
+
 
 def test_no_fp_calls():
     """Test hash of reference without first party calls."""
@@ -91,3 +98,29 @@ def test_lambda_handling():
     exp_msg = "Source code for function `<lambda>` could not be found or does not exist."
     assert e_info.type is ValueError
     assert e_info.value.args[0] == exp_msg
+
+
+def test_call_collection():
+    """Test that all the first party calls are collected."""
+
+    def _get_fname(loc):
+        return loc.resource.read()[loc.region[0] : loc.region[1]]
+
+    tfunc = tliba.summary.compute_conditional_moments
+    fh = FunctionHasher()
+    fh.hash_func(tfunc)
+
+    calls = tuple(_get_fname(loc) for loc in fh.func_call_store[fh.get_func_location(tfunc)])
+    assert calls == _REFERNCE_CALLS[tfunc]
+
+    tfunc = tliba.summary.add_bernoulli_samples
+    calls = tuple(_get_fname(loc) for loc in fh.func_call_store[fh.get_func_location(tfunc)])
+    assert calls == _REFERNCE_CALLS[tfunc]
+
+    tfunc = tliba.etl.combine_random_samples
+    calls = tuple(_get_fname(loc) for loc in fh.func_call_store[fh.get_func_location(tfunc)])
+    assert calls == _REFERNCE_CALLS[tfunc]
+
+    tfunc = tliba.random.draw_bernoulli_samples
+    calls = tuple(_get_fname(loc) for loc in fh.func_call_store[fh.get_func_location(tfunc)])
+    assert calls == _REFERNCE_CALLS[tfunc]
