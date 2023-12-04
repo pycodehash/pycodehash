@@ -61,11 +61,7 @@ Then you can serve the docs locally:
 mkdocs serve
 ```
 
-To update the docs on GitHub Pages run:
-
-```shell
-mkdocs gh-deploy --remote-branch gh-pages
-```
+The docs are [automatically deployed](https://github.com/pycodehash/pycodehash/blob/main/.github/workflows/docs.yml) to GitHub Pages by GitHub actions.
 
 ## Release
 
