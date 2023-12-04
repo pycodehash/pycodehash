@@ -21,6 +21,7 @@ class HashCallNameTransformer(NodeTransformer):
     def __init__(self, hasher: FunctionHasher, location: Location):
         self.hasher = hasher
         self.project_store: ProjectStore = hasher.project_store
+        self.def_location = location
 
         for project in self.project_store:
             module = project.get_pymodule(location.resource)
@@ -39,6 +40,8 @@ class HashCallNameTransformer(NodeTransformer):
             location = find_call_definition(node, self.module, project)
 
             if isinstance(location, Location):
+                # store the calls
+                self.hasher.func_call_store[self.def_location] = location
                 # here we recurse into the hashing function
                 self.hash_repr = self.hasher.hash_location(location, project)
                 if isinstance(node.func, ast.Attribute) and not contains_call(node.func):

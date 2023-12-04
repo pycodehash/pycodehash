@@ -6,7 +6,7 @@ from types import BuiltinFunctionType, FunctionType
 from typing import TYPE_CHECKING
 
 from pycodehash.preprocessing import DocstringStripper, FunctionStripper, TypeHintStripper, WhitespaceNormalizer
-from pycodehash.stores import FunctionStore, ModuleStore, ProjectStore
+from pycodehash.stores import FunctionCallStore, FunctionStore, ModuleStore, ProjectStore
 from pycodehash.tracing import get_func_def_location, get_func_node_from_location
 from pycodehash.transfomers import HashCallNameTransformer
 from pycodehash.unparse import _unparse
@@ -77,6 +77,8 @@ class FunctionHasher:
         # of the function that is hashed. Not strictly needed but does make debugging
         # or evaluation a lot easier.
         self.func_ir_store = FunctionStore()
+        # stores the location(s) of the calls in a given function definition
+        self.func_call_store = FunctionCallStore()
 
     def hash_location(self, location: Location, project: Project) -> str:
         """Hash a location (~text range) of Python code
