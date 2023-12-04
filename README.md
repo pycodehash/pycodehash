@@ -115,4 +115,4 @@ _[Dataset Usage Example](https://github.com/pycodehash/pycodehash/blob/main/exam
 
 ## License
 
-Pycodehash is completely free, open-source and licensed under the [MIT license](https://en.wikipedia.org/wiki/MIT_License).
+PyCodeHash is completely free, open-source and licensed under the [MIT license](https://en.wikipedia.org/wiki/MIT_License).
