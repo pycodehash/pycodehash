@@ -20,6 +20,7 @@ Learn more on how PyCodeHash detects changes in:
 - [Python Functions](https://pycodehash.github.io/pycodehash/python_functions/)
 - [SQL Queries](https://pycodehash.github.io/pycodehash/sql_queries/)
 - [Datasets](https://pycodehash.github.io/pycodehash/datasets/): Files, Directories, S3, Hive
+- [Python dependencies](https://pycodehash.github.io/pycodehash/dependencies/)
 
 ## Installation
 
@@ -85,7 +86,7 @@ print(hasher.hash_file(query_2_file))
 ```
 _[SQL Usage Example](https://github.com/pycodehash/pycodehash/blob/main/example_sql.py)_
 
-## Datasets
+### Datasets
 
 Hash data, such as files, directories, database tables:
 
@@ -112,6 +113,30 @@ print(len(dh.collect_partitions(Path(__file__).parent / "src")))
 # 29
 ```
 _[Dataset Usage Example](https://github.com/pycodehash/pycodehash/blob/main/example_data.py)_
+
+
+### Python Package Dependencies
+
+Hash a user-provided list of Python packages your code depends on. This may be a selection of the total list of dependencies.
+For example the most important libraries your code depends on, that you want to track in order to trigger a rerun of your pipeline in case of version changes.
+The hasher retrieves the installed package versions and creates a hash of those. We emphasize it is up to the user to provide the list of relevant dependencies.
+
+```python
+from pycodehash.dependency import PythonDependencyHash
+
+# hash a list of dependencies
+hasher = PythonDependencyHash()
+
+print(hasher.collect_metadata(dependencies=["pycodehash", "rope"], add_python_version=True))
+# hasher retrieves the installed package versions found
+# {'pycodehash': '0.2.0', 'rope': '1.11.0', 'Python': '3.11'}
+
+print(hasher.compute_hash(dependencies=["pycodehash", "rope"], add_python_version=True))
+# cecb8036ad61235c2577db9943f519b824f7a25e449da9cd332bc600fb5dccf0
+```
+_[Dependency Usage Example](https://github.com/pycodehash/pycodehash/blob/main/example_dependency.py)_
+
+
 
 ## License
 
