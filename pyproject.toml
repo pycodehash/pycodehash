@@ -13,9 +13,9 @@ classifiers = [
     "Programming Language :: Python :: 3",
 ]
 authors = [
-  { name = "Max Baak", email = "max.baak@ing.com" },
-  { name = "Simon Brugman", email = "simon.brugman@ing.com" },
-  { name = "Ralph Urlus", email = "ralph.urlus@ing.com" },
+  { name = "Max Baak", email = "maxbaak@gmail.com" },
+  { name = "Simon Brugman", email = "sfbbrugman@gmail.com" },
+  { name = "Ralph Urlus", email = "rurlus.dev@gmail.com" },
 ]
 
 dependencies = [
@@ -44,9 +44,9 @@ docs = [
 ]
 
 [project.urls]
-Source = "https://github.com/RUrlus/pycodehash"
-Documentation = "https://github.com/RUrlus/pycodehash#readme"
-Issues = "https://github.com/RUrlus/pycodehash/issues"
+Source = "https://github.com/pycodehash/pycodehash"
+Documentation = "https://github.com/pycodehash/pycodehash#readme"
+Issues = "https://github.com/pycodehash/pycodehash/issues"
 
 [tool.hatch.version]
 path = "src/pycodehash/version.py"
