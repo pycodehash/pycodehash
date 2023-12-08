@@ -47,9 +47,9 @@ class PythonModuleHasher(PartitionedApproximateHasher):
     def __init__(self, first_party: list[str] | None):
         self.first_party = first_party
         # Import graph
-        self.modules = {}
+        self.modules: dict[str, set[str]] = {}
         # Module paths
-        self.module_paths = {}
+        self.module_paths: dict[str, str | Path] = {}
         super().__init__(LocalFileHash())  # Alternative: PythonFileHash
 
     def is_whitelisted(self, module_name: str) -> bool:
@@ -73,7 +73,7 @@ class PythonModuleHasher(PartitionedApproximateHasher):
                 continue
 
             spec = find_module_spec(module_import)
-            if spec is not None and spec.origin.endswith(".py"):  # Exclude .so sources
+            if spec is not None and spec.origin is not None and spec.origin.endswith(".py"):  # Exclude .so sources
                 module_references.add(spec.name)
                 self.module_paths[spec.name] = spec.origin
 
@@ -83,7 +83,10 @@ class PythonModuleHasher(PartitionedApproximateHasher):
             if module_reference not in self.modules:
                 self.visit_module(self.module_paths[module_reference])
 
-    def collect_partitions(self, func: Callable) -> dict[str]:
+    def collect_partitions(self, func: Callable) -> dict[str, str]:
         file_name = inspect.getsourcefile(func)
+        if file_name is None:
+            msg = "Could not obtain source file for function"
+            raise ValueError(msg)
         self.visit_module(file_name)
         return {module_name: str(module_path) for module_name, module_path in self.module_paths.items()}

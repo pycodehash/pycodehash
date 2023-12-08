@@ -119,7 +119,7 @@ def get_func_call_location(node: ast.Call, project: Project, mview: ModuleView) 
     if isinstance(pyname, (ImportedName, ImportedModule)):
         # we assume that as this is an ImportedModule that the node has an ast.Attribute
         # as func rather than an ast.Name
-        name = node.func.attr if isinstance(pyname, ImportedModule) else pyname.imported_name
+        name = node.func.attr if isinstance(pyname, ImportedModule) else pyname.imported_name  # type: ignore[attr-defined]
         finder = occurrences.Finder(project, name, [check_func_definition])
         for occurrence in finder.find_occurrences(pymodule=module):
             location = Location(occurrence)
@@ -157,7 +157,7 @@ def get_func_def_location(func: Callable, project: Project) -> Location | None:
     return None
 
 
-def find_call_definition(node: ast.expr, module: ModuleView, project: Project) -> Location | None:
+def find_call_definition(node: ast.Call, module: ModuleView, project: Project) -> Location | None:
     loc = get_func_call_location(node, project, module)
     if loc is None:
         return None
