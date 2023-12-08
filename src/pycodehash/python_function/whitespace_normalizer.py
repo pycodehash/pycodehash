@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from pycodehash.preprocessing.lines_transformer import LinesTransformer
+from pycodehash.python_function.lines_transformer import LinesTransformer
 
 
 class WhitespaceNormalizer(LinesTransformer):
