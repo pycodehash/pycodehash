@@ -1,4 +1,9 @@
-from pycodehash.sql.references import _find_table_references, _table_reference_to_string, extract_table_references
+from pycodehash.sql.references import (
+    EnrichedTableReferenceVisitor,
+    TableReferenceVisitor,
+    _table_reference_to_string,
+    extract_table_references,
+)
 
 
 def test_table_reference_to_string():
@@ -14,31 +19,43 @@ def test_find_table_references():
         "file": [
             {
                 "statement": {
-                    "select_statement": {
-                        "select_clause": {
-                            "keyword": "SELECT",
-                            "whitespace": " ",
-                            "select_clause_element": {"wildcard_expression": {"wildcard_identifier": {"star": "*"}}},
+                    "create_table_statement": [
+                        {"keyword": "CREATE"},
+                        {"whitespace": " "},
+                        {"keyword": "TABLE"},
+                        {"whitespace": " "},
+                        {"table_reference": {"naked_identifier": "db.my_table"}},
+                        {"whitespace": " "},
+                        {"keyword": "AS"},
+                        {"whitespace": " "},
+                        {
+                            "select_statement": {
+                                "select_clause": {
+                                    "keyword": "SELECT",
+                                    "whitespace": " ",
+                                    "select_clause_element": {
+                                        "wildcard_expression": {"wildcard_identifier": {"star": "*"}}
+                                    },
+                                },
+                                "whitespace": " ",
+                                "from_clause": {
+                                    "keyword": "FROM",
+                                    "whitespace": " ",
+                                    "from_expression": {
+                                        "from_expression_element": {
+                                            "table_expression": {
+                                                "table_reference": {"naked_identifier": "db.that_table"}
+                                            }
+                                        }
+                                    },
+                                },
+                            }
                         },
-                        "whitespace": " ",
-                        "from_clause": {
-                            "keyword": "FROM",
-                            "whitespace": " ",
-                            "from_expression": {
-                                "from_expression_element": {
-                                    "table_expression": {
-                                        "table_reference": [
-                                            {"naked_identifier": "db"},
-                                            {"dot": "."},
-                                            {"naked_identifier": "templates"},
-                                        ]
-                                    }
-                                }
-                            },
-                        },
-                    }
+                    ]
                 }
             },
+            {"statement_terminator": ";"},
+            {"whitespace": " "},
             {
                 "statement": {
                     "select_statement": {
@@ -53,13 +70,7 @@ def test_find_table_references():
                             "whitespace": " ",
                             "from_expression": {
                                 "from_expression_element": {
-                                    "table_expression": {
-                                        "table_reference": [
-                                            {"naked_identifier": "db"},
-                                            {"dot": "."},
-                                            {"naked_identifier": "templates"},
-                                        ]
-                                    }
+                                    "table_expression": {"table_reference": {"naked_identifier": "db.my_table"}}
                                 }
                             },
                         },
@@ -68,5 +79,12 @@ def test_find_table_references():
             },
         ]
     }
-    assert list(_find_table_references(query)) == ["db.templates", "db.templates"]
-    assert extract_table_references(query) == {"db.templates"}
+
+    v = TableReferenceVisitor()
+    v.generic_visit(query)
+    assert v.references == ["db.my_table", "db.that_table", "db.my_table"]
+    assert extract_table_references(query) == {"db.my_table", "db.that_table"}
+
+    ev = EnrichedTableReferenceVisitor()
+    ev.generic_visit(query)
+    assert ev.references == [("CREATE", "db.my_table"), ("FROM", "db.that_table"), ("FROM", "db.my_table")]

@@ -1,7 +1,7 @@
 """Extract references to input and output tables in the SQL AST"""
 from __future__ import annotations
 
-from typing import Any
+from pycodehash.sql.ast_visitor import ASTVisitor
 
 
 def _table_reference_to_string(reference: list | dict) -> str:
@@ -14,20 +14,6 @@ def _table_reference_to_string(reference: list | dict) -> str:
     raise TypeError(msg)
 
 
-def _find_table_references(sql_ast: dict[str, Any]) -> str:
-    if isinstance(sql_ast, dict):
-        for k, v in sql_ast.items():
-            if k == "table_reference":
-                yield _table_reference_to_string(v)
-            if isinstance(v, dict):
-                for result in _find_table_references(v):
-                    yield result
-            elif isinstance(v, list):
-                for d in v:
-                    for result in _find_table_references(d):
-                        yield result
-
-
 def extract_table_references(ast: dict) -> set[str]:
     """Extract the table references from SQL AST
 
@@ -37,4 +23,34 @@ def extract_table_references(ast: dict) -> set[str]:
     Returns:
         unique table references
     """
-    return set(_find_table_references(ast))
+    visitor = TableReferenceVisitor()
+    visitor.generic_visit(ast)
+    return set(visitor.references)
+
+
+class TableReferenceVisitor(ASTVisitor):
+    def __init__(self):
+        self.references = []
+        super().__init__()
+
+    def visit_table_reference(self, node: dict):
+        self.references.append(_table_reference_to_string(node))
+
+
+class EnrichedTableReferenceVisitor(ASTVisitor):
+    def __init__(self):
+        self.references = []
+        self.mode = None
+        super().__init__()
+
+    def visit_table_reference(self, node: dict):
+        self.references.append((self.mode, _table_reference_to_string(node)))
+        self.mode = None
+
+    def visit_create_table_statement(self, node: dict):
+        self.mode = "CREATE"
+        self.generic_visit(node)
+
+    def visit_from_expression_element(self, node: dict):
+        self.mode = "FROM"
+        self.generic_visit(node)
