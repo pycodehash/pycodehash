@@ -24,6 +24,6 @@ def test_s3_hash():
     result = s3h.collect_metadata(s3_file_path)
     assert isinstance(result, dict)
     assert len(result) == 1
-    assert result["etag"] == "5eb63bbbe01eeed093cb22bb8f5acdc3"
+    assert result["__file0__ETag"] == "5eb63bbbe01eeed093cb22bb8f5acdc3"
 
-    assert s3h.compute_hash(s3_file_path) == "578825776ff1306b1ee7dfeef1e2cb8277db7b261d15a2229296934f375c90bb"
+    assert s3h.compute_hash(s3_file_path) == "06922e5e834ad51fb456c1fd787cd494bc6f71b2f4184e40d3dd95f5727149fb"
