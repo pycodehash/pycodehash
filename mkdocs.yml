@@ -8,6 +8,7 @@ nav:
     - 'Python Functions': 'python_functions.md'
     - 'SQL Queries': 'sql_queries.md'
     - 'Datasets': 'datasets.md'
+    - 'Python Dependencies': 'dependencies.md'
 
 theme:
   name: readthedocs
