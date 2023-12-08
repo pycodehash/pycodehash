@@ -86,7 +86,7 @@ extend-select = [
 
 [tool.ruff.lint.per-file-ignores]
 "{tests,docs}/*" = ["ANN001", "INP", "PLR2004"]
-"src/pycodehash/preprocessing/{typehint_stripper,function_stripper}.py" = [
+"src/pycodehash/python_function/{typehint_stripper,function_stripper}.py" = [
     "PLR6301"  # ununsed self in combination with NodeVisitor
 ]
 

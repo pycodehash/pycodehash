@@ -12,13 +12,13 @@ from rope.contrib import fixsyntax
 from rope.contrib.findit import Location
 from rope.refactor import occurrences
 
-from pycodehash.utils import contains_call
+from pycodehash.python_function.utils import contains_call
 
 if TYPE_CHECKING:
     from asttokens.util import Token
     from rope.refactor.occurrences import Occurrence
 
-    from pycodehash.stores import ModuleView
+    from pycodehash.python_function.stores import ModuleView
 
 
 def _get_text_range(node: ast.expr, tokens: list[Token]):

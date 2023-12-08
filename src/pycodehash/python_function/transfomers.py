@@ -9,10 +9,10 @@ from typing import TYPE_CHECKING
 from rope.contrib.findit import Location
 
 if TYPE_CHECKING:
-    from pycodehash.hashing import FunctionHasher
-    from pycodehash.stores import ModuleView, ProjectStore
-from pycodehash.tracing import find_call_definition
-from pycodehash.utils import contains_call
+    from pycodehash.python_function.hashing import FunctionHasher
+    from pycodehash.python_function.stores import ModuleView, ProjectStore
+from pycodehash.python_function.tracing import find_call_definition
+from pycodehash.python_function.utils import contains_call
 
 
 class HashCallNameTransformer(NodeTransformer):

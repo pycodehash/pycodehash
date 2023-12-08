@@ -5,8 +5,9 @@ from typing import TYPE_CHECKING
 import pytest
 import tliba
 from pycodehash import FunctionHasher
-from resources.standalone import standalone_func, wrapper_func
 from tlibb.etl import combine_random_samples as tlibb_etl_combine_random_samples
+
+from tests.python_function.standalone import standalone_func, wrapper_func
 
 if TYPE_CHECKING:
     from types import FunctionType
@@ -18,7 +19,7 @@ _REFERNCE_HASHES: dict[FunctionType, str] = {
     tlibb_etl_combine_random_samples: "482acd40279d561126e281ddc57be141e3f474ae466cdfc25ab82896a71e8fba",
     tliba.summary.add_bernoulli_samples: "9f084968cc4a3baf0743f49df222ca88d32db8d241b089f6d09d1adbc9014a74",
     standalone_func: "1b4196e28cc1e2a4658d151d1a31ae77a96ac190d98d31cadc80ccbc720ef6e3",
-    wrapper_func: "e74296ec2f6c2e44970642164aba5e4804ae193ad1558750fd293f99978f53f7",
+    wrapper_func: "a6bcb86d4331a0fddb3741a583038f31b707734a2f2bf8d1297c4b358251792c",
 }
 
 _REFERNCE_CALLS = {

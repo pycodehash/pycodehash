@@ -1,8 +1,8 @@
 import ast
 import sys
 
-from pycodehash.preprocessing import DocstringStripper, FunctionStripper, TypeHintStripper, WhitespaceNormalizer
-from pycodehash.unparse import _unparse
+from pycodehash.python_function import DocstringStripper, FunctionStripper, TypeHintStripper, WhitespaceNormalizer
+from pycodehash.python_function.unparse import _unparse
 
 
 def _strip(src: str) -> str:
