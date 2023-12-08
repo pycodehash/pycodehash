@@ -4,6 +4,7 @@
 [![Latest Github release](https://img.shields.io/github/v/release/pycodehash/pycodehash)](https://github.com/pycodehash/pycodehash/releases)
 [![GitHub release date](https://img.shields.io/github/release-date/pycodehash/pycodehash)](https://github.com/pycodehash/pycodehash/releases)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/charliermarsh/ruff/main/assets/badge/v1.json)](https://github.com/astral-sh/ruff)
+[![Downloads](https://static.pepy.tech/badge/pycodehash)](https://pepy.tech/project/pycodehash)
 
 Data pipelines are of paramount importance in data science, engineering and analysis.
 Often, there are parts of the pipeline that have not changed.
