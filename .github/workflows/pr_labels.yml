@@ -1,0 +1,17 @@
+name: Pull Request Labels
+on:
+  pull_request:
+    types: [opened, labeled, unlabeled, synchronize]
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: mheap/github-action-required-labels@v5
+        with:
+          mode: minimum
+          count: 1
+          labels: "breaking, bug, change, cicd, dependency, documentation, enhancement, maintenance, tests, typing"
+          message: "This PR requires at least one label from: breaking, bug, change, cicd, dependency, documentation, enhancement, maintenance, tests, typing. The labels are used to automatically generate the changelog."
