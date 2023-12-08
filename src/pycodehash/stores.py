@@ -5,7 +5,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from importlib.util import find_spec
 from pathlib import Path
-from typing import TYPE_CHECKING, Callable, Iterable
+from typing import TYPE_CHECKING, Callable, Iterator
 
 import asttokens
 from rope.base.libutils import analyze_modules
@@ -156,11 +156,14 @@ class ProjectStore:
     def get_or_create_for_func(self, func: Callable) -> Project:
         # get the module from the function
         module = inspect.getmodule(func)
+        if module is None:
+            msg = "Module for function not found"
+            raise ValueError(msg)
         name = module.__name__
         pkg, _, _ = name.partition(".")
         if pkg not in self.store:
             self._initialize_project(pkg)
         return self.__getitem__(pkg)
 
-    def __iter__(self) -> Iterable[Project]:
+    def __iter__(self) -> Iterator[Project]:
         yield from self.store.values()

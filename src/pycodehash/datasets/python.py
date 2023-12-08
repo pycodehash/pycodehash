@@ -28,25 +28,21 @@ class PythonFileHash(ApproximateHasher):
         """Read PYC from PEP: https://peps.python.org/pep-0552/
         Based on https://stackoverflow.com/questions/11141387/given-a-python-pyc-file-is-there-a-tool-that-let-me-view-the-bytecode
         """
-        cache_file = Path(importlib.util.cache_from_source(path))
+        cache_file = Path(importlib.util.cache_from_source(str(path)))
         if not cache_file.exists():
-            compile(path, invalidation_mode=self.invalidation_mode)
+            compile(str(path), invalidation_mode=self.invalidation_mode)
 
         hash_str = None
         timestamp = None
         size = None
         with cache_file.open("rb") as file:
-            magic = file.read(4)
-            magic = hexlify(magic).decode("utf-8")
+            magic = hexlify(file.read(4)).decode("utf-8")
 
             bit_field = int.from_bytes(file.read(4), byteorder=sys.byteorder)
             if bit_field & 1 == 1:
-                hash_str = file.read(8)
-                hash_str = hexlify(hash_str).decode("utf-8")
+                hash_str = hexlify(file.read(8)).decode("utf-8")
             else:
-                timestamp = file.read(4)
-                timestamp = asctime(localtime(unpack("I", timestamp)[0]))
-                size = file.read(4)
-                size = unpack("I", size)[0]
+                timestamp = asctime(localtime(unpack("I", file.read(4))[0]))
+                size = unpack("I", file.read(4))[0]
 
         return {"magic": magic, "timestamp": timestamp, "size": size, "hash": hash_str, "bit_field": bit_field}

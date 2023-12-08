@@ -29,7 +29,7 @@ class HashCallNameTransformer(NodeTransformer):
                 self.project = project
                 break
         self.module: ModuleView = self.hasher.module_store[module]
-        self.hash_repr = None
+        self.hash_repr: str | None = None
 
     def visit_Call(self, node: ast.Call):
         """Find the hash each call"""

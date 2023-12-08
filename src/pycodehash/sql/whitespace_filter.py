@@ -31,6 +31,6 @@ class WhitespaceFilter(ASTTransformer):
             # SQLFluff parses clauses with non-unique dict keys (e.g. newline) as a list of dicts
             # When after stripping whitespace and newlines the keys are distinct, we should try to flatten
             if _should_flatten(data):
-                data = _flatten(data)
+                data = _flatten(data)  # type: ignore[assignment]
             return data
         return node
