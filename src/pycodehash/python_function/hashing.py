@@ -5,7 +5,13 @@ from types import BuiltinFunctionType, FunctionType
 from typing import TYPE_CHECKING
 
 from pycodehash.hashing import hash_string
-from pycodehash.python_function import DocstringStripper, FunctionStripper, TypeHintStripper, WhitespaceNormalizer
+from pycodehash.python_function import (
+    DocstringStripper,
+    FunctionStripper,
+    LinesTransformer,
+    TypeHintStripper,
+    WhitespaceNormalizer,
+)
 from pycodehash.python_function.stores import FunctionCallStore, FunctionStore, ModuleStore, ProjectStore
 from pycodehash.python_function.tracing import get_func_def_location, get_func_node_from_location
 from pycodehash.python_function.transfomers import HashCallNameTransformer
@@ -13,6 +19,8 @@ from pycodehash.python_function.unparse import _unparse
 from pycodehash.python_function.utils import get_func_name
 
 if TYPE_CHECKING:
+    from ast import NodeTransformer
+
     from rope.base.project import Project
     from rope.contrib.findit import Location
 
@@ -26,13 +34,20 @@ class FunctionHasher:
     The scope is the first-party library by default but more packages can be set.
 
     Attributes:
-        func_store (FunctionStore): container that caches hashed functions
-        module_store (ModuleStore): container that caches the AST representations of the modules
-        project_store (ProjectStore): container that caches analyzed packages
-        ast_transformers (list): set of ast.Transformers to be applied to function's AST representation
-        lines_transformers (list): set of functions to be applied to the textual representation
-        func_ir_store (FunctionStore): container that store the intermediate representations of functions
+        func_store: container that caches hashed functions
+        module_store: container that caches the AST representations of the modules
+        project_store: container that caches analyzed packages
+        ast_transformers: NodeTransformer for the `ast` module to be applied to function's AST representation
+        lines_transformers: set of functions to be applied to the textual representation
+        func_ir_store: container that store the intermediate representations of functions
     """
+
+    func_store: FunctionStore
+    module_store: ModuleStore
+    project_store: ProjectStore
+    ast_transformers: list[NodeTransformer]
+    lines_transformers: list[LinesTransformer]
+    func_ir_store: FunctionStore
 
     def __init__(
         self,
@@ -89,14 +104,14 @@ class FunctionHasher:
         src_node = HashCallNameTransformer(self, location).visit(src_node)
 
         # preprocessing of AST
-        for transformer in self.ast_transformers:
-            src_node = transformer.visit(src_node)
+        for ast_transformer in self.ast_transformers:
+            src_node = ast_transformer.visit(src_node)
 
         prc_src = _unparse(src_node)
 
         # preprocessing of the lines
-        for transformer in self.lines_transformers:
-            prc_src = transformer.transform(prc_src)
+        for line_transformer in self.lines_transformers:
+            prc_src = line_transformer.transform(prc_src)
 
         function_hash = hash_string(prc_src)
         self.func_ir_store[location] = prc_src
