@@ -43,14 +43,24 @@ class EnrichedTableReferenceVisitor(ASTVisitor):
         self.mode = None
         super().__init__()
 
-    def visit_table_reference(self, node: dict):
+    def visit_table_reference(self, node: dict | list):
         self.references.append((self.mode, _table_reference_to_string(node)))
         self.mode = None
 
-    def visit_create_table_statement(self, node: dict):
+    def visit_create_table_statement(self, node: dict | list):
         self.mode = "CREATE"
         self.generic_visit(node)
 
-    def visit_from_expression_element(self, node: dict):
+    def visit_from_expression_element(self, node: dict | list):
         self.mode = "FROM"
+        self.generic_visit(node)
+
+    def visit_common_table_expression(self, node: dict | list):
+        if isinstance(node, dict) and "naked_identifier" in node:
+            self.references.append(("CTE", node["naked_identifier"]))
+        # AST is structured this way when there are multiple nodes of the same type, e.g. `whitespace`
+        if isinstance(node, list):
+            for item in node:
+                if "naked_identifier" in item:
+                    self.references.append(("CTE", item["naked_identifier"]))
         self.generic_visit(node)
