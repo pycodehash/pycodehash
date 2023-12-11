@@ -34,13 +34,13 @@ for n in n_records:
 
     measurements1 = repeat(
         f'hash_file_full("data_{n}.csv")',
-        setup="from datasets.local import hash_file_full",
+        setup="from pycodehash.hashing import hash_file_full",
         number=number,
         repeat=repeats,
     )
     measurements2 = repeat(
         f'fh.compute_hash("data_{n}.csv")',
-        setup="from datasets.local import LocalFileHash\nfh = LocalFileHash()",
+        setup="from pycodehash.datasets.local import LocalFileHash\nfh = LocalFileHash()",
         number=number,
         repeat=repeats,
     )
