@@ -1,5 +1,5 @@
 import pytest
-from pycodehash.datasets.local import LocalDirectoryHash, LocalFileHash, hash_file_full
+from pycodehash.datasets.local import LocalDirectoryHash, LocalFileHash
 
 
 @pytest.fixture(scope="function")
@@ -23,10 +23,6 @@ def local_dataset_directory(tmp_path):
     file_name4 = dir_name1 / "my_file4.txt"
     file_name4.write_text("Hello Saturn!")
     return tmp_path
-
-
-def test_hash_file_full(local_dataset):
-    assert hash_file_full(local_dataset) == "7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069"
 
 
 def test_approximate_hasher_local_file(local_dataset):
