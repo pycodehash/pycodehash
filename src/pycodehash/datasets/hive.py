@@ -3,7 +3,13 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING, Any
 
-from pyspark.errors.exceptions.captured import AnalysisException
+import pyspark
+
+if hasattr(pyspark, "errors"):
+    from pyspark.errors.exceptions.captured import AnalysisException
+else:
+    # pyspark < (3, 4)
+    from pyspark.sql.utils import AnalysisException
 
 if TYPE_CHECKING:
     from pyspark.sql import SparkSession
