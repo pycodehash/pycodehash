@@ -1,13 +1,26 @@
 from __future__ import annotations
 
 import ast
-from typing import TYPE_CHECKING
+from functools import singledispatch
+from types import FunctionType  # noqa
+from typing import Any  # noqa
 
-if TYPE_CHECKING:
-    from types import FunctionType
+from rope.contrib.findit import Location  # noqa
 
 
-def get_func_name(func: FunctionType, default: str = "<unnamed>") -> str:
+@singledispatch
+def get_func_name(arg: Any, *args, **kwargs):
+    msg = f"type `{type(arg)} is not supported."
+    raise NotImplementedError(msg)
+
+
+@get_func_name.register
+def _(loc: Location):
+    return loc.resource.read()[loc.region[0] : loc.region[1]]
+
+
+@get_func_name.register
+def _(func: FunctionType, default: str = "<unnamed>") -> str:
     return getattr(func, "__name__", default)
 
 
