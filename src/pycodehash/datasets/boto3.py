@@ -1,4 +1,5 @@
 """Helper functions for interacting with S3 on DAP."""
+
 from __future__ import annotations
 
 import os

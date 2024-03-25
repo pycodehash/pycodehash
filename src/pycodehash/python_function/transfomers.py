@@ -1,4 +1,5 @@
 """Visitors used in call tracing."""
+
 from __future__ import annotations
 
 import ast
