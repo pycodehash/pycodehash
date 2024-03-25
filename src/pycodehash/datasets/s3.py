@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-import os
 from typing import Any
 from urllib.parse import urlparse
 
-import boto3
-
 from pycodehash.datasets.approximate_hasher import ApproximateHasher
+from pycodehash.datasets.boto3 import new_s3_client
 
 
 def s3path_to_bucket_key(s3_file_path: str) -> tuple[str, str]:
@@ -21,7 +19,7 @@ def s3path_to_bucket_key(s3_file_path: str) -> tuple[str, str]:
 
 
 class S3Hash(ApproximateHasher):
-    def __init__(self, s3_client: Any = None, endpoint_url: str = os.environ.get("AWS_S3_ENDPOINT_URL", "")):
+    def __init__(self, s3_client: Any = None, credentials: dict[str, Any] = None):
         """Initialization of S3Hash
 
         Args:
@@ -31,7 +29,7 @@ class S3Hash(ApproximateHasher):
         super().__init__()
 
         if s3_client is None:
-            s3_client = boto3.client("s3", endpoint_url=endpoint_url)
+            s3_client = new_s3_client(credentials=credentials)
 
         self.s3_client = s3_client
 
