@@ -4,12 +4,12 @@ from __future__ import annotations
 
 import os
 from copy import deepcopy
-from typing import Any
+from typing import Any, Optional
 
 import boto3
 
 
-def _from_env_var(*args, default: str = None):
+def _from_env_var(*args, default: Optional[str] = None):
     for name in args:
         if name in os.environ:
             return os.environ[name]
@@ -17,10 +17,10 @@ def _from_env_var(*args, default: str = None):
 
 
 class S3ClientFactory:
-    def __init__(self, credentials: dict[str, Any] = None):
+    def __init__(self, credentials: Optional[dict[str, Any]] = None):
         self.creds = deepcopy(credentials)
 
-    def new(self, clean: bool = False, credentials: dict[str, Any] = None) -> boto3.client.S3:
+    def new(self, clean: bool = False, credentials: Optional[dict[str, Any]] = None) -> boto3.client.S3:
         creds = deepcopy(credentials) if credentials else self.creds
         if creds is None or clean:
             # revert to default AWS environment variables, for endpoint, region, session, access.
@@ -34,13 +34,13 @@ class S3ClientFactory:
             creds = self.creds
         return boto3.client("s3", **creds)
 
-    def __call__(self, clean: bool = False, credentials: dict[str, Any] = None) -> boto3.Session.client:
+    def __call__(self, clean: bool = False, credentials: Optional[dict[str, Any]] = None) -> boto3.Session.client:
         return self.new(clean=clean, credentials=credentials)
 
 
 _s3_client = S3ClientFactory()
 
 
-def new_s3_client(clean: bool = False, credentials: dict[str, Any] = None) -> boto3.client.S3:
+def new_s3_client(clean: bool = False, credentials: Optional[dict[str, Any]] = None) -> boto3.client.S3:
     """Get new connection to S3."""
     return _s3_client(clean=clean, credentials=credentials)
