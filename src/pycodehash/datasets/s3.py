@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Optional
 from urllib.parse import urlparse
 
 from pycodehash.datasets.approximate_hasher import ApproximateHasher
@@ -19,7 +19,7 @@ def s3path_to_bucket_key(s3_file_path: str) -> tuple[str, str]:
 
 
 class S3Hash(ApproximateHasher):
-    def __init__(self, s3_client: Any = None, credentials: dict[str, Any] = None):
+    def __init__(self, s3_client: Any = None, credentials: Optional[dict[str, Any]] = None):  # noqa UP007
         """Initialization of S3Hash
 
         Args:
