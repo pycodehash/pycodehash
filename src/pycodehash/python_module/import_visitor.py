@@ -1,4 +1,5 @@
 """Collect module imports from the Python AST"""
+
 import ast
 from ast import NodeVisitor
 

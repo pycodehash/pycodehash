@@ -1,4 +1,5 @@
 """Preprocessing classes to make the hash invariant to certain source code transformations"""
+
 from pycodehash.python_function.decorator_stripper import DecoratorStripper
 from pycodehash.python_function.docstring_stripper import DocstringStripper
 from pycodehash.python_function.function_stripper import FunctionStripper
