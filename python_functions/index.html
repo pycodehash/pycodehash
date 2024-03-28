@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://pycodehash.github.io/pycodehash/python_functions/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Python Functions - PyCodeHash Documentation</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Python Functions";
+        var mkdocs_page_input_path = "python_functions.md";
+        var mkdocs_page_url = "/pycodehash/python_functions/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> PyCodeHash Documentation
+        </a>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Introduction</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Detecting changes</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Python Functions</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#algorithm">Algorithm</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#abstract-syntax-tree">Abstract Syntax Tree</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#find-call-definitions">Find call definitions</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#strip-invariant-changes">Strip invariant changes</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#hashing">Hashing</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#what-makes-it-hard-to-find-call-definitions-in-python">What makes it hard to find call definitions in Python</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../sql_queries/">SQL Queries</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../datasets/">Datasets</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dependencies/">Python Dependencies</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">PyCodeHash Documentation</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Detecting changes</li>
+      <li class="breadcrumb-item active">Python Functions</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="detecting-code-changes">Detecting code changes</h1>
+<p><code>pycodehash</code> attempts to reliably hash code that reflects changes to:</p>
+<ul>
+<li>the implementation</li>
+<li>the dependencies of the implementation</li>
+<li>the dependencies of the dependencies</li>
+<li>...</li>
+</ul>
+<p>but it is invariant to non-functional changes:</p>
+<ul>
+<li>function name</li>
+<li>formatting</li>
+<li>comments and docstrings</li>
+<li>type hints</li>
+</ul>
+<h2 id="algorithm">Algorithm</h2>
+<p>Given a Python function as source code we:</p>
+<ol>
+<li>Create an Abstract Syntax Tree (AST)</li>
+<li><strong>Replace the name of called functions with the hash of the function definition</strong></li>
+<li>Remove invariant changes </li>
+<li>AST: Strip docstrings and type hints, and remove the function name</li>
+<li>Unparse the AST to a string presentation</li>
+<li>Lines: Normalize whitespace</li>
+<li>Hash</li>
+</ol>
+<h2 id="abstract-syntax-tree">Abstract Syntax Tree</h2>
+<p>The AST is parsed using Pythons <a href="https://docs.python.org/3/library/ast.html">standard library</a>.
+This step removed comments and normalises formatting.</p>
+<p>The current implementation in addition uses the <code>asttokens</code> package to map AST nodes to their offset in the Python source code.
+This is required to interact with <code>rope</code> (see below)</p>
+<h2 id="find-call-definitions">Find call definitions</h2>
+<p>The inspiration for solving the dependency invariance comes from compilers/interpreters:</p>
+<blockquote>
+<p>Source code -&gt; ... -&gt; Interpreted/compiled -&gt; ... -&gt; Machine instructions </p>
+</blockquote>
+<p>Compilers often <em>inline</em> code to enable additional transformations.
+PyCodeHash applies the same concept.</p>
+<p>For example, in the following code:</p>
+<pre><code class="language-python">def multiply(y, z):
+    return y * z
+
+def shift_left(x):
+    return multiply(x, 2)
+</code></pre>
+<p>If we hash the source code of <code>shift_left</code>, then the hash is invariant to changes in multiply. This does not meet our desiderata.
+By inlining <code>multiply</code>, this is no longer true:</p>
+<pre><code class="language-python">def shift_left(x):
+    def multiply(y, z):
+        return y * z
+    return multiply(x, 2)
+</code></pre>
+<p>In our implementation, the function call is replaced with the hash of the source definition, rather than inlined:</p>
+<pre><code class="language-python">def shift_left(x):
+    return 9e8c617fe2e0d524469d75f43edb1ff91f9a5387af6c444017ddcd194c983aed(x, 2) 
+</code></pre>
+<p>The implementation builds on <a href="https://github.com/python-rope/rope"><code>rope</code></a>, an advanced open-source Python refactoring library.
+This package performs a lot of heavy lifting. See the section "What makes it hard to find call definitions in Python" for details.</p>
+<h2 id="strip-invariant-changes">Strip invariant changes</h2>
+<p>In this step, PyCodeHash transforms the AST to remove invariant syntax.
+For this we implemented multiple <code>NodeTransformers</code> that can be found in <code>src/pycodehash/preprocessing/</code>.</p>
+<p>Then we unparse the AST representation to obtain the Python source code (without comments and formatting).</p>
+<p>On this string, we apply whitespace normalisation to ensure platform-independent hashes.</p>
+<h2 id="hashing">Hashing</h2>
+<p>Finally, the resulting source code is hashed using <code>hash_string</code>.
+The function uses the SHA256 algorithm provided by the <a href="https://docs.python.org/3/library/hashlib.html">standard library</a>.</p>
+<h2 id="what-makes-it-hard-to-find-call-definitions-in-python">What makes it hard to find call definitions in Python</h2>
+<p>The example below illustrates how the dynamic nature of Python allows for various styles of function definition:</p>
+<pre><code class="language-python">data = [1, 2, 3, 4, 5]
+
+# builtins
+sum(data)
+
+
+# function definition
+def sum(x):
+    return x + [6, 7, 8, 9]
+
+
+sum(data)
+
+from stats import sum
+
+# import
+sum(data)
+
+
+def processing(y):
+    # alias import in local scope
+    from another.lib import multiply as sum
+
+    sum(y)
+
+    # enclosing scope
+    def sum(z):
+        return z * 2
+
+    sum(y)
+
+
+processing(data)
+
+# dynamic function creating
+def create_func(y):
+    def func(x):
+        return x + y
+
+    return func
+
+
+sum = create_func(3)
+sum(data)
+</code></pre>
+<p>Read more on the <a href="https://realpython.com/python-scope-legb-rule/#using-the-legb-rule-for-python-scope">LEGB Rule for Python Scope</a></p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href=".." class="btn btn-neutral float-left" title="Introduction"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../sql_queries/" class="btn btn-neutral float-right" title="SQL Queries">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href=".." style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../sql_queries/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
