@@ -1,4 +1,5 @@
 """Functionality to hash the function body."""
+
 from __future__ import annotations
 
 from types import BuiltinFunctionType, FunctionType

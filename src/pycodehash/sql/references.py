@@ -1,4 +1,5 @@
 """Extract references to input and output tables in the SQL AST"""
+
 from __future__ import annotations
 
 from pycodehash.sql.ast_visitor import ASTVisitor
