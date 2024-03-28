@@ -1,5 +1,5 @@
 import boto3
-from moto import mock_s3
+from moto import mock_aws
 from pycodehash.datasets.s3 import S3Hash, s3path_to_bucket_key
 
 
@@ -10,7 +10,7 @@ def test_s3path_to_bucket_key():
     assert key == "folder1/folder2/file1.json"
 
 
-@mock_s3
+@mock_aws
 def test_s3_hash():
     bucket_name = "bucket_name"
     key = "folder1/folder2/file1.txt"
