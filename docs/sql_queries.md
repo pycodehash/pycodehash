@@ -27,21 +27,21 @@ The `SQLHasher` allows for passing on configuration to [SQLFluff] via [configura
 
 ## SQL query dependencies
 
-In real-world applications, engineers and analysts typically structure 
-multiple SQL queries in separate files that are executed sequentially or according to a topological order. 
-This is often achieved using data transformation frameworks like [dbt], 
+In real-world applications, engineers and analysts typically structure
+multiple SQL queries in separate files that are executed sequentially or according to a topological order.
+This is often achieved using data transformation frameworks like [dbt],
 [SQLMesh] , or similar commercial products.
 
-In such scenarios, simply relying on the hash of individual SQL files is 
-insufficient. When a referenced table in a query is updated, the query 
-must be re-executed, regardless of whether the query's contents have 
-changed. To address this, we can automatically extract table references by 
+In such scenarios, simply relying on the hash of individual SQL files is
+insufficient. When a referenced table in a query is updated, the query
+must be re-executed, regardless of whether the query's contents have
+changed. To address this, we can automatically extract table references by
 parsing the SQL Abstract Syntax Tree (AST).
 
-This approach is straightforward, as table references are limited to 
-specific contexts like `CREATE`, `FROM`, `INTO` and [Common Table Expressions] 
-(CTEs). We've chosen to integrate with existing efforts, leveraging the 
-[SQLLineage] implementation built on top of [SQLFluff], to prevent duplication 
+This approach is straightforward, as table references are limited to
+specific contexts like `CREATE`, `FROM`, `INTO` and [Common Table Expressions]
+(CTEs). We've chosen to integrate with existing efforts, leveraging the
+[SQLLineage] implementation built on top of [SQLFluff], to prevent duplication
 of effort.
 
 Usage:
