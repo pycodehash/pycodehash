@@ -118,7 +118,8 @@ prefixing the hash value would ensure that the resulting string is a valid
 Python identifier, effectively guaranteeing its syntactical validity.
 
 The implementation builds on [`rope`], an advanced open-source Python refactoring library.
-This package performs a lot of heavy lifting. See the section "What makes it hard to find call definitions in Python" for details.
+This package performs a lot of heavy lifting. 
+See the section "The Challenge of Finding Call Definitions in Python" for details.
 
 ### 3. Strip invariant changes
 
