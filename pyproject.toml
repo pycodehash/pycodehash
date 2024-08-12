@@ -33,7 +33,8 @@ test = [
     "moto[s3]"
 ]
 sql = [
-    "sqlfluff"
+    "sqlfluff",
+    "sqllineage"
 ]
 s3 = [
     "boto3"
