@@ -4,15 +4,14 @@
 the version numbers of the Python packages most relevant to your pipeline or framework.
 
 We emphasize it is up to the user to provide the list of relevant package dependencies.
-This list may be different per executed function or node in a pipeline, 
+This list may be different per executed function or node in a pipeline,
 and clearly this may be a selection of the total list of Python dependencies.
-For example, provide the most important libraries your code depends on, 
+For example, provide the most important libraries your code depends on,
 and that you want to track to trigger a rerun of your pipeline in case of package version changes.
 
-The class `PythonDependencyHash` hashes a user-provided list of Python packages. 
-The hasher retrieves the installed package versions and creates a hash of those. 
+The class `PythonDependencyHash` hashes a user-provided list of Python packages.
+The hasher retrieves the installed package versions and creates a hash of those.
 Optionally, the Python version can be included in the hash.
-
 
 ```python
 from pycodehash.dependency import PythonDependencyHash
@@ -30,7 +29,7 @@ print(hasher.compute_hash(dependencies=["pycodehash", "rope"], add_python_versio
 
 ## Tracking changes in Python environment
 
-Alternatively, one may wish to track all Python packages installed in ones environment. 
+Alternatively, one may wish to track all Python packages installed in ones environment.
 The following subsections refer to standard Python tooling, although for both optimized implementations are available through the [uv] package.
 
 ### Compiling dependencies
@@ -42,7 +41,7 @@ This makes sure that your builds are predictable and deterministic.
 ### Freezing dependencies
 
 It's also possible to "freeze" all dependencies in the current environment, even though not all may be used and thus won't affect your code.
-In that case call `pip freeze > requirements_freeze.txt` and then make a hash of the file `requirements_freeze.txt`, 
+In that case call `pip freeze > requirements_freeze.txt` and then make a hash of the file `requirements_freeze.txt`,
 as detailed below.
 
 ```python

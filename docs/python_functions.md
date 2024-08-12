@@ -2,52 +2,52 @@
 
 ## Simplifying Hash Computation with Pure Functions
 
-In the context of Python, implementing hash computations for arbitrary 
-functions can be challenging due to the language's dynamic nature. To 
-simplify this process and avoid having to implement a full Python 
+In the context of Python, implementing hash computations for arbitrary
+functions can be challenging due to the language's dynamic nature. To
+simplify this process and avoid having to implement a full Python
 execution module, we restrict hashing to pure functions.
 
-What are [pure functions]? In simple terms, a pure function is a function 
+What are [pure functions]? In simple terms, a pure function is a function
 that:
 
 * Always returns the same output given the same inputs
 * Has no side effects
 
-In modern software engineering practices, lints like [`mr-proper`] can aid 
-in identifying and enforcing the purity of functions, making it a more 
+In modern software engineering practices, lints like [`mr-proper`] can aid
+in identifying and enforcing the purity of functions, making it a more
 maintainable and efficient development process.
 
 ## How `pycodehash` detects code changes
 
-`pycodehash` attempts to accurately detect code modifications by focusing on the 
+`pycodehash` attempts to accurately detect code modifications by focusing on the
 following aspects that reflect true changes to your implementation
 
 ### Functional Changes
 
-* **Implementation**: Changes to the underlying logic of your code, 
+* **Implementation**: Changes to the underlying logic of your code,
 including new functionality or updates to existing behavior.
-* **Dependencies**: Modifications to the external libraries, frameworks, 
+* **Dependencies**: Modifications to the external libraries, frameworks,
 or modules upon which your code relies.
-* **Transitive Dependencies**: Updates to the dependencies of your 
-dependencies, ensuring that `pycodehash` captures changes that may not be 
+* **Transitive Dependencies**: Updates to the dependencies of your
+dependencies, ensuring that `pycodehash` captures changes that may not be
 immediately apparent.
 
 ### Ignored Non-Functional Changes
 
-On the other hand, `pycodehash` intentionally ignores non-functional 
-modifications that do not affect the actual behavior of your code. These 
+On the other hand, `pycodehash` intentionally ignores non-functional
+modifications that do not affect the actual behavior of your code. These
 include:
 
-* **Function Name**: Renaming functions or variables does not change their 
+* **Function Name**: Renaming functions or variables does not change their
 functionality.
-* **Formatting**: Code formatting changes, such as indentation or line 
+* **Formatting**: Code formatting changes, such as indentation or line
 wrapping, are disregarded.
-* **Comments and Docstrings**: Comments and documentation strings may be 
+* **Comments and Docstrings**: Comments and documentation strings may be
 updated without affecting the code's execution.
 * **Type Hints**: Changes to type hints do not impact the code's behavior.
 
-By focusing on functional changes while ignoring non-functional 
-modifications, `pycodehash` provides a reliable way to detect true changes 
+By focusing on functional changes while ignoring non-functional
+modifications, `pycodehash` provides a reliable way to detect true changes
 in your code.
 
 ### Algorithm
@@ -56,10 +56,10 @@ Given a Python function as source code we:
 
 1. Create an Abstract Syntax Tree (AST)
 2. **Replace the name of called functions with the hash of the function definition**
-3. Remove invariant changes 
-   - AST: Strip docstrings and type hints, and remove the function name
-   - Unparse the AST to a string presentation
-   - Lines: Normalize whitespace
+3. Remove invariant changes
+   * AST: Strip docstrings and type hints, and remove the function name
+   * Unparse the AST to a string presentation
+   * Lines: Normalize whitespace
 4. Hash
 
 ### 1. Abstract Syntax Tree
@@ -74,7 +74,7 @@ This is required to interact with [`rope`] (see below)
 
 The inspiration for solving the dependency invariance comes from compilers/interpreters:
 
-> Source code -> ... -> Interpreted/compiled -> ... -> Machine instructions 
+> Source code -> ... -> Interpreted/compiled -> ... -> Machine instructions
 
 Compilers often _inline_ code to enable additional transformations.
 PyCodeHash applies the same concept.
@@ -106,19 +106,19 @@ def shift_left(x):
     return 9e8c617fe2e0d524469d75f43edb1ff91f9a5387af6c444017ddcd194c983aed(x, 2) 
 ```
 
-Note that technically speaking, the code snippet is no longer valid Python 
-syntax due to the function name constraint: identifiers (such as function 
-names) cannot start with digits. According to the [Python reference 
+Note that technically speaking, the code snippet is no longer valid Python
+syntax due to the function name constraint: identifiers (such as function
+names) cannot start with digits. According to the [Python reference
 documentation](https://docs.python.org/3/reference/lexical_analysis.html#identifiers), this is a fundamental rule for Python's lexical analysis.
 
-However, since we are only concerned with generating hashes and not 
-executing the code, the syntactical validity of the inlined code is 
-irrelevant. Even if the function name were to start with a digit, 
-prefixing the hash value would ensure that the resulting string is a valid 
+However, since we are only concerned with generating hashes and not
+executing the code, the syntactical validity of the inlined code is
+irrelevant. Even if the function name were to start with a digit,
+prefixing the hash value would ensure that the resulting string is a valid
 Python identifier, effectively guaranteeing its syntactical validity.
 
 The implementation builds on [`rope`], an advanced open-source Python refactoring library.
-This package performs a lot of heavy lifting. 
+This package performs a lot of heavy lifting.
 See the section "The Challenge of Finding Call Definitions in Python" for details.
 
 ### 3. Strip invariant changes
@@ -137,14 +137,15 @@ The function uses the SHA256 algorithm provided by the [standard library](https:
 
 ## The Challenge of Finding Call Definitions in Python
 
-Python's dynamic nature makes it difficult to find call definitions due to 
-the various ways functions can be defined. This section highlights some 
+Python's dynamic nature makes it difficult to find call definitions due to
+the various ways functions can be defined. This section highlights some
 examples that illustrate this challenge.
 
 ### Function Definition Variations
 
-The following code snippets demonstrate different styles of function 
+The following code snippets demonstrate different styles of function
 definition:
+
 ```python
 data = [1, 2, 3, 4, 5]
 
@@ -165,7 +166,7 @@ sum(data)
 
 ### Function Definition in Nested Scopes
 
-Functions can be defined within other functions or modules, leading to 
+Functions can be defined within other functions or modules, leading to
 nested scopes. For example:
 
 ```python
@@ -185,6 +186,7 @@ def processing(y):
 ### Dynamic Function Creation
 
 Functions can also be created dynamically using closures. For instance:
+
 ```python
 def create_func(y):
     def func(x):
@@ -196,7 +198,7 @@ sum = create_func(3)
 sum(data)
 ```
 
-Understanding these variations is crucial for effectively resolving call 
+Understanding these variations is crucial for effectively resolving call
 definitions in Python.
 
 Read more about the [LEGB Rule for Python Scope] to better grasp how scope and naming work in Python.

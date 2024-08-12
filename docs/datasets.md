@@ -33,9 +33,9 @@ However, in practice, we still can do better.
 Many datasets do have metadata associated with it that can be used as an alternative to hashing the data itself.
 This metadata will remain the same if the data has not changed, and almost certainly changes if modified.
 Examples are **Size**, **Modification date** or [**ETag**](https://en.wikipedia.org/wiki/HTTP_ETag).
-The user is responsible for selecting the most collision-resistant subset of metadata depending on the data generation 
+The user is responsible for selecting the most collision-resistant subset of metadata depending on the data generation
 process from the available metadata.
-Retrieving the metadata for a dataset requires constant time. 
+Retrieving the metadata for a dataset requires constant time.
 
 | Records             | Full file hashing | Fast approximate hashing | Speedup Ratio |
 |---------------------|-------------------|--------------------------|---------------|
@@ -66,8 +66,7 @@ The following approximate hashers are implemented at this time:
 | [Hive Tables](https://github.com/pycodehash/pycodehash/blob/main/src/pycodehash/datasets/hive.py)    | Size, Creation Date, Is Partitioned     |
 | [Python Files](https://github.com/pycodehash/pycodehash/blob/main/src/pycodehash/datasets/python.py) | Magic, Size, Timestamp, Hash, Bit Field |
 
-
-Feel free to open a Pull Request if you would like to contribute additional dataset types or metadata. 
+Feel free to open a Pull Request if you would like to contribute additional dataset types or metadata.
 
 ## Incremental loads
 
