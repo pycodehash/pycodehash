@@ -61,7 +61,7 @@ class PythonModuleHasher(PartitionedApproximateHasher):
         module_name = modname(Resource(NoProject(), module_path))
         self.module_paths[module_name] = module_path
 
-        src = Path(module_path).read_text()
+        src = Path(module_path).read_text(encoding="utf-8")
         root = ast.parse(src)
 
         iv = ImportVisitor()

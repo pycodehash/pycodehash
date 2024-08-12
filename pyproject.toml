@@ -60,7 +60,9 @@ packages = ["src/pycodehash"]
 [tool.ruff]
 target-version = "py38"
 line-length = 120
-lint.extend-select = [
+
+[tool.ruff.lint]
+extend-select = [
     "E", # pyflakes `E`
     "W", # pyflakes `W`
     "I", # isort
@@ -85,7 +87,12 @@ lint.extend-select = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"{tests,docs}/*" = ["ANN001", "INP", "PLR2004"]
+"{tests,docs}/*" = [
+    "ANN001", # no strict requirement for docstrings in tests
+    "INP",
+    "PLR2004",
+    "PLC2701" # private imports are allowed for tests
+]
 "src/pycodehash/python_function/{typehint_stripper,function_stripper}.py" = [
     "PLR6301"  # ununsed self in combination with NodeVisitor
 ]

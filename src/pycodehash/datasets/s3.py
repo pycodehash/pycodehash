@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import operator
 from typing import Any
 from urllib.parse import urlparse
 
@@ -62,4 +63,6 @@ class S3Hash(ApproximateHasher):
             # clean up the ETag hash, remove unnecessary quotes.
             file["ETag"] = file["ETag"].strip('"')
 
-        return {f"__file{idx}__ETag": file["ETag"] for idx, file in enumerate(sorted(files, key=lambda x: x["Key"]))}
+        return {
+            f"__file{idx}__ETag": file["ETag"] for idx, file in enumerate(sorted(files, key=operator.itemgetter("Key")))
+        }
