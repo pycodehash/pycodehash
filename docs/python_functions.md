@@ -101,10 +101,21 @@ def shift_left(x):
 
 In our implementation, the function call is replaced with the hash of the source definition, rather than inlined:
 
-```python
+```text
 def shift_left(x):
     return 9e8c617fe2e0d524469d75f43edb1ff91f9a5387af6c444017ddcd194c983aed(x, 2) 
 ```
+
+Note that technically speaking, the code snippet is no longer valid Python 
+syntax due to the function name constraint: identifiers (such as function 
+names) cannot start with digits. According to the [Python reference 
+documentation](https://docs.python.org/3/reference/lexical_analysis.html#identifiers), this is a fundamental rule for Python's lexical analysis.
+
+However, since we are only concerned with generating hashes and not 
+executing the code, the syntactical validity of the inlined code is 
+irrelevant. Even if the function name were to start with a digit, 
+prefixing the hash value would ensure that the resulting string is a valid 
+Python identifier, effectively guaranteeing its syntactical validity.
 
 The implementation builds on [`rope`], an advanced open-source Python refactoring library.
 This package performs a lot of heavy lifting. See the section "What makes it hard to find call definitions in Python" for details.
