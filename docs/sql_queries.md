@@ -8,7 +8,7 @@ The same principle holds for SQL as for Python functions: the hash of an SQL que
 
 PyCodeHash supports hashing SQL queries and files.
 
-The Abstract Syntax Tree (AST) parsing from the excellent [`SQLFluff`] library is used in our implementation.
+The Abstract Syntax Tree (AST) parsing from the excellent [SQLFluff] library is used in our implementation.
 
 Currently, our default implementation is invariant to newlines and whitespace.
 This behavior can be extended with user-provided AST transformers.
@@ -23,14 +23,14 @@ This results in many dialects of SQL being [supported](https://docs.sqlfluff.com
 - T-SQL (MSSQL)
 - Trino
 
-The `SQLHasher` allows for passing on configuration to `SQLFluff` via [configuration files](https://docs.sqlfluff.com/en/stable/configuration.html).
+The `SQLHasher` allows for passing on configuration to [SQLFluff] via [configuration files](https://docs.sqlfluff.com/en/stable/configuration.html).
 
 ## SQL query dependencies
 
 In real-world applications, engineers and analysts typically structure 
 multiple SQL queries in separate files that are executed sequentially or according to a topological order. 
 This is often achieved using data transformation frameworks like [dbt], 
-[SQLMesh], or similar commercial products.
+[SQLMesh] , or similar commercial products.
 
 In such scenarios, simply relying on the hash of individual SQL files is 
 insufficient. When a referenced table in a query is updated, the query 
@@ -41,7 +41,7 @@ parsing the SQL Abstract Syntax Tree (AST).
 This approach is straightforward, as table references are limited to 
 specific contexts like `CREATE`, `FROM`, `INTO` and [Common Table Expressions] 
 (CTEs). We've chosen to integrate with existing efforts, leveraging the 
-[`SQLLineage`] implementation built on top of [`SQLFluff`], to prevent duplication 
+[SQLLineage] implementation built on top of [SQLFluff], to prevent duplication 
 of effort.
 
 Usage:
@@ -63,7 +63,7 @@ print(dropped_tables)
 ```
 
 [dbt]: https://github.com/dbt-labs/dbt-core
-[SQLMesh]: https://github.com/TobikoData/sqlmesh)
-[`SQLLineage`]: https://github.com/reata/sqllineage
+[SQLMesh]: https://github.com/TobikoData/sqlmesh
+[SQLLineage]: https://github.com/reata/sqllineage
 [Common Table Expressions]: https://en.wikipedia.org/wiki/Hierarchical_and_recursive_queries_in_SQL#Common_table_expression
-[`SQLFluff`]: https://docs.sqlfluff.com/en/stable/index.html
+[SQLFluff]: https://docs.sqlfluff.com/en/stable/index.html
