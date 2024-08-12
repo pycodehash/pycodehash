@@ -62,7 +62,7 @@ Given a Python function as source code we:
    - Lines: Normalize whitespace
 4. Hash
 
-### Abstract Syntax Tree
+### 1. Abstract Syntax Tree
 
 The AST is parsed using Pythons [standard library](https://docs.python.org/3/library/ast.html).
 This step removed comments and normalises formatting.
@@ -70,7 +70,7 @@ This step removed comments and normalises formatting.
 The current implementation in addition uses the `asttokens` package to map AST nodes to their offset in the Python source code.
 This is required to interact with [`rope`] (see below)
 
-### Find call definitions
+### 2. Find call definitions
 
 The inspiration for solving the dependency invariance comes from compilers/interpreters:
 
@@ -109,7 +109,7 @@ def shift_left(x):
 The implementation builds on [`rope`], an advanced open-source Python refactoring library.
 This package performs a lot of heavy lifting. See the section "What makes it hard to find call definitions in Python" for details.
 
-### Strip invariant changes
+### 3. Strip invariant changes
 
 In this step, PyCodeHash transforms the AST to remove invariant syntax.
 For this we implemented multiple `NodeTransformers` that can be found in `src/pycodehash/preprocessing/`.
@@ -118,64 +118,78 @@ Then we unparse the AST representation to obtain the Python source code (without
 
 On this string, we apply whitespace normalisation to ensure platform-independent hashes.
 
-### Hashing
+### 4. Hashing
 
 Finally, the resulting source code is hashed using `hash_string`.
 The function uses the SHA256 algorithm provided by the [standard library](https://docs.python.org/3/library/hashlib.html).
 
-### What makes it hard to find call definitions in Python
+## The Challenge of Finding Call Definitions in Python
 
-The example below illustrates how the dynamic nature of Python allows for various styles of function definition:
+Python's dynamic nature makes it difficult to find call definitions due to 
+the various ways functions can be defined. This section highlights some 
+examples that illustrate this challenge.
 
+### Function Definition Variations
+
+The following code snippets demonstrate different styles of function 
+definition:
 ```python
 data = [1, 2, 3, 4, 5]
 
-# builtins
+# Built-in function call (no explicit definition)
 sum(data)
 
-
-# function definition
+# Explicit function definition
 def sum(x):
     return x + [6, 7, 8, 9]
-
 
 sum(data)
 
 from stats import sum
 
-# import
+# Importing a function from another module
 sum(data)
+```
 
+### Function Definition in Nested Scopes
 
+Functions can be defined within other functions or modules, leading to 
+nested scopes. For example:
+
+```python
 def processing(y):
-    # alias import in local scope
+    # Import alias within local scope
     from another.lib import multiply as sum
 
     sum(y)
 
-    # enclosing scope
+    # Enclosing scope function definition
     def sum(z):
         return z * 2
 
     sum(y)
+```
 
+### Dynamic Function Creation
 
-processing(data)
-
-# dynamic function creating
+Functions can also be created dynamically using closures. For instance:
+```python
 def create_func(y):
     def func(x):
         return x + y
 
     return func
 
-
 sum = create_func(3)
 sum(data)
 ```
 
-Read more on the [LEGB Rule for Python Scope](https://realpython.com/python-scope-legb-rule/#using-the-legb-rule-for-python-scope)
+Understanding these variations is crucial for effectively resolving call 
+definitions in Python.
+
+Read more about the [LEGB Rule for Python Scope] to better grasp how scope and naming work in Python.
 
 [pure functions]: https://en.wikipedia.org/wiki/Pure_function
 [`mr-proper`]: https://github.com/best-doctor/mr_proper
 [`rope`]: https://github.com/python-rope/rope
+[LEGB Rule for Python Scope]: https://realpython.com/python-scope-legb-rule/#using-the-legb-rule-for-python-scope
