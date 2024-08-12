@@ -106,7 +106,7 @@ class ProjectStore:
 
         Args:
             whitelist: set of packages that are allowed to be analyzed.
-                By default all packages are allowed.
+                By default, all packages are allowed.
         """
         self.store: dict[str, Project] = {}
 
@@ -146,7 +146,7 @@ class ProjectStore:
         self.store[pkg] = project
 
     def add_project(self, pkg: str):
-        """Explicitly add project for tracing.
+        """Explicitly add a project for tracing.
 
         Args:
             pkg: the name of the package to be analyzed
@@ -163,7 +163,7 @@ class ProjectStore:
         pkg, _, _ = name.partition(".")
         if pkg not in self.store:
             self._initialize_project(pkg)
-        return self.__getitem__(pkg)
+        return self[pkg]
 
     def __iter__(self) -> Iterator[Project]:
         yield from self.store.values()

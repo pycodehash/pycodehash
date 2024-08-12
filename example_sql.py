@@ -1,4 +1,5 @@
 """Hash SQL queries and files (requires `sqlfluff` to be installed)"""
+
 from pathlib import Path
 
 from pycodehash.sql.sql_hasher import SQLHasher
