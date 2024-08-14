@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+from abc import ABC
 from typing import Any
 
 
-class ASTVisitor:
+class ASTVisitor(ABC):
     # based on Pythons AST visitor:
     # https://github.com/python/cpython/blob/3.12/Lib/ast.py#L383
     def visit(self, key: str, node: dict[str, Any] | list[dict[str, Any]]):
