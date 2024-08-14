@@ -10,7 +10,24 @@ PyCodeHash supports hashing SQL queries and files.
 
 The Abstract Syntax Tree (AST) parsing from the excellent [SQLFluff] library is used in our implementation.
 
-Currently, our default implementation is invariant to newlines and whitespace.
+Currently, our default implementation is invariant to omitting database names and whitespace, e.g.
+
+```sql
+USE my_database;
+
+SELECT 
+    * 
+FROM 
+    hello_world
+```
+
+is equivalent to
+
+```sql
+USE my_database;
+SELECT * FROM my_database.hello_world
+```
+
 This behavior can be extended with user-provided AST transformers.
 
 This results in many dialects of SQL being [supported](https://docs.sqlfluff.com/en/stable/dialects.html) out of the box, e.g.:
@@ -49,8 +66,10 @@ Usage:
 ```python
 from pycodehash.sql import extract_table_references
 
+query = "SELECT * INTO output_table FROM my_database.input_table"
+
 input_tables, output_tables, dropped_tables = extract_table_references(
-    "SELECT * INTO output_table FROM my_database.input_table", 
+    query, 
     default_db="my_database", 
     dialect="t-sql"
 )

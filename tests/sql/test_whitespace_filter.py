@@ -57,5 +57,5 @@ def test_whitespace_filter():
             }
         }
     }
-    result = WhitespaceFilter().transform(query)
+    result = WhitespaceFilter().generic_transform(query)
     assert result == expected
