@@ -42,6 +42,24 @@ This results in many dialects of SQL being [supported](https://docs.sqlfluff.com
 
 The `SQLHasher` allows for passing on configuration to [SQLFluff] via [configuration files](https://docs.sqlfluff.com/en/stable/configuration.html).
 
+## Usage examples
+
+### Hashing SQL files and queries
+
+The [SQL Usage Example](https://github.com/pycodehash/pycodehash/blob/main/example_sql.py) demonstrates how to hash SQL queries and files:
+
+```python
+{% include 'example_sql.py' %}
+```
+
+### Hashing files in git history
+
+Below is a more advanced example for checking if there was a behavioural change in a [SQL file in a specific git commit](https://github.com/pycodehash/pycodehash/blob/main/example_sql_git.py):
+
+```python
+{% include 'example_sql_git.py' %}
+```
+
 ## SQL query dependencies
 
 In real-world applications, engineers and analysts typically structure
