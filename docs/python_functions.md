@@ -141,6 +141,36 @@ Python's dynamic nature makes it difficult to find call definitions due to
 the various ways functions can be defined. This section highlights some
 examples that illustrate this challenge.
 
+### Naive approach to hashing
+
+We can use the `inspect` module to get the source code of the
+function as a string, and then compute its hash.
+
+Here's an example:
+
+```python
+import inspect
+
+from pycodehash.hashing import hash_string
+
+def my_function(x):
+    return x * 2
+
+# Get the source code of the function as a string
+func_str = inspect.getsource(my_function)
+
+# Compute the hash value. Uses the stdlib `hashlib.sha256` underneath
+hash_value = hash_string(func_str)
+
+print(hash_value)
+```
+
+Please note that this approach has a serious limitation:
+
+It only works for functions with simple source code. If the function
+has a very long or complex implementation (e.g., due to many nested
+loops), computing its hash might be problematic.
+
 ### Function Definition Variations
 
 The following code snippets demonstrate different styles of function
@@ -203,7 +233,28 @@ definitions in Python.
 
 Read more about the [LEGB Rule for Python Scope] to better grasp how scope and naming work in Python.
 
+## Cant we use Python's built-in hashing functions?
+
+In Python, there is the built-in `hash()` function or the `__hash__`
+method in classes to compute a hash value for an object, which is an
+integer that represents the "identity" of the object being hashed.
+When you call `hash()` on an
+object, it computes the hash value on-the-fly using the object's
+attributes and methods.
+The built-in `hash()` function in Python cannot be used
+to reliably compare if the content of a function has changed because
+even if two functions have the same source code, there's no guarantee
+that their hash values will remain stable across different runs of your program or in different environments.
+
+Python also has a built-in library to "hash" your functions, namely [hashlib],
+which provides secure and efficient hashing algorithms. The [cryptography] package
+is an example of a third-party packages that also offers such cryptographic algorithms.
+However, these libraries are designed for general-purpose hashing, not specifically for
+computing hashes of Python functions.
+
 [pure functions]: https://en.wikipedia.org/wiki/Pure_function
 [mr-proper]: https://github.com/best-doctor/mr_proper
 [rope]: https://github.com/python-rope/rope
 [LEGB Rule for Python Scope]: https://realpython.com/python-scope-legb-rule/#using-the-legb-rule-for-python-scope
+[hashlib]: https://docs.python.org/3/library/hashlib.html
+[cryptography]: https://cryptography.io/en/latest/
