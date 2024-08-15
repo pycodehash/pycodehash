@@ -7,6 +7,7 @@ from sqlfluff import parse
 
 from pycodehash.datasets.approximate_hasher import inline_metadata
 from pycodehash.hashing import hash_string
+from pycodehash.sql.default_database_filter import DefaultDatabaseFilter
 from pycodehash.sql.whitespace_filter import WhitespaceFilter
 
 if TYPE_CHECKING:
@@ -21,6 +22,7 @@ class SQLHasher:
         ast_transformers: list[ASTTransformer] | None = None,
         dialect: str = "ansi",
         config_path: str | None = None,
+        default_db: str | None = None,
     ):
         """Initialize the SQLHasher object
 
@@ -28,10 +30,16 @@ class SQLHasher:
             ast_transformers: a list of ASTTransformers for SQL
             dialect: SQLFluff `dialect <https://docs.sqlfluff.com/en/stable/dialects.html>`_
             config_path: SQLFLuff `config path <https://docs.sqlfluff.com/en/stable/configuration.html>`_
+            default_db: default database
         """
         self.dialect = dialect
         self.config_path = config_path
-        self.ast_transformers = ast_transformers or [WhitespaceFilter()]
+        if ast_transformers is None:
+            ast_transformers = [WhitespaceFilter()]
+            if default_db is not None:
+                ast_transformers.append(DefaultDatabaseFilter(default_db))
+
+        self.ast_transformers = ast_transformers
 
     def hash_file(self, file_path: Path | str):
         """Hash the query in a file
@@ -58,7 +66,7 @@ class SQLHasher:
         """
         ast = parse(query, dialect=self.dialect, config_path=self.config_path)
         for transformer in self.ast_transformers:
-            ast = transformer.transform(ast)
+            ast = transformer.generic_transform(ast)
 
         data = inline_metadata(ast)
 
