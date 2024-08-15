@@ -22,29 +22,29 @@ maintainable and efficient development process.
 `pycodehash` attempts to accurately detect code modifications by focusing on the
 following aspects that reflect true changes to your implementation
 
-### Functional Changes
+**Functional Changes**:
 
-* **Implementation**: Changes to the underlying logic of your code,
+* _Implementation_: Changes to the underlying logic of your code,
 including new functionality or updates to existing behavior.
-* **Dependencies**: Modifications to the external libraries, frameworks,
+* _Dependencies_: Modifications to the external libraries, frameworks,
 or modules upon which your code relies.
-* **Transitive Dependencies**: Updates to the dependencies of your
+* _Transitive Dependencies_: Updates to the dependencies of your
 dependencies, ensuring that `pycodehash` captures changes that may not be
 immediately apparent.
 
-### Ignored Non-Functional Changes
+**Ignored Non-Functional Changes**:
 
 On the other hand, `pycodehash` intentionally ignores non-functional
 modifications that do not affect the actual behavior of your code. These
 include:
 
-* **Function Name**: Renaming functions or variables does not change their
+* _Function Name_: Renaming functions or variables does not change their
 functionality.
-* **Formatting**: Code formatting changes, such as indentation or line
+* _Formatting_: Code formatting changes, such as indentation or line
 wrapping, are disregarded.
-* **Comments and Docstrings**: Comments and documentation strings may be
+* _Comments and Docstrings_: Comments and documentation strings may be
 updated without affecting the code's execution.
-* **Type Hints**: Changes to type hints do not impact the code's behavior.
+* _Type Hints_: Changes to type hints do not impact the code's behavior.
 
 By focusing on functional changes while ignoring non-functional
 modifications, `pycodehash` provides a reliable way to detect true changes
