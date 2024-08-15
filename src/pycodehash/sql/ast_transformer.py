@@ -28,8 +28,11 @@ class ASTTransformer(ABC):
 
         return value
 
-    def generic_transform(self, node: dict[str, Any] | list[dict[str, Any]]):
+    def generic_transform(self, node: dict[str, Any] | list[dict[str, Any]] | None):
         """Called if no explicit visitor function exists for a node."""
+
+        if node is None:
+            return {}
 
         if isinstance(node, list):
             transformed_list = [self.generic_transform(item) for item in node]

@@ -41,10 +41,16 @@ def detect_file_change(
         INVALID, if the file did not exist or the SQL could not be parsed
     """
     try:
-        before = git_show_file(f"{commit_id}^", file_name)
         after = git_show_file(commit_id, file_name)
     except subprocess.CalledProcessError:
+        # deleted file
         return "INVALID"
+
+    try:
+        before = git_show_file(f"{commit_id}^", file_name)
+    except subprocess.CalledProcessError:
+        # newly created file
+        return "FUNCTIONAL"
 
     try:
         before_hash = hasher.hash_query(before)
@@ -61,4 +67,4 @@ if change_type == "FUNCTIONAL":
 elif change_type == "NON-FUNCTIONAL":
     print("The SQL query does not have to be executed after this commit")
 else:
-    print("The query file is invalid before or after the commit")
+    print("The query file is invalid before or after the commit (e.g. syntax error or deleted)")
