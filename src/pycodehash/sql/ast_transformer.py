@@ -32,7 +32,7 @@ class ASTTransformer(ABC):
         """Called if no explicit visitor function exists for a node."""
 
         if node is None:
-            return {}
+            return None
 
         if isinstance(node, list):
             transformed_list = [self.generic_transform(item) for item in node]

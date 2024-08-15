@@ -2,7 +2,10 @@ from pathlib import Path
 
 import pytest
 from pycodehash.hashing import hash_string
+from pycodehash.sql.comment_filter import CommentFilter
+from pycodehash.sql.default_database_filter import DefaultDatabaseFilter
 from pycodehash.sql.sql_hasher import SQLHasher
+from pycodehash.sql.whitespace_filter import WhitespaceFilter
 
 
 def test_sql_hasher():
@@ -61,3 +64,12 @@ def test_sql_hasher_file(query_file):
 def test_sql_hasher_empty():
     sh = SQLHasher(dialect="ansi", default_db="my_database")
     assert sh.hash_query("") == hash_string("")
+
+
+def test_sql_transform_empty():
+    # empty ast
+    ast = {"file": None}
+    for transform in [WhitespaceFilter(), CommentFilter(), DefaultDatabaseFilter("db")]:
+        # ensure ast remains None
+        ast = transform.generic_transform(ast)
+        assert ast is None

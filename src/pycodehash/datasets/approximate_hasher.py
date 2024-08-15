@@ -8,11 +8,13 @@ from typing import Any
 from pycodehash.hashing import hash_string
 
 
-def inline_metadata(metadata: dict[str, Any]) -> str:
+def inline_metadata(metadata: dict[str, Any] | None) -> str:
     """Convert dict of metadata to string
     (all dictionary items should be serializable to string)
     Inlined metadata is invariant to the ordering of keys.
     """
+    if metadata is None:
+        return ""
     return "|".join([f"{key}: {value}" for key, value in sorted(metadata.items())])
 
 

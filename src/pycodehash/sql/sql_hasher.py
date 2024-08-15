@@ -7,6 +7,7 @@ from sqlfluff import parse
 
 from pycodehash.datasets.approximate_hasher import inline_metadata
 from pycodehash.hashing import hash_string
+from pycodehash.sql.comment_filter import CommentFilter
 from pycodehash.sql.default_database_filter import DefaultDatabaseFilter
 from pycodehash.sql.whitespace_filter import WhitespaceFilter
 
@@ -35,7 +36,7 @@ class SQLHasher:
         self.dialect = dialect
         self.config_path = config_path
         if ast_transformers is None:
-            ast_transformers = [WhitespaceFilter()]
+            ast_transformers = [WhitespaceFilter(), CommentFilter()]
             if default_db is not None:
                 ast_transformers.append(DefaultDatabaseFilter(default_db))
 

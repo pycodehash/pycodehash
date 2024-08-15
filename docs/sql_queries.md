@@ -10,12 +10,14 @@ PyCodeHash supports hashing SQL queries and files.
 
 The Abstract Syntax Tree (AST) parsing from the excellent [SQLFluff] library is used in our implementation.
 
-Currently, our default implementation is invariant to omitting database names and whitespace, e.g.
+Currently, our default implementation is invariant to omitting database names, comments, and whitespace, e.g.
 
 ```sql
+/* block comment: set `my_database` as the default database */
 USE my_database;
 
 SELECT 
+    -- inline comment: select all columns
     * 
 FROM 
     hello_world
