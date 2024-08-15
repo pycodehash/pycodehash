@@ -30,7 +30,7 @@ test = [
     "pytest",
     "pytest-cov",
     "pycodehash[sql,s3]",
-    "moto[s3]"
+    "moto[s3]>=5,<6"
 ]
 sql = [
     "sqlfluff",
