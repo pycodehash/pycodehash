@@ -32,13 +32,13 @@ This behavior can be extended with user-provided AST transformers.
 
 This results in many dialects of SQL being [supported](https://docs.sqlfluff.com/en/stable/dialects.html) out of the box, e.g.:
 
-- ANSI
-- BigQuery
-- PostgreSQL
-- SparkSQL
-- SQLite
-- T-SQL (MSSQL)
-- Trino
+* ANSI
+* BigQuery
+* PostgreSQL
+* SparkSQL
+* SQLite
+* T-SQL (MSSQL)
+* Trino
 
 The `SQLHasher` allows for passing on configuration to [SQLFluff] via [configuration files](https://docs.sqlfluff.com/en/stable/configuration.html).
 

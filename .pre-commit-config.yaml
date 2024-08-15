@@ -18,5 +18,4 @@ repos:
   rev: v0.41.0
   hooks:
   - id: markdownlint-fix
-    args: [ --disable, MD013 ] # line length
     exclude: docs/index.md
