@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import pytest
+from pycodehash.hashing import hash_string
 from pycodehash.sql.sql_hasher import SQLHasher
 
 
@@ -55,3 +56,8 @@ def test_sql_hasher_file(query_file):
 
     hash_str = sh.hash_file(str(query_file))
     assert hash_str == "ba46f6c7ebf45fb57da743ef050869e1e45d32defe9da56e4593ba82c3305d8a"
+
+
+def test_sql_hasher_empty():
+    sh = SQLHasher(dialect="ansi", default_db="my_database")
+    assert sh.hash_query("") == hash_string("")
