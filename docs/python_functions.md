@@ -60,7 +60,8 @@ Given a Python function as source code we:
     * AST: Strip docstrings and type hints, and remove the function name
     * Unparse the AST to a string presentation
     * Lines: Normalize whitespace
-4. Hash
+4. Unparse the AST and normalise
+5. Hash
 
 ### 1. Abstract Syntax Tree
 
@@ -126,11 +127,13 @@ See the section "The Challenge of Finding Call Definitions in Python" for detail
 In this step, PyCodeHash transforms the AST to remove invariant syntax.
 For this we implemented multiple `NodeTransformers` that can be found in `src/pycodehash/preprocessing/`.
 
+### 4. Unparse AST and normalise
+
 Then we unparse the AST representation to obtain the Python source code (without comments and formatting).
 
 On this string, we apply whitespace normalisation to ensure platform-independent hashes.
 
-### 4. Hashing
+### 5. Hashing
 
 Finally, the resulting source code is hashed using `hash_string`.
 The function uses the SHA256 algorithm provided by the [standard library](https://docs.python.org/3/library/hashlib.html).
