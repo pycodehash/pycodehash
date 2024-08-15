@@ -72,8 +72,8 @@ Feel free to open a Pull Request if you would like to contribute additional data
 
 Many datasets consist of collections of objects, or subsets of data:
 
-- Hive table partitions, e.g. data grouped per day or month
-- Directories of images
+* Hive table partitions, e.g. data grouped per day or month
+* Directories of images
 
 Hashing these datasets on the object level, allows for only recomputing the parts of the data that have changed.
 For these cases, `pycodehash` has the `PartitionedApproximateHasher` base class.

@@ -13,7 +13,7 @@ that:
 * Always returns the same output given the same inputs
 * Has no side effects
 
-In modern software engineering practices, lints like [`mr-proper`] can aid
+In modern software engineering practices, lints like [mr-proper] can aid
 in identifying and enforcing the purity of functions, making it a more
 maintainable and efficient development process.
 
@@ -57,9 +57,9 @@ Given a Python function as source code we:
 1. Create an Abstract Syntax Tree (AST)
 2. **Replace the name of called functions with the hash of the function definition**
 3. Remove invariant changes
-   * AST: Strip docstrings and type hints, and remove the function name
-   * Unparse the AST to a string presentation
-   * Lines: Normalize whitespace
+    * AST: Strip docstrings and type hints, and remove the function name
+    * Unparse the AST to a string presentation
+    * Lines: Normalize whitespace
 4. Hash
 
 ### 1. Abstract Syntax Tree
@@ -68,7 +68,7 @@ The AST is parsed using Pythons [standard library](https://docs.python.org/3/lib
 This step removed comments and normalises formatting.
 
 The current implementation in addition uses the `asttokens` package to map AST nodes to their offset in the Python source code.
-This is required to interact with [`rope`] (see below)
+This is required to interact with [rope] (see below)
 
 ### 2. Find call definitions
 
@@ -117,7 +117,7 @@ irrelevant. Even if the function name were to start with a digit,
 prefixing the hash value would ensure that the resulting string is a valid
 Python identifier, effectively guaranteeing its syntactical validity.
 
-The implementation builds on [`rope`], an advanced open-source Python refactoring library.
+The implementation builds on [rope], an advanced open-source Python refactoring library.
 This package performs a lot of heavy lifting.
 See the section "The Challenge of Finding Call Definitions in Python" for details.
 
@@ -204,6 +204,6 @@ definitions in Python.
 Read more about the [LEGB Rule for Python Scope] to better grasp how scope and naming work in Python.
 
 [pure functions]: https://en.wikipedia.org/wiki/Pure_function
-[`mr-proper`]: https://github.com/best-doctor/mr_proper
-[`rope`]: https://github.com/python-rope/rope
+[mr-proper]: https://github.com/best-doctor/mr_proper
+[rope]: https://github.com/python-rope/rope
 [LEGB Rule for Python Scope]: https://realpython.com/python-scope-legb-rule/#using-the-legb-rule-for-python-scope
