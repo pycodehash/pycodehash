@@ -14,4 +14,4 @@ h2 = fh.hash_func(create_df_mapping)
 print("Hash for `create_df_mapping`", h2)
 
 assert h1 == h2
-assert h1 == "316c8b82698ff62aa5e115e73efbd5ded6a7a7a27358a29bd0c289cd3d61f8c5"
+assert h1 == "38d6e9f262ab77f6536e14c74be687ce2cb44cdebb7045e5b2f51946215cf4d0"

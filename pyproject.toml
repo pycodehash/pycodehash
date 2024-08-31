@@ -23,6 +23,7 @@ dependencies = [
     'typing_extensions; python_version <= "3.11"',
     'asttokens',
     'rope',
+    'ruff==0.6.3'
 ]
 
 [project.optional-dependencies]
@@ -86,9 +87,13 @@ extend-select = [
     "PERF", # perflint
     "FURB", # refurb
 ]
+exclude = [
+    # formatting these samples loses their power
+    "examples/equivalance/*"
+]
 
 [tool.ruff.lint.per-file-ignores]
-"{tests,docs}/*" = [
+"{tests,docs,examples}/*" = [
     "ANN001", # no strict requirement for docstrings in tests
     "INP",
     "PLR2004",

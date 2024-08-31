@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from pycodehash.python_function.lines_transformer import LinesTransformer
+from pycodehash.python_function.source_processor import SourceProcessor
 
 
-class WhitespaceNormalizer(LinesTransformer):
+class WhitespaceNormalizer(SourceProcessor):
     """Normalize source code newlines
 
     The trailing whitespace is removed

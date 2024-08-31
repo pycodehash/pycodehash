@@ -1,7 +1,13 @@
 import ast
 import sys
 
-from pycodehash.python_function import DocstringStripper, FunctionStripper, TypeHintStripper, WhitespaceNormalizer
+from pycodehash.python_function import (
+    DocstringStripper,
+    FunctionStripper,
+    RuffProcessor,
+    TypeHintStripper,
+    WhitespaceNormalizer,
+)
 from pycodehash.python_function.unparse import _unparse
 
 
@@ -196,3 +202,9 @@ def test_function_name_stripper():
     processed = _unparse(FunctionStripper().visit(ast.parse(f_str)))
     f_str_ref = "def _(x, y):\n    y = y or 10\n    z = 2 * x\n    return z + y"
     assert _compatible(processed) == _compatible(f_str_ref)
+
+
+def test_ruff_processor():
+    src = "import logging\n\ndef hello():\n    a = 1\n    print('123')\n"
+    result = RuffProcessor().transform(src)
+    assert result == 'def hello():\n    print("123")'

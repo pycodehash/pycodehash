@@ -11,7 +11,7 @@ Often, there are parts of the pipeline that have not changed.
 Recomputing these nodes is wasteful, especially for larger datasets.
 PyCodeHash is a generic data and code hashing library that facilitates downstream caching.
 
-🚩 Output of `hash_func` for **both functions is identical**: `316c8b82698ff62aa5e115e73efbd5ded6a7a7a27358a29bd0c289cd3d61f8c5`! 🚩
+🚩 Output of `hash_func` for **both functions below is identical**: `38d6e9f262ab77f6536e14c74be687ce2cb44cdebb7045e5b2f51946215cf4d0`! 🚩
 
 Read more on the [documentation site](https://pycodehash.github.io/pycodehash/).
 
@@ -36,7 +36,7 @@ def func(data, key_col, value_col, **kwargs):
     return dict(zip(data[key_col], data[value_col]))
 ```
 
-_[Sample 1](./examples/equivalance/sample1.py): An implementation of a function that creates a mapping from two columns in a pandas DataFrame._
+_[Sample 1](./examples/equivalance/sample1.py): An implementation of a function that creates a mapping from two columns in a pandas DataFrame. Hash: `38d6e9f262ab77f6536e14c74be687ce2cb44cdebb7045e5b2f51946215cf4d0`_
 
 ```python
 from __future__ import annotations
@@ -84,7 +84,7 @@ def create_df_mapping(data: pd.DataFrame, key_col: str, value_col: str, **kwargs
         }
 ```
 
-_[Sample 2](./examples/equivalance/sample2.py): An alternative implementation of the snippet above._
+_[Sample 2](./examples/equivalance/sample2.py): An alternative implementation of the snippet above. Hash: `38d6e9f262ab77f6536e14c74be687ce2cb44cdebb7045e5b2f51946215cf4d0`_
 
 ## Detecting changes in data pipelines
 
