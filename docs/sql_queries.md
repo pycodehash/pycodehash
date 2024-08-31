@@ -51,7 +51,7 @@ The `SQLHasher` allows for passing on configuration to [SQLFluff] via [configura
 The [SQL Usage Example](https://github.com/pycodehash/pycodehash/blob/main/example_sql.py) demonstrates how to hash SQL queries and files:
 
 ```python
-{% include 'example_sql.py' %}
+{% include 'examples/example_sql.py' %}
 ```
 
 ### Hashing files in git history
@@ -59,7 +59,7 @@ The [SQL Usage Example](https://github.com/pycodehash/pycodehash/blob/main/examp
 Below is a more advanced example for checking if there was a behavioural change in a [SQL file in a specific git commit](https://github.com/pycodehash/pycodehash/blob/main/example_sql_git.py):
 
 ```python
-{% include 'example_sql_git.py' %}
+{% include 'examples/example_sql_git.py' %}
 ```
 
 ## SQL query dependencies
