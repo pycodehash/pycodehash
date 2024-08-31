@@ -21,17 +21,28 @@ On the other hand, `pycodehash` intentionally ignores non-functional
 modifications that do not affect the actual behavior of your code. These
 include:
 
-* _Function Name_: Renaming functions or variables does not change their
-functionality.
-* _Formatting_: Code formatting changes, such as indentation or line
-wrapping, are disregarded.
-* _Comments and Docstrings_: Comments and documentation strings may be
-updated without affecting the code's execution.
+* _Function Name_: Renaming functions or variables does not change their functionality.
+* _Formatting_: Code formatting changes, such as indentation or line wrapping, trailing commas, are disregarded.
+* _Comments and Docstrings_: Comments and documentation strings may be updated without affecting the code's execution.
 * _Type Hints_: Changes to type hints do not impact the code's behavior.
+* _Dead code elimination_: [Unused imports](https://pylint.pycqa.org/en/latest/user_guide/messages/warning/unused-import.html), [unused variables](https://pylint.readthedocs.io/en/stable/user_guide/messages/warning/unused-variable.html), unused arguments in formatting, [duplicate dictionary keys](https://pylint.pycqa.org/en/latest/user_guide/messages/warning/duplicate-key.html)
+* _Newer Python Syntax_: super calls, set literals, etc. See [pyupgrade](https://github.com/asottile/pyupgrade) for details.
+* _Miscellaneous code style idiom and conventions_: [simplified comprehensions](https://github.com/adamchainz/flake8-comprehensions), [dictionary key membership checks](https://github.com/MartinThoma/flake8-simplify/issues/40), [import ordering](https://github.com/PyCQA/isort), [unnecessary return syntax](https://pypi.org/project/flake8-return/)  
 
 By focusing on functional changes while ignoring non-functional
 modifications, `pycodehash` provides a reliable way to detect true changes
 in your code.
+
+See the two equivalent code snippets in the [Equivalence example](examples/equivalance/) for examples of the non-functional changes listed below.
+
+## Code change detection guarantees
+
+For code change detection: False positive matches are possible, but false negatives are not*.
+In other words, if the hash of two functions is equal, it's guaranteed there is no functional change.
+If the hashes are not equal, then it's likely, but not guaranteed that there is no functional change.
+These guarantees are analogous to that of the [bloom filter] probabilistic data structure.
+
+* Except for hash collisions that are caused by the choice of hashing algorithm, by default SHA512.
 
 ## Simplifying Hash Computation with Pure Functions
 
@@ -53,24 +64,31 @@ and have predictable behavior.
 
 Given a Python function as source code we:
 
-1. Create an Abstract Syntax Tree (AST)
-2. **Replace the name of called functions with the hash of the function definition**
-3. Remove invariant changes
+1. Initialize or load the function's package source
+2. Create an Abstract Syntax Tree (AST) for the provided function
+3. **Replace the name of called functions with the hash of the function definition**
+4. Remove invariant changes
     * AST: Strip docstrings and type hints, and remove the function name
     * Unparse the AST to a string presentation
     * Lines: Normalize whitespace
-4. Unparse the AST and normalise
-5. Hash
+5. Unparse the AST and normalise
+6. Hash
 
-### 1. Abstract Syntax Tree
+### 1. Package initialization
+
+PyCodeHash initializes a package when it's first encountered, e.g., in `from my_package.functions import func`, `my_package` would be the package.
+The initialization phase consists of:
+
+* Copying the source to a temporary directory (enabled by default)
+* Indexing the source via static object analysis on all python files (via `rope`)
+* Brining the source in a canonical form where possible via auto-fixing lint violations (via `ruff`)
+
+### 2. Abstract Syntax Tree
 
 The AST is parsed using Pythons [standard library](https://docs.python.org/3/library/ast.html).
 This step removed comments and normalises formatting.
 
-The current implementation in addition uses the `asttokens` package to map AST nodes to their offset in the Python source code.
-This is required to interact with [rope] (see below)
-
-### 2. Find call definitions
+### 3. Find call definitions
 
 The inspiration for solving the dependency invariance comes from compilers/interpreters:
 
@@ -103,36 +121,32 @@ In our implementation, the function call is replaced with the hash of the source
 
 ```text
 def shift_left(x):
-    return 9e8c617fe2e0d524469d75f43edb1ff91f9a5387af6c444017ddcd194c983aed(x, 2) 
+    return c_9e8c617fe2e0d524469d75f43edb1ff91f9a5387af6c444017ddcd194c983aed(x, 2) 
 ```
 
-Note that technically speaking, the code snippet is no longer valid Python
+Note that the hash is prefixed with an `c_` (for call) to ensure syntactical validity.
+Hashes can start with digits, which makes the code snippet is no longer valid Python
 syntax due to the function name constraint: identifiers (such as function
 names) cannot start with digits. According to the [Python reference
 documentation](https://docs.python.org/3/reference/lexical_analysis.html#identifiers), this is a fundamental rule for Python's lexical analysis.
-
-However, since we are only concerned with generating hashes and not
-executing the code, the syntactical validity of the inlined code is
-irrelevant. Even if the function name were to start with a digit,
-prefixing the hash value would ensure that the resulting string is a valid
-Python identifier, effectively guaranteeing its syntactical validity.
+Syntactical validity is required to be able to use tools that transform the code afterward.
 
 The implementation builds on [rope], an advanced open-source Python refactoring library.
 This package performs a lot of heavy lifting.
 See the section "The Challenge of Finding Call Definitions in Python" for details.
 
-### 3. Strip invariant changes
+### 4. Strip invariant AST changes
 
 In this step, PyCodeHash transforms the AST to remove invariant syntax.
 For this we implemented multiple `NodeTransformers` that can be found in `src/pycodehash/preprocessing/`.
 
-### 4. Unparse AST and normalise
+### 5. Unparse AST and normalise
 
 Then we unparse the AST representation to obtain the Python source code (without comments and formatting).
 
 On this string, we apply whitespace normalisation to ensure platform-independent hashes.
 
-### 5. Hashing
+### 6. Hashing
 
 Finally, the resulting source code is hashed using `hash_string`.
 The function uses the SHA256 algorithm provided by the [standard library](https://docs.python.org/3/library/hashlib.html).
@@ -290,9 +304,21 @@ In modern software engineering practices, lints like [mr-proper] can aid
 in identifying and enforcing the purity of functions, making it a more
 maintainable and efficient development process.
 
+## Implementation Considerations
+
+To maximize development efficiency and minimize long-term maintenance burdens, this library uses established third-party libraries rather than implementing similar functionality from scratch.
+Hence, PyCodeHash is built on top of `rope` (for call tracing) and `ruff` (for applying a multitude of invariant changes).
+The current implementation in addition uses the `asttokens` package to map AST nodes to their offset in the Python source code, which is required to interact with [rope].
+This results in an effective library that can be used today.
+
+This approach does come with some trade-offs, however.
+By relying on external libraries, we sacrifice access to internal state from these programs, such as the control-flow graph that may be useful for more highly optimized or specialized functionality.
+Users who already have access to their own control-flow graphs may find it more beneficial to implement equivalent functionality directly within their own systems.
+
 [pure functions]: https://en.wikipedia.org/wiki/Pure_function
 [mr-proper]: https://github.com/best-doctor/mr_proper
 [rope]: https://github.com/python-rope/rope
 [LEGB Rule for Python Scope]: https://realpython.com/python-scope-legb-rule/#using-the-legb-rule-for-python-scope
 [hashlib]: https://docs.python.org/3/library/hashlib.html
 [cryptography]: https://cryptography.io/en/latest/
+[bloom filter]: https://en.wikipedia.org/wiki/Bloom_filter
