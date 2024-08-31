@@ -11,7 +11,80 @@ Often, there are parts of the pipeline that have not changed.
 Recomputing these nodes is wasteful, especially for larger datasets.
 PyCodeHash is a generic data and code hashing library that facilitates downstream caching.
 
+🚩 Output of `hash_func` for **both functions is identical**: `316c8b82698ff62aa5e115e73efbd5ded6a7a7a27358a29bd0c289cd3d61f8c5`! 🚩
+
 Read more on the [documentation site](https://pycodehash.github.io/pycodehash/).
+
+```python
+def func(data, key_col, value_col, **kwargs):
+    if not isinstance(key_col, str) or not isinstance(value_col, str):
+        raise TypeError(
+            f"Column names must be strings, got {key_col}:{type(key_col)} and {value_col}:{type(value_col)}"
+        )
+
+    reserved_col = "index"
+    if reserved_col in (key_col, value_col):
+        raise ValueError(f"Reserved keyword: `{reserved_col}`")
+
+    data = data[~data.isnull().any(axis=1)].copy()
+    data[key_col] = data[key_col].astype(int)
+
+    column_names = [key_col, value_col]
+    for column_name in column_names:
+        print(f"Unique values in {column_name}", list(data[column_name].unique()))
+
+    return dict(zip(data[key_col], data[value_col]))
+```
+
+_[Sample 1](./examples/equivalance/sample1.py): An implementation of a function that creates a mapping from two columns in a pandas DataFrame._
+
+```python
+from __future__ import annotations
+
+import logging  # on purpose unused import
+
+import pandas as pd
+
+
+def create_df_mapping(data: pd.DataFrame, key_col: str, value_col: str, **kwargs) -> dict[int, str]:
+    """Example function to demonstrate PyCodeHash.
+    This function takes a pandas DataFrame and two column names, and turns them into a dictionary.
+
+    Args:
+        data: DataFrame containing the data
+        key_col: column
+    """
+    legacy_variable = None
+    if not isinstance(key_col, str) or not isinstance(value_col, str):
+        raise TypeError(
+            "Column names must be strings, got {key_col}:{key_type} and {value_col}:{value_type}".format(
+                key_col=key_col,
+                key_type=type(key_col),
+                value_col=value_col,
+                value_type=type(value_col),
+            )
+        )
+    else:
+        reserved_col = str("index")
+        if key_col == reserved_col:
+            raise ValueError("Reserved keyword: `{}`".format(reserved_col))
+        elif value_col == reserved_col:
+            raise ValueError("Reserved keyword: `{}`".format(reserved_col))
+
+        data = data[~data.isnull().any(axis=1)].copy()
+        data[key_col] = data[key_col].astype(int)
+
+        column_names = [key_col, value_col]
+        for index, column_name in enumerate(column_names):
+            print(f"Unique values in {column_names[index]}", list(data[column_names[index]].unique()))
+
+        return {
+            key: value
+            for key, value in zip(data[key_col], data[value_col])
+        }
+```
+
+_[Sample 2](./examples/equivalance/sample2.py): An alternative implementation of the snippet above._
 
 ## Detecting changes in data pipelines
 
