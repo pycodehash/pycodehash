@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import inspect
+import shutil
 from collections import defaultdict
 from dataclasses import dataclass
 from importlib.util import find_spec
@@ -16,6 +17,8 @@ if TYPE_CHECKING:
 
     from rope.base.pyobjectsdef import PyModule
     from rope.contrib.findit import Location
+
+    from pycodehash.python_function import ProjectSourceProcessor
 
 
 def _item_to_key(item: Location):
@@ -101,14 +104,22 @@ class ProjectStore:
     Note that analyzing a large package can be fairly slow.
     """
 
-    def __init__(self):
+    def __init__(self, tempdir: Path | None = None, source_processors: list[ProjectSourceProcessor] | None = None):
         """Initialise the class.
 
         Args:
-            whitelist: set of packages that are allowed to be analyzed.
-                By default, all packages are allowed.
+            tempdir: path to the tempdir, or None if modified inplace
+            source_processors: transformations to apply to the entire project source
         """
         self.store: dict[str, Project] = {}
+        self.tempdir = tempdir
+        self.source_processors = source_processors or []
+        if tempdir is None and source_processors is not None:
+            msg = (
+                "It's not supported to modify projects in-place. Either enable `use_tempdir` or remove "
+                "the source_preprocessors."
+            )
+            raise ValueError(msg)
 
     def __getitem__(self, item: str) -> Project:
         """Get rope project from package name.
@@ -132,7 +143,11 @@ class ProjectStore:
 
         """
         if pkg == "__main__":
-            msg = "Cannot resolve `__main__` yet"
+            msg = (
+                "Cannot resolve `__main__` yet. Import from a module for now. "
+                "Please open an issue if you would be willing to contribute this feature: "
+                "https://github.com/pycodehash/pycodehash/issues"
+            )
             raise ValueError(msg)
 
         spec = find_spec(pkg)
@@ -140,8 +155,19 @@ class ProjectStore:
             msg = f"Could not import package {pkg}."
             raise ImportError(msg)
 
-        project_root = Path.cwd() if spec.submodule_search_locations is None else spec.submodule_search_locations[0]
-        project = Project(projectroot=project_root)
+        project_root = (
+            Path.cwd() if spec.submodule_search_locations is None else Path(spec.submodule_search_locations[0])
+        )
+        if self.tempdir is not None:
+            new_project_root = self.tempdir / project_root.name
+            # note: this may copy unintended files such as the `venv` folder
+            shutil.copytree(project_root, str(new_project_root), dirs_exist_ok=True, symlinks=True)
+            project_root = new_project_root.absolute()
+
+            for source_processor in self.source_processors:
+                source_processor.transform(project_root)
+
+        project = Project(projectroot=project_root, python_path=[str(self.tempdir)])
         analyze_modules(project)
         self.store[pkg] = project
 

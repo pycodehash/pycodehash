@@ -2,14 +2,19 @@
 
 from __future__ import annotations
 
+import tempfile
+from pathlib import Path
 from types import BuiltinFunctionType, FunctionType
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from pycodehash.hashing import hash_string
 from pycodehash.python_function import (
     DocstringStripper,
     FunctionStripper,
-    LinesTransformer,
+    ProjectSourceProcessor,
+    RuffProcessor,
+    RuffProjectProcessor,
+    SourceProcessor,
     TypeHintStripper,
     WhitespaceNormalizer,
 )
@@ -39,22 +44,30 @@ class FunctionHasher:
         module_store: container that caches the AST representations of the modules
         project_store: container that caches analyzed packages
         ast_transformers: NodeTransformer for the `ast` module to be applied to function's AST representation
-        lines_transformers: set of functions to be applied to the textual representation
+        source_preprocessors: list of transformations to be applied to the source representation before
+            the AST processors
+        source_postprocessors: list of transformations to be applied to the source representation after
+            the AST processors
         func_ir_store: container that store the intermediate representations of functions
     """
 
     func_store: FunctionStore
     module_store: ModuleStore
     project_store: ProjectStore
+    source_preprocessors: list[ProjectSourceProcessor]
     ast_transformers: list[NodeTransformer]
-    lines_transformers: list[LinesTransformer]
+    source_postprocessors: list[SourceProcessor]
     func_ir_store: FunctionStore
+    use_tempdir: bool
+    _data_path: Path | None
 
     def __init__(
         self,
         packages: list[str] | None = None,
-        ast_transformers: list | None = None,
-        lines_transformers: list | None = None,
+        source_preprocessors: list[ProjectSourceProcessor] | None = None,
+        ast_transformers: list[NodeTransformer] | None = None,
+        source_postprocessors: list[SourceProcessor] | None = None,
+        use_tempdir: bool = True,
     ):
         """Initialise the class.
 
@@ -65,18 +78,30 @@ class FunctionHasher:
             ast_transformers: set of transformers to be applied to function's AST representation.
                 They are ran before the `lines_transformers` and should inherit from `ast.NodeTransformer`
                 By default these are: `DocstringStripper`, `FunctionStore`, `TypeHintStripper`
-            lines_transformers: list of functions that transform the textual representation.
-                By default this is: `WhitespaceNormalizer`
+            source_preprocessors: list of transformations to be applied to the source representation after
+                the AST processors. By default this is: `[RuffPathProcessor()]`
+            source_postprocessors: list of transformations to be applied to the source representation after
+                the AST processors. By default this is: `[WhitespaceNormalizer()]`
+            use_tempdir: if True, copies project files to a temporary directory before processing (default: True)
 
         """
+        if use_tempdir:
+            temp_dir = tempfile.TemporaryDirectory()
+            self._temp_dir = temp_dir
+            self._data_path = Path(temp_dir.name)
+        else:
+            self._data_path = None
+
         self.func_store = FunctionStore()
         self.module_store = ModuleStore()
-        self.project_store = ProjectStore()
+        self.source_preprocessors = source_preprocessors or [RuffProjectProcessor()]
+
+        self.project_store = ProjectStore(self._data_path, self.source_preprocessors)
         if packages is not None:
             for pkg in packages:
                 self.project_store.add_project(pkg)
         self.ast_transformers = ast_transformers or [FunctionStripper(), DocstringStripper(), TypeHintStripper()]
-        self.lines_transformers = lines_transformers or [WhitespaceNormalizer()]
+        self.source_postprocessors = source_postprocessors or [RuffProcessor(), WhitespaceNormalizer()]
         # Function store is re-used to store the intermediate representation (IR)
         # of the function that is hashed. Not strictly needed but does make debugging
         # or evaluation a lot easier.
@@ -110,9 +135,9 @@ class FunctionHasher:
 
         prc_src = _unparse(src_node)
 
-        # preprocessing of the lines
-        for line_transformer in self.lines_transformers:
-            prc_src = line_transformer.transform(prc_src)
+        # postprocessing of the lines
+        for source_postprocessor in self.source_postprocessors:
+            prc_src = source_postprocessor.transform(prc_src)
 
         function_hash = hash_string(prc_src)
         self.func_ir_store[location] = prc_src
@@ -181,3 +206,10 @@ class FunctionHasher:
         """
         location, _ = self._get_location_and_project(func)
         return location
+
+    def __enter__(self):
+        pass
+
+    def __exit__(self, _: Any, __: Any, ___: Any) -> None:
+        if self._data_path is not None:
+            self._temp_dir.cleanup()

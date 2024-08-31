@@ -48,7 +48,9 @@ class HashCallNameTransformer(NodeTransformer):
                 if isinstance(node.func, ast.Attribute) and not contains_call(node.func):
                     # here we assume that we are looking at chained attributes
                     node = ast.Call(
-                        func=ast.Name(id=self.hash_repr, ctx=node.func.ctx), args=node.args, keywords=node.keywords
+                        func=ast.Name(id=f"c_{self.hash_repr}", ctx=node.func.ctx),
+                        args=node.args,
+                        keywords=node.keywords,
                     )
                     self.hash_repr = None
                     # we don't need to traverse down this node as we just created it and know what it contains...
@@ -63,6 +65,6 @@ class HashCallNameTransformer(NodeTransformer):
     def visit_Name(self, node: ast.Name):
         """Replace the name of a call with the source hash"""
         if self.hash_repr is not None:
-            node.id = self.hash_repr
+            node.id = f"c_{self.hash_repr}"
             self.hash_repr = None
         return node
