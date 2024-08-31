@@ -22,5 +22,9 @@ class DocstringStripper(NodeTransformer):
             and isinstance(node.value, ast.Constant)
             and isinstance(node.value.value, str)
         ):
+            # If the docstring is the only node, then we need to return a placeholder in order to
+            # remain valid syntax
+            if len(self.parent.body) == 1 and self.parent.body[0] == node:
+                return ast.Pass()
             return None
         return node

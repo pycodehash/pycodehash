@@ -112,6 +112,14 @@ def test_nodoc_with_str_assign():
     assert _to_stripped_str(processed) != _REFERENCE_FUNC
 
 
+def test_docstr_empty():
+    """Test that functions with only a docstring remain valid syntax by adding the
+    `pass` placeholder."""
+    f_str = "def _():\n" '    """This is a docstring"""\n'
+    processed = DocstringStripper().visit(ast.parse(f_str))
+    assert _to_stripped_str(processed) == _compatible("def_():pass")
+
+
 def test_smoke_typehints():
     """Test nothing happens when nothing has to happen."""
     processed = TypeHintStripper().visit(ast.parse(_RAW_REFERENCE_FUNC))
