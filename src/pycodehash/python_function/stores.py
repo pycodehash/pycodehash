@@ -143,6 +143,7 @@ class ProjectStore:
 
         """
         if pkg == "__main__":
+            # See "Known issues" in CONTRIBUTING.md
             msg = (
                 "Cannot resolve `__main__` yet. Import from a module for now. "
                 "Please open an issue if you would be willing to contribute this feature: "
