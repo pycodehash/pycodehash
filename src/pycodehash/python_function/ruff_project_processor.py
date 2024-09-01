@@ -18,7 +18,18 @@ def _ruff_check(path: str, select: list[str], unsafe: bool, preview: bool) -> No
         unsafe: if True, also apply autofixes marked as "unsafe"
         preview: if True, also apply autofixes marked as "preview"
     """
-    cmd = ["ruff", "check", "--isolated", "--select", ",".join(select), "--fix-only", "--quiet"]
+    cmd = [
+        "ruff",
+        "check",
+        "--isolated",
+        "--no-cache",
+        "--select",
+        ",".join(select),
+        "--ignore",
+        "PLR0402",  # See "Known issues" in CONTRIBUTING.md
+        "--fix-only",
+        "--quiet",
+    ]
     if unsafe:
         cmd.append("--unsafe-fixes")
     if preview:
@@ -37,7 +48,7 @@ def _ruff_fmt(path: str) -> None:
     Args:
         path: path to pass to ruff format
     """
-    cmd = ["ruff", "format", "--isolated", "--quiet", path]
+    cmd = ["ruff", "format", "--isolated", "--no-cache", "--quiet", path]
 
     result = subprocess.run(cmd, check=False)
     if result.returncode != 0:
