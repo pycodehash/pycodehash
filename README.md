@@ -36,7 +36,7 @@ def func(data, key_col, value_col, **kwargs):
     return dict(zip(data[key_col], data[value_col]))
 ```
 
-_[Sample 1](./examples/equivalance/sample1.py): An implementation of a function that creates a mapping from two columns in a pandas DataFrame. Hash: `38d6e9f262ab77f6536e14c74be687ce2cb44cdebb7045e5b2f51946215cf4d0`_
+_[Sample 1](https://github.com/pycodehash/pycodehash/blob/main/examples/equivalance/sample1.py): An implementation of a function that creates a mapping from two columns in a pandas DataFrame. Hash: `38d6e9f262ab77f6536e14c74be687ce2cb44cdebb7045e5b2f51946215cf4d0`_
 
 ```python
 from __future__ import annotations
@@ -84,7 +84,7 @@ def create_df_mapping(data: pd.DataFrame, key_col: str, value_col: str, **kwargs
         }
 ```
 
-_[Sample 2](./examples/equivalance/sample2.py): An alternative implementation of the snippet above. Hash: `38d6e9f262ab77f6536e14c74be687ce2cb44cdebb7045e5b2f51946215cf4d0`_
+_[Sample 2](https://github.com/pycodehash/pycodehash/blob/main/examples/equivalance/sample2.py): An alternative implementation of the snippet above. Hash: `38d6e9f262ab77f6536e14c74be687ce2cb44cdebb7045e5b2f51946215cf4d0`_
 
 ## Detecting changes in data pipelines
 
@@ -129,7 +129,7 @@ h3 = fh.hash_func(combine_random_samples)
 print("Hash for `combine_random_samples`", h3)
 ```
 
-_[Python Usage Example](https://github.com/pycodehash/pycodehash/blob/main/example.py)_
+_[Python Usage Example](https://github.com/pycodehash/pycodehash/blob/main/examples/example.py)_
 
 ### SQL
 
@@ -160,7 +160,7 @@ print(hasher.hash_query(query_1))
 print(hasher.hash_file(query_2_file))
 ```
 
-_[SQL Usage Example](https://github.com/pycodehash/pycodehash/blob/main/example_sql.py)_
+_[SQL Usage Example](https://github.com/pycodehash/pycodehash/blob/main/examples/example_sql.py)_
 
 ### Datasets
 
@@ -189,7 +189,7 @@ print(len(dh.collect_partitions(Path(__file__).parent / "src")))
 # 29
 ```
 
-_[Dataset Usage Example](https://github.com/pycodehash/pycodehash/blob/main/example_data.py)_
+_[Dataset Usage Example](https://github.com/pycodehash/pycodehash/blob/main/examples/example_data.py)_
 
 ### Python Package Dependencies
 
@@ -211,7 +211,7 @@ print(hasher.compute_hash(dependencies=["pycodehash", "rope"], add_python_versio
 # cecb8036ad61235c2577db9943f519b824f7a25e449da9cd332bc600fb5dccf0
 ```
 
-_[Dependency Usage Example](https://github.com/pycodehash/pycodehash/blob/main/example_dependency.py)_
+_[Dependency Usage Example](https://github.com/pycodehash/pycodehash/blob/main/examples/example_dependency.py)_
 
 ## License
 
