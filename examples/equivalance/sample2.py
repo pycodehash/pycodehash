@@ -32,6 +32,6 @@ def create_df_mapping(data: pd.DataFrame, key_col: str, value_col: str, **kwargs
 
         column_names = [key_col, value_col]
         for index, column_name in enumerate(column_names):
-            print(f"Unique values in {column_names[index]}", list(data[column_name].unique()))
+            print(f"Unique values in {column_names[index]}", list(data[column_names[index]].unique()))
 
         return {key: value for key, value in zip(data[key_col], data[value_col])}
