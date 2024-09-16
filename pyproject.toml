@@ -23,7 +23,7 @@ dependencies = [
     'typing_extensions; python_version <= "3.11"',
     'asttokens',
     'rope',
-    'ruff==0.6.4'
+    'ruff==0.6.5'
 ]
 
 [project.optional-dependencies]
