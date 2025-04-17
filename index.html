@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="description" content="PyCodeHash is a generic data and code hashing library that facilitates downstream caching." /><link rel="canonical" href="https://pycodehash.github.io/pycodehash/" />
+      <link rel="shortcut icon" href="img/favicon.ico" />
+    <title>PyCodeHash Documentation</title>
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Introduction";
+        var mkdocs_page_input_path = "index.md";
+        var mkdocs_page_url = "/pycodehash/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="." class="icon icon-home"> PyCodeHash Documentation
+        </a>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Introduction</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#detecting-changes-in-data-pipelines">Detecting changes in data pipelines</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#python">Python</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#sql">SQL</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#datasets">Datasets</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#python-package-dependencies">Python Package Dependencies</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#license">License</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Detecting changes</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="python_functions/">Python Functions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="sql_queries/">SQL Queries</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="datasets/">Datasets</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="dependencies/">Python Dependencies</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href=".">PyCodeHash Documentation</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Introduction</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="pycodehash">PyCodeHash</h1>
+<p><a href="https://github.com/pycodehash/pycodehash/actions"><img alt="Build" src="https://github.com/pycodehash/pycodehash/actions/workflows/build.yml/badge.svg?branch=main" /></a>
+<a href="https://github.com/pycodehash/pycodehash/releases"><img alt="Latest Github release" src="https://img.shields.io/github/v/release/pycodehash/pycodehash" /></a>
+<a href="https://github.com/pycodehash/pycodehash/releases"><img alt="GitHub release date" src="https://img.shields.io/github/release-date/pycodehash/pycodehash" /></a>
+<a href="https://github.com/astral-sh/ruff"><img alt="Ruff" src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/charliermarsh/ruff/main/assets/badge/v1.json" /></a>
+<a href="https://pepy.tech/project/pycodehash"><img alt="Downloads" src="https://static.pepy.tech/badge/pycodehash" /></a></p>
+<p>Data pipelines are of paramount importance in data science, engineering and analysis.
+Often, there are parts of the pipeline that have not changed.
+Recomputing these nodes is wasteful, especially for larger datasets.
+PyCodeHash is a generic data and code hashing library that facilitates downstream caching.</p>
+<p>🚩 Output of <code>hash_func</code> for <strong>both functions below is identical</strong>: <code>38d6e9f262ab77f6536e14c74be687ce2cb44cdebb7045e5b2f51946215cf4d0</code>! 🚩</p>
+<p>Read more on the <a href="https://pycodehash.github.io/pycodehash/">documentation site</a>.</p>
+<pre><code class="language-python">def func(data, key_col, value_col, **kwargs):
+    if not isinstance(key_col, str) or not isinstance(value_col, str):
+        raise TypeError(
+            f&quot;Column names must be strings, got {key_col}:{type(key_col)} and {value_col}:{type(value_col)}&quot;
+        )
+
+    reserved_col = &quot;index&quot;
+    if reserved_col in (key_col, value_col):
+        raise ValueError(f&quot;Reserved keyword: `{reserved_col}`&quot;)
+
+    data = data[~data.isnull().any(axis=1)].copy()
+    data[key_col] = data[key_col].astype(int)
+
+    column_names = [key_col, value_col]
+    for column_name in column_names:
+        print(f&quot;Unique values in {column_name}&quot;, list(data[column_name].unique()))
+
+    return dict(zip(data[key_col], data[value_col]))
+</code></pre>
+<p><em><a href="https://github.com/pycodehash/pycodehash/blob/main/examples/equivalance/sample1.py">Sample 1</a>: An implementation of a function that creates a mapping from two columns in a pandas DataFrame. Hash: <code>38d6e9f262ab77f6536e14c74be687ce2cb44cdebb7045e5b2f51946215cf4d0</code></em></p>
+<pre><code class="language-python">from __future__ import annotations
+
+import logging  # on purpose unused import
+
+import pandas as pd
+
+
+def create_df_mapping(data: pd.DataFrame, key_col: str, value_col: str, **kwargs) -&gt; dict[int, str]:
+    &quot;&quot;&quot;Example function to demonstrate PyCodeHash.
+    This function takes a pandas DataFrame and two column names, and turns them into a dictionary.
+
+    Args:
+        data: DataFrame containing the data
+        key_col: column
+    &quot;&quot;&quot;
+    legacy_variable = None
+    if not isinstance(key_col, str) or not isinstance(value_col, str):
+        raise TypeError(
+            &quot;Column names must be strings, got {key_col}:{key_type} and {value_col}:{value_type}&quot;.format(
+                key_col=key_col,
+                key_type=type(key_col),
+                value_col=value_col,
+                value_type=type(value_col),
+            )
+        )
+    else:
+        reserved_col = str(&quot;index&quot;)
+        if key_col == reserved_col:
+            raise ValueError(&quot;Reserved keyword: `{}`&quot;.format(reserved_col))
+        elif value_col == reserved_col:
+            raise ValueError(&quot;Reserved keyword: `{}`&quot;.format(reserved_col))
+
+        data = data[~data.isnull().any(axis=1)].copy()
+        data[key_col] = data[key_col].astype(int)
+
+        column_names = [key_col, value_col]
+        for index, column_name in enumerate(column_names):
+            print(f&quot;Unique values in {column_names[index]}&quot;, list(data[column_names[index]].unique()))
+
+        return {
+            key: value
+            for key, value in zip(data[key_col], data[value_col])
+        }
+</code></pre>
+<p><em><a href="https://github.com/pycodehash/pycodehash/blob/main/examples/equivalance/sample2.py">Sample 2</a>: An alternative implementation of the snippet above. Hash: <code>38d6e9f262ab77f6536e14c74be687ce2cb44cdebb7045e5b2f51946215cf4d0</code></em></p>
+<h2 id="detecting-changes-in-data-pipelines">Detecting changes in data pipelines</h2>
+<p>The canonical way to check if two things are equal is to compare their hashes.
+Learn more on how PyCodeHash detects changes in:</p>
+<ul>
+<li><a href="https://pycodehash.github.io/pycodehash/python_functions/">Python Functions</a></li>
+<li><a href="https://pycodehash.github.io/pycodehash/sql_queries/">SQL Queries</a></li>
+<li><a href="https://pycodehash.github.io/pycodehash/datasets/">Datasets</a>: Files, Directories, S3, Hive</li>
+<li><a href="https://pycodehash.github.io/pycodehash/dependencies/">Python dependencies</a></li>
+</ul>
+<h2 id="installation">Installation</h2>
+<p>PyCodeHash is available from <a href="https://pypi.org/project/pycodehash/">PyPI</a>:</p>
+<pre><code class="language-shell">pip install pycodehash
+</code></pre>
+<h2 id="examples">Examples</h2>
+<h3 id="python">Python</h3>
+<p>Use the FunctionHasher to obtain the hash of a Python function object:</p>
+<pre><code class="language-python">from pycodehash import FunctionHasher
+from tliba import compute_moments
+from tliba.etl import add_bernoulli_samples, combine_random_samples
+
+fh = FunctionHasher()
+# Hash the function `add_bernoulli_samples`
+h1 = fh.hash_func(add_bernoulli_samples)
+print(&quot;Hash for `add_bernoulli_samples`&quot;, h1)
+
+# Hash the function `compute_moments`
+h2 = fh.hash_func(compute_moments)
+print(&quot;Hash for `compute_moments`&quot;, h2)
+
+# Hash the function `combine_random_samples`
+h3 = fh.hash_func(combine_random_samples)
+print(&quot;Hash for `combine_random_samples`&quot;, h3)
+</code></pre>
+<p><em><a href="https://github.com/pycodehash/pycodehash/blob/main/examples/example.py">Python Usage Example</a></em></p>
+<h3 id="sql">SQL</h3>
+<p>Hash SQL queries and files using the <code>SQLHasher</code> (requires <code>pip install pycodehash[sql]</code>):</p>
+<pre><code class="language-python">from pathlib import Path
+
+from pycodehash.sql.sql_hasher import SQLHasher
+
+# First query
+query_1 = &quot;SELECT * FROM db.templates&quot;
+
+# The second query is equivalent, but has additional whitespace
+query_2 = &quot;SELECT\n    * \nFROM \n    db.templates&quot;
+
+# Write the second query to a file
+query_2_file = Path(&quot;/tmp/query.sql&quot;)
+query_2_file.write_text(query_2)
+
+# Create the SQLHasher object for SparkSQL
+hasher = SQLHasher(dialect=&quot;sparksql&quot;)
+
+# We can hash a string
+print(hasher.hash_query(query_1))
+
+# Or pass a path
+print(hasher.hash_file(query_2_file))
+</code></pre>
+<p><em><a href="https://github.com/pycodehash/pycodehash/blob/main/examples/example_sql.py">SQL Usage Example</a></em></p>
+<h3 id="datasets">Datasets</h3>
+<p>Hash data, such as files, directories, database tables:</p>
+<pre><code class="language-python">from pathlib import Path
+
+from pycodehash.datasets import LocalFileHash, LocalDirectoryHash
+
+
+# Hash a single file
+fh = LocalFileHash()
+
+print(fh.collect_metadata(&quot;example.py&quot;))
+# {'last_modified': datetime.datetime(2023, 11, 24, 23, 38, 17, 524024), 'size': 543}
+
+print(fh.compute_hash(&quot;example.py&quot;))
+# 6189721d3ecdf86503a82c07eed82743069ebbf39e974f33ca684809e67e9e0e
+
+# Hash a directory
+dh = LocalDirectoryHash()
+
+# Recursively hash all files in a directory
+print(len(dh.collect_partitions(Path(__file__).parent / &quot;src&quot;)))
+# 29
+</code></pre>
+<p><em><a href="https://github.com/pycodehash/pycodehash/blob/main/examples/example_data.py">Dataset Usage Example</a></em></p>
+<h3 id="python-package-dependencies">Python Package Dependencies</h3>
+<p>Hash a user-provided list of Python packages your code depends on. This may be a selection of the total list of dependencies.
+For example the most important libraries your code depends on, that you want to track in order to trigger a rerun of your pipeline in case of version changes.
+The hasher retrieves the installed package versions and creates a hash of those. We emphasize it is up to the user to provide the list of relevant dependencies.</p>
+<pre><code class="language-python">from pycodehash.dependency import PythonDependencyHash
+
+# hash a list of dependencies
+hasher = PythonDependencyHash()
+
+print(hasher.collect_metadata(dependencies=[&quot;pycodehash&quot;, &quot;rope&quot;], add_python_version=True))
+# hasher retrieves the installed package versions found
+# {'pycodehash': '0.2.0', 'rope': '1.11.0', 'Python': '3.11'}
+
+print(hasher.compute_hash(dependencies=[&quot;pycodehash&quot;, &quot;rope&quot;], add_python_version=True))
+# cecb8036ad61235c2577db9943f519b824f7a25e449da9cd332bc600fb5dccf0
+</code></pre>
+<p><em><a href="https://github.com/pycodehash/pycodehash/blob/main/examples/example_dependency.py">Dependency Usage Example</a></em></p>
+<h2 id="license">License</h2>
+<p>PyCodeHash is completely free, open-source and licensed under the <a href="https://en.wikipedia.org/wiki/MIT_License">MIT license</a>.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="python_functions/" class="btn btn-neutral float-right" title="Python Functions">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+    
+      <span><a href="python_functions/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = ".";</script>
+    <script src="js/theme_extra.js"></script>
+    <script src="js/theme.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
+
+<!--
+MkDocs version : 1.6.1
+Build Date UTC : 2025-04-17 09:55:57.798778+00:00
+-->

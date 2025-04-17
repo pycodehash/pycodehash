@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+         <loc>https://pycodehash.github.io/pycodehash/</loc>
+         <lastmod>2025-04-17</lastmod>
+    </url>
+    <url>
+         <loc>https://pycodehash.github.io/pycodehash/datasets/</loc>
+         <lastmod>2025-04-17</lastmod>
+    </url>
+    <url>
+         <loc>https://pycodehash.github.io/pycodehash/dependencies/</loc>
+         <lastmod>2025-04-17</lastmod>
+    </url>
+    <url>
+         <loc>https://pycodehash.github.io/pycodehash/python_functions/</loc>
+         <lastmod>2025-04-17</lastmod>
+    </url>
+    <url>
+         <loc>https://pycodehash.github.io/pycodehash/sql_queries/</loc>
+         <lastmod>2025-04-17</lastmod>
+    </url>
+</urlset>

@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://pycodehash.github.io/pycodehash/datasets/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Datasets - PyCodeHash Documentation</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Datasets";
+        var mkdocs_page_input_path = "datasets.md";
+        var mkdocs_page_url = "/pycodehash/datasets/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> PyCodeHash Documentation
+        </a>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Introduction</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Detecting changes</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../python_functions/">Python Functions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../sql_queries/">SQL Queries</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Datasets</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#hashing-datasets">Hashing datasets</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#approximate-hashers">Approximate Hashers</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#supported-dataset-types">Supported Dataset types</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#incremental-loads">Incremental loads</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dependencies/">Python Dependencies</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">PyCodeHash Documentation</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Detecting changes</li>
+      <li class="breadcrumb-item active">Datasets</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="detecting-dataset-change">Detecting dataset change</h1>
+<p>A question that we may ask before running expensive computations on a dataset is: has my dataset changed since the last time it was processed?
+If the dataset and the computation have not changed, then the output will be the same and the computation can be skipped.</p>
+<p>Comparing a dataset with its previous version requires two copies of the data to be stored, which can be costly for larger datasets.
+Instead, we can store a <a href="https://en.wikipedia.org/wiki/Hash_function">hash</a> of the data to avoid this.</p>
+<h2 id="hashing-datasets">Hashing datasets</h2>
+<p>Computing the hash value for a dataset, such as a file, scales with the file size. Table 1 shows results on a mock datasets of various sizes:</p>
+<table>
+<thead>
+<tr>
+<th>Records</th>
+<th>File size</th>
+<th>Time</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>402B</td>
+<td>0.189ms</td>
+</tr>
+<tr>
+<td>10</td>
+<td>3KB</td>
+<td>0.292ms*</td>
+</tr>
+<tr>
+<td>100</td>
+<td>33KB</td>
+<td>0.194ms</td>
+</tr>
+<tr>
+<td>1.000</td>
+<td>329KB</td>
+<td>0.400ms</td>
+</tr>
+<tr>
+<td>10.000</td>
+<td>3.3MB</td>
+<td>3.173ms</td>
+</tr>
+<tr>
+<td>100.000</td>
+<td>32.8MB</td>
+<td>24.368ms</td>
+</tr>
+<tr>
+<td>1.000.000</td>
+<td>327.6MB</td>
+<td>0.223s</td>
+</tr>
+<tr>
+<td>10.000.000</td>
+<td>3.28GB</td>
+<td>2.223s</td>
+</tr>
+</tbody>
+</table>
+<p><em>Table 1: SHA256 hash of the mock data file. The hash is updated in blocks of 8K. The data is generated with <a href="https://faker.readthedocs.io/en/master/index.html">Faker</a>. The reported time is the mean of 5 trials of 10 repetitions. *Due to the choice for 8KB block reads.</em></p>
+<p>When working with larger datasets, the time needed to compute the hash increases from negligible (&lt;&lt; 1s) to noticeable (couple of seconds).
+Note that the time reported is 1/10th of the total time of running the hashing 10 times, to be able to measure more accurately.
+For larger compute loads that take 1 hour, it might not be a problem to have this overhead if a cache hit means that the job does not need to run.
+However, in practice, we still can do better.</p>
+<h2 id="approximate-hashers">Approximate Hashers</h2>
+<p>Many datasets do have metadata associated with it that can be used as an alternative to hashing the data itself.
+This metadata will remain the same if the data has not changed, and almost certainly changes if modified.
+Examples are <strong>Size</strong>, <strong>Modification date</strong> or <a href="https://en.wikipedia.org/wiki/HTTP_ETag"><strong>ETag</strong></a>.
+The user is responsible for selecting the most collision-resistant subset of metadata depending on the data generation
+process from the available metadata.
+Retrieving the metadata for a dataset requires constant time.</p>
+<table>
+<thead>
+<tr>
+<th>Records</th>
+<th>Full file hashing</th>
+<th>Fast approximate hashing</th>
+<th>Speedup Ratio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1 (402B)</td>
+<td>0.189ms</td>
+<td>0.017ms</td>
+<td>11x</td>
+</tr>
+<tr>
+<td>10 (3KB)</td>
+<td>0.292ms</td>
+<td>0.017ms</td>
+<td>17x</td>
+</tr>
+<tr>
+<td>100 (33KB)</td>
+<td>0.194ms</td>
+<td>0.016ms</td>
+<td>12x</td>
+</tr>
+<tr>
+<td>1.000 (329KB)</td>
+<td>0.400ms</td>
+<td>0.017ms</td>
+<td>23x</td>
+</tr>
+<tr>
+<td>10.000 (3.3MB)</td>
+<td>3.173ms</td>
+<td>0.018ms</td>
+<td>180x</td>
+</tr>
+<tr>
+<td>100.000 (32.8MB)</td>
+<td>24.368ms</td>
+<td>0.019ms</td>
+<td>1.313x</td>
+</tr>
+<tr>
+<td>1.000.000 (327.6MB)</td>
+<td>0.223s</td>
+<td>0.019ms</td>
+<td>11.924x</td>
+</tr>
+<tr>
+<td>10.000.000 (3.28GB)</td>
+<td>2.223s</td>
+<td>0.019ms</td>
+<td>114.626x</td>
+</tr>
+</tbody>
+</table>
+<p><em>Table 2: Comparison of SHA256 hashing of the full file and fast approximate hashing for various numbers of records. The reported time is the mean of 5 trials. Each trial consists of 10 repetitions, for which the average time is listed. The benchmark script can be found in <code>timing.py</code>.</em></p>
+<p>In the above table, we can see that the larger the dataset gets, the higher speedup ratio is.
+To create an <code>ApproximateHasher</code> in <code>pycodehash</code>, we only need to code the logic to obtain this metadata as a
+dictionary in the <code>collect_metadata</code> method, and the class does the rest.
+The hash of the metadata is invariant to the ordering of the keys.</p>
+<h2 id="supported-dataset-types">Supported Dataset types</h2>
+<p>The following approximate hashers are implemented at this time:</p>
+<table>
+<thead>
+<tr>
+<th><strong>Dataset Type</strong></th>
+<th><strong>Implemented Metadata</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/pycodehash/pycodehash/blob/main/src/pycodehash/datasets/local.py">Local Files</a></td>
+<td>File Size, Modification Date</td>
+</tr>
+<tr>
+<td><a href="https://github.com/pycodehash/pycodehash/blob/main/src/pycodehash/datasets/s3.py">Files on S3</a></td>
+<td>ETag</td>
+</tr>
+<tr>
+<td><a href="https://github.com/pycodehash/pycodehash/blob/main/src/pycodehash/datasets/hive.py">Hive Tables</a></td>
+<td>Size, Creation Date, Is Partitioned</td>
+</tr>
+<tr>
+<td><a href="https://github.com/pycodehash/pycodehash/blob/main/src/pycodehash/datasets/python.py">Python Files</a></td>
+<td>Magic, Size, Timestamp, Hash, Bit Field</td>
+</tr>
+</tbody>
+</table>
+<p>Feel free to open a Pull Request if you would like to contribute additional dataset types or metadata.</p>
+<h2 id="incremental-loads">Incremental loads</h2>
+<p>Many datasets consist of collections of objects, or subsets of data:</p>
+<ul>
+<li>Hive table partitions, e.g. data grouped per day or month</li>
+<li>Directories of images</li>
+</ul>
+<p>Hashing these datasets on the object level, allows for only recomputing the parts of the data that have changed.
+For these cases, <code>pycodehash</code> has the <code>PartitionedApproximateHasher</code> base class.
+It requires an <code>ApproximateHasher</code> and implements the <code>collect_partitions</code> method.
+Currently, there is an implementation of <code>LocalDirectoryHash</code> recursively collects the hashes for each file in that directory.
+Another implementation of the <code>PartitionedApproximateHasher</code> is <code>LocalFilesHash</code>, which operates on a list of files.</p>
+<p>The <code>PartitionedApproximateHasher</code> is an <code>ApproximateHasher</code> in itself, which means that the <code>compute_hash</code> method is supported.
+This hash is invariant to the ordering of the partitions.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../sql_queries/" class="btn btn-neutral float-left" title="SQL Queries"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../dependencies/" class="btn btn-neutral float-right" title="Python Dependencies">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../sql_queries/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../dependencies/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

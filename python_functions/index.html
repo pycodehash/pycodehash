@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://pycodehash.github.io/pycodehash/python_functions/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Python Functions - PyCodeHash Documentation</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Python Functions";
+        var mkdocs_page_input_path = "python_functions.md";
+        var mkdocs_page_url = "/pycodehash/python_functions/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> PyCodeHash Documentation
+        </a>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Introduction</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Detecting changes</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Python Functions</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#how-pycodehash-detects-code-changes">How pycodehash detects code changes</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#code-change-detection-guarantees">Code change detection guarantees</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#simplifying-hash-computation-with-pure-functions">Simplifying Hash Computation with Pure Functions</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#algorithm">Algorithm</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#1-package-initialization">1. Package initialization</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#2-abstract-syntax-tree">2. Abstract Syntax Tree</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#3-find-call-definitions">3. Find call definitions</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#4-strip-invariant-ast-changes">4. Strip invariant AST changes</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#5-unparse-ast-and-normalise">5. Unparse AST and normalise</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#6-hashing">6. Hashing</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#the-challenge-of-finding-call-definitions-in-python">The Challenge of Finding Call Definitions in Python</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#naive-approach-to-hashing">Naive approach to hashing</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#function-definition-variations">Function Definition Variations</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#function-definition-in-nested-scopes">Function Definition in Nested Scopes</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#dynamic-function-creation">Dynamic Function Creation</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#cant-we-use-pythons-built-in-hashing-functions">Cant we use Python's built-in hashing functions?</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#tips-for-writing-pure-functions">Tips for writing Pure Functions</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#how-to-make-functions-with-randomness-pure">How to make functions with randomness pure?</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#tools-for-enforcing-pureness">Tools for enforcing pureness</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#implementation-considerations">Implementation Considerations</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../sql_queries/">SQL Queries</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../datasets/">Datasets</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dependencies/">Python Dependencies</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">PyCodeHash Documentation</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Detecting changes</li>
+      <li class="breadcrumb-item active">Python Functions</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="detecting-code-changes-in-python-function">Detecting code changes in Python function</h1>
+<h2 id="how-pycodehash-detects-code-changes">How <code>pycodehash</code> detects code changes</h2>
+<p><code>pycodehash</code> attempts to accurately detect code modifications by focusing on the
+following aspects that reflect true changes to your implementation</p>
+<p><strong>Functional Changes</strong>:</p>
+<ul>
+<li><em>Implementation</em>: Changes to the underlying logic of your code,
+including new functionality or updates to existing behavior.</li>
+<li><em>Dependencies</em>: Modifications to the external libraries, frameworks,
+or modules upon which your code relies.</li>
+<li><em>Transitive Dependencies</em>: Updates to the dependencies of your
+dependencies, ensuring that <code>pycodehash</code> captures changes that may not be
+immediately apparent.</li>
+</ul>
+<p><strong>Ignored Non-Functional Changes</strong>:</p>
+<p>On the other hand, <code>pycodehash</code> intentionally ignores non-functional
+modifications that do not affect the actual behavior of your code. These
+include:</p>
+<ul>
+<li><em>Function Name</em>: Renaming functions or variables does not change their functionality.</li>
+<li><em>Formatting</em>: Code formatting changes, such as indentation or line wrapping, trailing commas, are disregarded.</li>
+<li><em>Comments and Docstrings</em>: Comments and documentation strings may be updated without affecting the code's execution.</li>
+<li><em>Type Hints</em>: Changes to type hints do not impact the code's behavior.</li>
+<li><em>Dead code elimination</em>: <a href="https://pylint.pycqa.org/en/latest/user_guide/messages/warning/unused-import.html">Unused imports</a>, <a href="https://pylint.readthedocs.io/en/stable/user_guide/messages/warning/unused-variable.html">unused variables</a>, unused arguments in formatting, <a href="https://pylint.pycqa.org/en/latest/user_guide/messages/warning/duplicate-key.html">duplicate dictionary keys</a></li>
+<li><em>Newer Python Syntax</em>: super calls, set literals, etc. See <a href="https://github.com/asottile/pyupgrade">pyupgrade</a> for details.</li>
+<li><em>Miscellaneous code style idiom and conventions</em>: <a href="https://github.com/adamchainz/flake8-comprehensions">simplified comprehensions</a>, <a href="https://github.com/MartinThoma/flake8-simplify/issues/40">dictionary key membership checks</a>, <a href="https://github.com/PyCQA/isort">import ordering</a>, <a href="https://pypi.org/project/flake8-return/">unnecessary return syntax</a>  </li>
+</ul>
+<p>By focusing on functional changes while ignoring non-functional
+modifications, <code>pycodehash</code> provides a reliable way to detect true changes
+in your code.</p>
+<p>See the two equivalent code snippets in the <a href="examples/equivalance/">Equivalence example</a> for examples of the non-functional changes listed below.</p>
+<h2 id="code-change-detection-guarantees">Code change detection guarantees</h2>
+<p>For code change detection: False positive matches are possible, but false negatives are not*.
+In other words, if the hash of two functions is equal, it's guaranteed there is no functional change.
+If the hashes are not equal, then it's likely, but not guaranteed that there is no functional change.
+These guarantees are analogous to that of the <a href="https://en.wikipedia.org/wiki/Bloom_filter">bloom filter</a> probabilistic data structure.</p>
+<ul>
+<li>Except for hash collisions that are caused by the choice of hashing algorithm, by default SHA512.</li>
+</ul>
+<h2 id="simplifying-hash-computation-with-pure-functions">Simplifying Hash Computation with Pure Functions</h2>
+<p>In the context of Python, implementing hash computations for arbitrary
+functions can be challenging due to the language's dynamic nature. To
+simplify this process and avoid having to implement a full Python
+execution module, we restrict hashing to <a href="https://en.wikipedia.org/wiki/Pure_function">pure functions</a>.</p>
+<p>In simple terms, a pure function is a function that:</p>
+<ul>
+<li>Always returns the same output given the same inputs</li>
+<li>Has no side effects</li>
+</ul>
+<p>Requiring Python functions to be pure is not a significant restriction,
+but rather a natural design principle. Pure functions are easier to test
+and have predictable behavior.</p>
+<h2 id="algorithm">Algorithm</h2>
+<p>Given a Python function as source code we:</p>
+<ol>
+<li>Initialize or load the function's package source</li>
+<li>Create an Abstract Syntax Tree (AST) for the provided function</li>
+<li><strong>Replace the name of called functions with the hash of the function definition</strong></li>
+<li>Remove invariant changes<ul>
+<li>AST: Strip docstrings and type hints, and remove the function name</li>
+<li>Unparse the AST to a string presentation</li>
+<li>Lines: Normalize whitespace</li>
+</ul>
+</li>
+<li>Unparse the AST and normalise</li>
+<li>Hash</li>
+</ol>
+<h3 id="1-package-initialization">1. Package initialization</h3>
+<p>PyCodeHash initializes a package when it's first encountered, e.g., in <code>from my_package.functions import func</code>, <code>my_package</code> would be the package.
+The initialization phase consists of:</p>
+<ul>
+<li>Copying the source to a temporary directory (enabled by default)</li>
+<li>Indexing the source via static object analysis on all python files (via <code>rope</code>)</li>
+<li>Brining the source in a canonical form where possible via auto-fixing lint violations (via <code>ruff</code>)</li>
+</ul>
+<h3 id="2-abstract-syntax-tree">2. Abstract Syntax Tree</h3>
+<p>The AST is parsed using Pythons <a href="https://docs.python.org/3/library/ast.html">standard library</a>.
+This step removed comments and normalises formatting.</p>
+<h3 id="3-find-call-definitions">3. Find call definitions</h3>
+<p>The inspiration for solving the dependency invariance comes from compilers/interpreters:</p>
+<blockquote>
+<p>Source code -&gt; ... -&gt; Interpreted/compiled -&gt; ... -&gt; Machine instructions</p>
+</blockquote>
+<p>Compilers often <em>inline</em> code to enable additional transformations.
+PyCodeHash applies the same concept.</p>
+<p>For example, in the following code:</p>
+<pre><code class="language-python">def multiply(y, z):
+    return y * z
+
+def shift_left(x):
+    return multiply(x, 2)
+</code></pre>
+<p>If we hash the source code of <code>shift_left</code>, then the hash is invariant to changes in multiply. This does not meet our desiderata.
+By inlining <code>multiply</code>, this is no longer true:</p>
+<pre><code class="language-python">def shift_left(x):
+    def multiply(y, z):
+        return y * z
+    return multiply(x, 2)
+</code></pre>
+<p>In our implementation, the function call is replaced with the hash of the source definition, rather than inlined:</p>
+<pre><code class="language-text">def shift_left(x):
+    return c_9e8c617fe2e0d524469d75f43edb1ff91f9a5387af6c444017ddcd194c983aed(x, 2) 
+</code></pre>
+<p>Note that the hash is prefixed with an <code>c_</code> (for call) to ensure syntactical validity.
+Hashes can start with digits, which makes the code snippet is no longer valid Python
+syntax due to the function name constraint: identifiers (such as function
+names) cannot start with digits. According to the <a href="https://docs.python.org/3/reference/lexical_analysis.html#identifiers">Python reference
+documentation</a>, this is a fundamental rule for Python's lexical analysis.
+Syntactical validity is required to be able to use tools that transform the code afterward.</p>
+<p>The implementation builds on <a href="https://github.com/python-rope/rope">rope</a>, an advanced open-source Python refactoring library.
+This package performs a lot of heavy lifting.
+See the section "The Challenge of Finding Call Definitions in Python" for details.</p>
+<h3 id="4-strip-invariant-ast-changes">4. Strip invariant AST changes</h3>
+<p>In this step, PyCodeHash transforms the AST to remove invariant syntax.
+For this we implemented multiple <code>NodeTransformers</code> that can be found in <code>src/pycodehash/preprocessing/</code>.</p>
+<h3 id="5-unparse-ast-and-normalise">5. Unparse AST and normalise</h3>
+<p>Then we unparse the AST representation to obtain the Python source code (without comments and formatting).</p>
+<p>On this string, we apply whitespace normalisation to ensure platform-independent hashes.</p>
+<h3 id="6-hashing">6. Hashing</h3>
+<p>Finally, the resulting source code is hashed using <code>hash_string</code>.
+The function uses the SHA256 algorithm provided by the <a href="https://docs.python.org/3/library/hashlib.html">standard library</a>.</p>
+<h2 id="the-challenge-of-finding-call-definitions-in-python">The Challenge of Finding Call Definitions in Python</h2>
+<p>Python's dynamic nature makes it difficult to find call definitions due to
+the various ways functions can be defined. This section highlights some
+examples that illustrate this challenge.</p>
+<h3 id="naive-approach-to-hashing">Naive approach to hashing</h3>
+<p>We can use the <code>inspect</code> module to get the source code of the
+function as a string, and then compute its hash.</p>
+<p>Here's an example:</p>
+<pre><code class="language-python">import inspect
+
+from pycodehash.hashing import hash_string
+
+def my_function(x):
+    return x * 2
+
+# Get the source code of the function as a string
+func_str = inspect.getsource(my_function)
+
+# Compute the hash value. Uses the stdlib `hashlib.sha256` underneath
+hash_value = hash_string(func_str)
+
+print(hash_value)
+</code></pre>
+<p>Please note that this approach has a serious limitation:</p>
+<p>It only works for functions with simple source code. If the function
+has a very long or complex implementation (e.g., due to many nested
+loops), computing its hash might be problematic.</p>
+<h3 id="function-definition-variations">Function Definition Variations</h3>
+<p>The following code snippets demonstrate different styles of function
+definition:</p>
+<pre><code class="language-python">data = [1, 2, 3, 4, 5]
+
+# Built-in function call (no explicit definition)
+sum(data)
+
+# Explicit function definition
+def sum(x):
+    return x + [6, 7, 8, 9]
+
+sum(data)
+
+from stats import sum
+
+# Importing a function from another module
+sum(data)
+</code></pre>
+<h3 id="function-definition-in-nested-scopes">Function Definition in Nested Scopes</h3>
+<p>Functions can be defined within other functions or modules, leading to
+nested scopes. For example:</p>
+<pre><code class="language-python">def processing(y):
+    # Import alias within local scope
+    from another.lib import multiply as sum
+
+    sum(y)
+
+    # Enclosing scope function definition
+    def sum(z):
+        return z * 2
+
+    sum(y)
+</code></pre>
+<h3 id="dynamic-function-creation">Dynamic Function Creation</h3>
+<p>Functions can also be created dynamically using closures. For instance:</p>
+<pre><code class="language-python">def create_func(y):
+    def func(x):
+        return x + y
+
+    return func
+
+sum = create_func(3)
+sum(data)
+</code></pre>
+<p>Understanding these variations is crucial for effectively resolving call
+definitions in Python.</p>
+<p>Read more about the <a href="https://realpython.com/python-scope-legb-rule/#using-the-legb-rule-for-python-scope">LEGB Rule for Python Scope</a> to better grasp how scope and naming work in Python.</p>
+<h2 id="cant-we-use-pythons-built-in-hashing-functions">Cant we use Python's built-in hashing functions?</h2>
+<p>In Python, there is the built-in <code>hash()</code> function or the <code>__hash__</code>
+method in classes to compute a hash value for an object, which is an
+integer that represents the "identity" of the object being hashed.
+When you call <code>hash()</code> on an
+object, it computes the hash value on-the-fly using the object's
+attributes and methods.
+The built-in <code>hash()</code> function in Python cannot be used
+to reliably compare if the content of a function has changed because
+even if two functions have the same source code, there's no guarantee
+that their hash values will remain stable across different runs of your program or in different environments.</p>
+<p>Python also has a built-in library to "hash" your functions, namely <a href="https://docs.python.org/3/library/hashlib.html">hashlib</a>,
+which provides secure and efficient hashing algorithms. The <a href="https://cryptography.io/en/latest/">cryptography</a> package
+is an example of a third-party packages that also offers such cryptographic algorithms.
+However, these libraries are designed for general-purpose hashing, not specifically for
+computing hashes of Python functions.</p>
+<h2 id="tips-for-writing-pure-functions">Tips for writing Pure Functions</h2>
+<h3 id="how-to-make-functions-with-randomness-pure">How to make functions with randomness pure?</h3>
+<p>To make functions with randomness pure, pass the seed value or random number generator object as an argument.</p>
+<p>For instance:</p>
+<pre><code class="language-python">import numpy as np
+
+def my_random_function(seed: int) -&gt; int:
+    &quot;&quot;&quot;A function that generates a random number between 1 and 10.
+
+    Args:
+        seed: The seed value for the random number generator.
+
+    Returns:
+        A random number between 1 and 10.
+    &quot;&quot;&quot;
+    rng = np.random.default_rng(seed)
+    return rng.integers(1, 10)
+
+# Usage example:
+print(my_random_function(42))  # Always generates the same output (if seeded correctly)
+</code></pre>
+<p>This way, you can control the sequence of random numbers generated by the
+RNG and make your function's output deterministic.</p>
+<h3 id="tools-for-enforcing-pureness">Tools for enforcing pureness</h3>
+<p>In modern software engineering practices, lints like <a href="https://github.com/best-doctor/mr_proper">mr-proper</a> can aid
+in identifying and enforcing the purity of functions, making it a more
+maintainable and efficient development process.</p>
+<h2 id="implementation-considerations">Implementation Considerations</h2>
+<p>To maximize development efficiency and minimize long-term maintenance burdens, this library uses established third-party libraries rather than implementing similar functionality from scratch.
+Hence, PyCodeHash is built on top of <code>rope</code> (for call tracing) and <code>ruff</code> (for applying a multitude of invariant changes).
+The current implementation in addition uses the <code>asttokens</code> package to map AST nodes to their offset in the Python source code, which is required to interact with <a href="https://github.com/python-rope/rope">rope</a>.
+This results in an effective library that can be used today.</p>
+<p>This approach does come with some trade-offs, however.
+By relying on external libraries, we sacrifice access to internal state from these programs, such as the control-flow graph that may be useful for more highly optimized or specialized functionality.
+Users who already have access to their own control-flow graphs may find it more beneficial to implement equivalent functionality directly within their own systems.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href=".." class="btn btn-neutral float-left" title="Introduction"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../sql_queries/" class="btn btn-neutral float-right" title="SQL Queries">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href=".." style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../sql_queries/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

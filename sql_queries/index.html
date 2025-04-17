@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://pycodehash.github.io/pycodehash/sql_queries/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>SQL Queries - PyCodeHash Documentation</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "SQL Queries";
+        var mkdocs_page_input_path = "sql_queries.md";
+        var mkdocs_page_url = "/pycodehash/sql_queries/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> PyCodeHash Documentation
+        </a>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Introduction</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Detecting changes</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../python_functions/">Python Functions</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">SQL Queries</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#hashing-sql-queries-and-files">Hashing SQL queries and files</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#usage-examples">Usage examples</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#hashing-sql-files-and-queries">Hashing SQL files and queries</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#hashing-files-in-git-history">Hashing files in git history</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#sql-query-dependencies">SQL query dependencies</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../datasets/">Datasets</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dependencies/">Python Dependencies</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">PyCodeHash Documentation</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Detecting changes</li>
+      <li class="breadcrumb-item active">SQL Queries</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="detecting-changes-in-sql">Detecting changes in SQL</h1>
+<p><em>Functionality described on this page requires installation via <code>pip install pycodehash[sql]</code></em></p>
+<p>The same principle holds for SQL as for Python functions: the hash of an SQL query should reflect changes of the implementation and be invariant to non-functional changes.</p>
+<h2 id="hashing-sql-queries-and-files">Hashing SQL queries and files</h2>
+<p>PyCodeHash supports hashing SQL queries and files.</p>
+<p>Currently, our default implementation is invariant to omitting database names, comments, and whitespace, e.g.</p>
+<pre><code class="language-sql">/* block comment: set `my_database` as the default database */
+USE my_database;
+
+SELECT 
+    -- inline comment: select all columns
+    * 
+FROM 
+    hello_world
+</code></pre>
+<p>is equivalent to</p>
+<pre><code class="language-sql">USE my_database;
+SELECT * FROM my_database.hello_world
+</code></pre>
+<p>This behavior can be extended with user-provided Abstract Syntax Tree (AST) transformers.</p>
+<p>The AST parsing from the excellent <a href="https://docs.sqlfluff.com/en/stable/index.html">SQLFluff</a> library is used in our implementation.</p>
+<p>This results in many dialects of SQL being <a href="https://docs.sqlfluff.com/en/stable/dialects.html">supported</a> out of the box, e.g.:</p>
+<ul>
+<li>ANSI</li>
+<li>BigQuery</li>
+<li>PostgreSQL</li>
+<li>SparkSQL</li>
+<li>SQLite</li>
+<li>T-SQL (MSSQL)</li>
+<li>Trino</li>
+</ul>
+<p>The <code>SQLHasher</code> allows for passing on configuration to <a href="https://docs.sqlfluff.com/en/stable/index.html">SQLFluff</a> via <a href="https://docs.sqlfluff.com/en/stable/configuration.html">configuration files</a>.</p>
+<h2 id="usage-examples">Usage examples</h2>
+<h3 id="hashing-sql-files-and-queries">Hashing SQL files and queries</h3>
+<p>The <a href="https://github.com/pycodehash/pycodehash/blob/main/example_sql.py">SQL Usage Example</a> demonstrates how to hash SQL queries and files:</p>
+<pre><code class="language-python">&quot;&quot;&quot;Hash SQL queries and files (requires `sqlfluff` to be installed)&quot;&quot;&quot;
+
+from pathlib import Path
+
+from pycodehash.sql.sql_hasher import SQLHasher
+
+# First query
+query_1 = &quot;SELECT * FROM db.templates&quot;
+
+# The second query is equivalent, but has additional whitespace
+query_2 = &quot;SELECT\n    * \nFROM \n    db.templates&quot;
+
+# Write the second query to a file
+query_2_file = Path(&quot;/tmp/query.sql&quot;)
+query_2_file.write_text(query_2)
+
+# Create the SQLHasher object for SparkSQL
+hasher = SQLHasher(dialect=&quot;sparksql&quot;)
+
+# We can hash a string
+result_1 = hasher.hash_query(query_1)
+print(result_1)
+
+# Or pass a path
+result_2 = hasher.hash_file(query_2_file)
+print(result_2)
+
+# Both hashes are identical
+assert result_1 == result_2
+</code></pre>
+<h3 id="hashing-files-in-git-history">Hashing files in git history</h3>
+<p>Below is a more advanced example for checking if there was a behavioural change in a <a href="https://github.com/pycodehash/pycodehash/blob/main/example_sql_git.py">SQL file in a specific git commit</a>:</p>
+<pre><code class="language-python">import subprocess
+from typing import Literal
+
+import sqlfluff
+from pycodehash.sql.sql_hasher import SQLHasher
+
+
+def git_show_file(commit_id: str, file_name: str) -&gt; str:
+    &quot;&quot;&quot;Get the contents of a file at a specific commit via `git show`
+
+    Args:
+        commit_id: the commit SHA ID
+        file_name: the name of the file
+
+    Returns:
+        string containing the contents of the file in git
+
+    Raises:
+        CalledProcessError: when the git command fails, e.g. when the file does not exist
+    &quot;&quot;&quot;
+    result = subprocess.run(
+        [&quot;git&quot;, &quot;--no-pager&quot;, &quot;show&quot;, f&quot;{commit_id}:{file_name}&quot;], stdout=subprocess.PIPE, encoding=&quot;utf-8&quot;, check=False
+    )
+    result.check_returncode()
+    return result.stdout
+
+
+def detect_file_change(
+    hasher: SQLHasher, commit_id: str, file_name: str
+) -&gt; Literal[&quot;FUNCTIONAL&quot;, &quot;NON-FUNCTIONAL&quot;, &quot;INVALID&quot;]:
+    &quot;&quot;&quot;Compares the hashes of versions of the same file in git
+
+    Args:
+        hasher: the SQL hasher object
+        commit_id: the reference to the commit
+        file_name: the name of the SQL file
+
+    Returns:
+        FUNCTIONAL if the code changed functionally
+        NON-FUNCTIONAL, if the code did not change functionally, e.g. whitespace
+        INVALID, if the file did not exist or the SQL could not be parsed
+    &quot;&quot;&quot;
+    try:
+        after = git_show_file(commit_id, file_name)
+    except subprocess.CalledProcessError:
+        # deleted file
+        return &quot;INVALID&quot;
+
+    try:
+        before = git_show_file(f&quot;{commit_id}^&quot;, file_name)
+    except subprocess.CalledProcessError:
+        # newly created file
+        return &quot;FUNCTIONAL&quot;
+
+    try:
+        before_hash = hasher.hash_query(before)
+        after_hash = hasher.hash_query(after)
+    except sqlfluff.api.simple.APIParsingError:
+        return &quot;INVALID&quot;
+    return &quot;FUNCTIONAL&quot; if before_hash != after_hash else &quot;NON-FUNCTIONAL&quot;
+
+
+hasher = SQLHasher(dialect=&quot;sparksql&quot;)
+change_type = detect_file_change(hasher, &quot;&lt;COMMIT_ID&gt;&quot;, &quot;&lt;FILE_NAME&gt;&quot;)
+if change_type == &quot;FUNCTIONAL&quot;:
+    print(&quot;The SQL query should be executed after this commit&quot;)
+elif change_type == &quot;NON-FUNCTIONAL&quot;:
+    print(&quot;The SQL query does not have to be executed after this commit&quot;)
+else:
+    print(&quot;The query file is invalid before or after the commit (e.g. syntax error or deleted)&quot;)
+</code></pre>
+<h2 id="sql-query-dependencies">SQL query dependencies</h2>
+<p>In real-world applications, engineers and analysts typically structure
+multiple SQL queries in separate files that are executed sequentially or according to a topological order.
+This is often achieved using data transformation frameworks like <a href="https://github.com/dbt-labs/dbt-core">dbt</a>,
+<a href="https://github.com/TobikoData/sqlmesh">SQLMesh</a> , or similar commercial products.</p>
+<p>In such scenarios, simply relying on the hash of individual SQL files is
+insufficient. When a referenced table in a query is updated, the query
+must be re-executed, regardless of whether the query's contents have
+changed. To address this, we can automatically extract table references by
+parsing the SQL Abstract Syntax Tree (AST).</p>
+<p>This approach is straightforward, as table references are limited to
+specific contexts like <code>CREATE</code>, <code>FROM</code>, <code>INTO</code> and <a href="https://en.wikipedia.org/wiki/Hierarchical_and_recursive_queries_in_SQL#Common_table_expression">Common Table Expressions</a>
+(CTEs). We've chosen to integrate with existing efforts, leveraging the
+<a href="https://github.com/reata/sqllineage">SQLLineage</a> implementation built on top of <a href="https://docs.sqlfluff.com/en/stable/index.html">SQLFluff</a>, to prevent duplication
+of effort.</p>
+<p>Usage:</p>
+<pre><code class="language-python">from pycodehash.sql import extract_table_references
+
+query = &quot;SELECT * INTO output_table FROM my_database.input_table&quot;
+
+input_tables, output_tables, dropped_tables = extract_table_references(
+    query, 
+    default_db=&quot;my_database&quot;, 
+    dialect=&quot;t-sql&quot;
+)
+print(input_tables)
+# {'my_database.input_table'}
+print(output_tables)
+# {'my_database.output_table'}
+print(dropped_tables)
+# {}
+</code></pre>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../python_functions/" class="btn btn-neutral float-left" title="Python Functions"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../datasets/" class="btn btn-neutral float-right" title="Datasets">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../python_functions/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../datasets/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
